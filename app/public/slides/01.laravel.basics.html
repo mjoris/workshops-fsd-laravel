@@ -1,0 +1,1112 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>W&amp;M Full-stack – Laravel course materials</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section data-background="#b5533c" >
+            <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
+            <h1>01. Laravel Basics</h1>
+        </section>
+
+
+        <!-- Getting started with Laravel -->
+        <section>
+            <section>
+                <h2>01.1<br>Getting started with Laravel</h2>
+            </section>
+
+            <section>
+                <h2>Frameworks</h2>
+                <ul>
+                    <li>
+                        Framework &gt; Library
+                        <ul>
+                            <li>Defines a structure to follow</li>
+                            <li>Your project must follow that structure</li>
+                            </li>
+                            <li>Internally, a framework will most likely contain/use a library</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        PHP frameworks are
+                        <ul>
+                            <li>assisting you in <strong>general</strong> web application development</li>
+                            <li>providing libraries for commonly used functions</li>
+                            <li>cutting down the number of lines of repetitive code</li>
+                            <li>speeding up the development process</li>
+                            <li>resulting in more standardized hence more stable and secure code</li>
+                            <li>often MVC</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>2 Types of Frameworks</h2>
+                <ul>
+                    <li>Microframework
+                        <ul>
+                            <li>Light-weight, extensible, fast</li>
+                            <li>Typically: a <em>router</em> connected to an extensible skeleton (where you need to plug and install other services) </li>
+                            <li>Examples: <a href="https://www.slimframework.com/">Slim</a>, <a href="https://silex.symfony.com/">Silex</a>, <a
+                                href="https://lumen.laravel.com/">Lumen</a>, Flight</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">Full-featured frameworks
+                        <ul>
+                            <li>Typically: a full-stack (enterprise) MVC framework supporting templating, caching, ORM, security, authentication, forms, &hellip; </li>
+                            <li>Examples: <a href="https://symfony.com/">Symfony</a>, <a
+                                href="https://laravel.com/">Laravel</a>, Zend, Nette, CodeIgniter, YII, PHPixie  </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section data-background="assets/01/laravelbg.jpg">
+            </section>
+
+            <section>
+                <h2>Laravel</h2>
+                <ul>
+                    <li>Full-featured PHP Framework for the development of web applications and web APIs
+                        <ul>
+                            <li>Model–View–Controller (MVC) pattern</li>
+                            <li>
+                                A <strong>huge</strong> number of built-in features
+                                <ul>
+                                    <li>Routing</li>
+                                    <li>Views and Template engine</li>
+                                    <li>DB-related: ORM, Query Builder, Migrations, &hellip;</li>
+                                    <li>Simple authentication</li>
+                                    <li>Queues, Logging, &hellip;</li>
+                                </ul>
+                            </li>
+                            <li>Emphasis on <em>beautiful code</em> (through syntactic sugar)</li>
+                            <li>Artisan CLI
+                                <ul>
+                                    <li>Example usages: generate classes, clear cache</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Installation (1)</h2>
+                <ul>
+                    <li>
+                        Installable via Composer
+                        <pre class="bigger"><code class="hljs bash">$ composer create-project laravel/laravel projectname ^8.0</code></pre>
+                        <ul>
+                            <li>Version is optional - beware though: 6.x and 7.x are backwards compatible (5.x is not)</li>
+                            <li><a href="https://getcomposer.org/doc/03-cli.md#create-project">Composer docs</a>: <code>composer create-project</code> is the equivalent of doing a <code>git clone</code> followed by a <code>composer install</code> of the vendors.</li>
+                            <li>In other words:
+                                <ul>
+                                    <li>It downloads the whole project structure including folders, PHP-files, an <code>.htaccess</code> file and a rather complex <code>composer.json</code> file. </li>
+                                    <li>Next, all dependencies are installed in the <code>vendor</code> folder and <code>composer.lock</code> is generated.</li>
+                                    <li>So: <strong>you start with an already <em>working</em> project</strong></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </section>
+
+            <section>
+                <h2>Installation (2)</h2>
+                <ul>
+                    <li>
+                        If you prefer <em>beautiful</em> commands such as <code>laravel new projectname</code>, you need to check <a href="https://laravel.com/docs/8.x#installing-laravel">Laravel Installer</a> (install via Composer)
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2><small>(Already installed)</small> <a href="https://laravel.com/docs/8.x/structure">project structure</a> (1)</h2>
+                <ul style="font-size: 75%">
+                    <li>
+                        <code>public/</code> &mdash; Public files
+                        <ul>
+                            <li>the document root of your web server points to this folder!</li>
+                            <li><code class="special">index.php</code> &mdash; Request Entry Point</li>
+                            <li>add your assets: <code>css/</code> <span style="font-size: 70%">&amp;</span> <code>js/</code> <span style="font-size: 70%">&amp;</span> <code>img/</code> <span style="font-size: 70%">&amp;</span> <code>files/</code> <span style="font-size: 70%">&amp;</span> &hellip;</li>
+                            <li><code>.htaccess</code> (<a href="03.url.design.html#/2">or the like</a>)</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <code>routes/</code> &mdash; Routes
+                        <ul>
+                            <li><code class="special">api.php</code> &mdash; Your API routes</li>
+                            <li><code class="special">console.php</code> &mdash; Your Artisan console routes</li>
+                            <li><code class="special">web.php</code> &mdash; Your web routes</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <code>app/</code> &mdash; <a href="http://www.php-fig.org/psr/psr-4/">PSR-4</a> classes of your application &mdash; 4&hellip;12 <a href="https://laravel.com/docs/8.x/structure#the-app-directory">subfolders</a> e.g.
+                        <ul>
+                            <li><code>Console/</code> &mdash; Your Artisan commands</li>
+                            <li><code>Http/</code> &mdash; Your controllers and middleware</li>
+                            <li>You create the classes with Artisan, which might add subfolders</li>
+                        </ul>
+
+                    </li>
+
+
+                </ul>
+                <footer><em>Note: Make sure only the contents of <code>public/</code> are accessible over HTTP(s)!</em></footer>
+            </section>
+
+            <section>
+                <h2><small>(Already installed)</small> <a href="https://laravel.com/docs/8.x/structure">project structure</a> (2)</h2>
+                <ul style="font-size: 70%">
+                    <li>
+                        <code>bootstrap/</code> &mdash; Bootstrap and autoloading
+                    </li>
+                    <li>
+                        <code>config/</code> &mdash; Configuration files
+                    </li>
+                    <li>
+                        <code>database/</code> &mdash; Database migration and seeds
+                    </li>
+                    <li>
+                        <code>resources/</code> &mdash; Raw assets (to be compiled) such as templates and localization files
+                    </li>
+                    <li>
+                        <code>storage/</code> &mdash; All kinds of generated files: logs, transpiled templates, caches, &hellip;
+                    </li>
+                    <li>
+                        <code>tests/</code> &mdash; Automated tests (PHPUnit)
+                    </li>
+                    <li>
+                        <code>vendor/</code> &mdash; <em>(as created by Composer)</em>
+                    </li>
+                    <li>
+                        <code>.env</code> &mdash; Environment configuration: see next slides
+                    </li>
+                    <li>
+                        <code>.gitignore</code> &mdash; <em>(already configured)</em>
+                    </li>
+                    <li>
+                        <code>artisan</code> &mdash; supports Artisan CLI
+                    </li>
+                    <li>
+                        <code>composer.json</code> <span style="font-size: 70%">&amp;</span> <code>composer.lock</code>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>The Request Lifecycle <small>how Laravel works</small></h2>
+                <ul>
+                    <li>Webserver hands over the request to <code>public/index.php</code></li>
+                    <li>It loads Composer's autoloader</li>
+                    <li>It retrieves an instance of the application <a href="https://laravel.com/docs/8.x/container">service container</a> from the <code>bootstrap/app.php</code> script</li>
+                    <li>Next, the request is handled by the <strong>HTTP Kernel</strong>
+                        <ul>
+                            <li>Bootstrapping includes calling <code>register</code> and <code>boot</code> on the
+                                <a href="https://laravel.com/docs/8.x/providers">service providers</a> defined in <code>config/app.php</code></li>
+                            <li>Request passes the middleware e.g. session handling, CSRF token</li>
+                            <li>Next, the request is dispatched to the router</li>
+                        </ul>
+
+                    </li>
+                </ul>
+                <footer><em>Read more on <a href="https://laravel.com/docs/8.x/providers">Laravel Service Providers</a></em></footer>
+            </section>
+
+            <section>
+                <h2>Artisan Console</h2>
+                <ul>
+                    <li>
+                        Functions: clear caches, generate classes, &hellip;
+                    </li>
+                    <li>
+                        Available commands and help
+                        <pre class="bigger"><code class="hljs bash">$ php artisan list</code></pre>
+                    </li>
+                    </li>
+                    <li>
+                        Help on a specific command
+                        <pre class="bigger"><code class="hljs bash">$ php artisan help serve</code></pre>
+                    </li>
+                    </li>
+                    <li>
+                        Host project on PHP's built-in development server
+                        <pre class="bigger"><code class="hljs bash">$ php artisan serve --port=8080</code></pre>
+                    </li>
+                    </li>
+                    <li>
+                        You can <a href="https://laravel.com/docs/8.x/artisan">extend Artisan with your own commands</a>
+                    </li>
+
+
+                </ul>
+                <footer><em>Driven by Symfony Console</em></footer>
+            </section>
+
+            <section>
+                <h2>Need help?!</h2>
+                <ul>
+                    <li>
+                        Docs: <a href="https://laravel.com/docs/8.x/">https://laravel.com/docs/8.x/</a>
+                    </li>
+                    <li>
+                        API: <a href="https://laravel.com/api/8.x/">https://laravel.com/api/8.x/</a>
+                    </li>
+
+                    <li>
+                        Replace the version number by <code>master</code> in the URLs for the most recent Laravel version
+                    </li>
+                    <li>
+                        Don't use the docs of old Laravel versions (!). A lot has changed.
+                    </li>
+
+                </ul>
+            </section>
+        </section>
+
+
+        <!-- Configuration -->
+        <section>
+            <section>
+                <h2>01.2<br>Configuration</h2>
+            </section>
+
+            <section>
+                <h2>Next step: configuration (1)</h2>
+                <ul>
+                    <li>
+                        Directory permissions
+                        <ul>
+                            <li><code>storage/</code> and <code>bootstrap/cache</code> writable by web server (associated account)</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Application key (= IMPORTANT)
+                        <ul>
+                            <li>a random and secret key, used for session security and encryption</li>
+                            <li>location: <code>.env</code> environment file</li>
+                            <li>assigned for you by the Composer/Laravel installer (not when you copied the project or alike)</li>
+                            <li>if necessary, generate with
+                                <pre class="bigger"><code class="hljs bash">$ php artisan key:generate</code></pre></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Next step: configuration (2)</h2>
+                <ul>
+                    <li>
+                        Additional configuration
+                        <ul>
+                            <li>
+                                <code>config/app.php</code> &mdash; Main settings, locale, timezone, automatically loaded service providers, &hellip;
+                            </li>
+                            <li>
+                                <code>config/database.php</code> &mdash; Database connection configurations
+                            </li>
+                            <li>
+                                11 other config files e.g. <code>config/cache.php</code>, <code>config/session.php</code>, &hellip;
+                            </li>
+                            <li>
+                                format: one big (nested) array of key-value pairs of settings e.g. <pre class="bigger"><code class="hljs php">'charset' => 'utf8mb4',</code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>CAUTION: the <a href="https://laravel.com/docs/8.x/helpers#method-env">env()</a> function</h2>
+                <ul>
+                    <li>
+                        Including environment variables in the <code>config/*.php</code> files
+                        <ul>
+                            <li>
+                                the <a href="https://laravel.com/docs/8.x/helpers#method-env">env()</a> function gets the value of an environment variable or returns a default value
+                                <ul>
+                                    <li>
+                                        Example without default value from <code>config/app.php</code>: <pre class="bigger"><code class="hljs php">'key' => env('APP_KEY'),</code></pre>
+                                    </li>
+                                    <li>
+                                        Example with default value from <code>config/database.php</code>: <pre class="bigger"><code class="hljs php">'password' => env('DB_PASSWORD', 'Azerty123'),</code></pre>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                Environment variables must/can be set in the <code>.env</code> file e.g. <pre class="bigger"><code>APP_KEY=base64:DBHbcyBbq0pBarhWVn0S8bYMqt9IV9EhXhthcyeioKw=
+DB_PASSWORD=secret</code></pre>
+                            </li>
+                            <li>This is the mechanism behind the <a href="https://laravel.com/docs/8.x/configuration#environment-configuration">Environment Configuration</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>The Environment Configuration</h2>
+                <ul>
+                    <li>
+                        Principles
+                        <ul>
+                            <li><strong>Idea:</strong> local/dev and production configurations may be different such as personal keys, Facebook Dev Credentials, e-mail component.</li>
+                            <li><strong>Mechanism:</strong> the <code>.env</code> file must/can be used to override settings in the <em>real config files</em><br/></li>
+                        </ul>
+                    </li>
+                    <li>
+                        How to use
+                        <ul>
+                            <li>Put your production configuration in <code>config/*.php</code></li>
+                            <li>Override parts of it with local settings in <code>.env</code></li>
+                            <li>In most cases: keep <code>.env</code> out of version control (git &rarr; <code>.gitignore</code>). It's private. <br/> </li>
+                        </ul>
+                    </li>
+                </ul>
+                <footer style="line-height: 1.5;"><em>Note: the application key is always in <code>.env</code></em><br><em>Note: alternative local configurations like <code>.env.testing</code> can be used by PHPUnit</em></footer>
+            </section>
+
+            <section>
+                <h2>Example: database config (1) </h2>
+                <small><code>config/database.php</code></small>
+                <pre class="bigger"><code class="hljs php">&lt;?php
+
+return [
+    &hellip;
+    'default' => env('DB_CONNECTION', 'mysql'),
+
+    'connections' => [
+        'sqlite' => [
+            &hellip;
+        ],
+
+        'mysql' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', 'db009.my-hosting-company.be'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'events'),
+            'username' => env('DB_USERNAME', 'production'),
+            'password' => env('DB_PASSWORD', 'Azerty123'),
+            'charset' => 'utf8mb4',
+			&hellip;</code></pre>
+            </section>
+            <section>
+                <h2>Example: database config (2) </h2>
+                <small><code>.env</code></small>
+                <pre class="bigger"><code>APP_NAME=Concert Guide
+APP_ENV=local
+APP_KEY=base64:WB2aLCAIUgFJCZbbg/KIA6M4Hum1bsz/s+o8hxbeW68=
+APP_DEBUG=true
+APP_URL=http://localhost
+
+LOG_CHANNEL=stack
+
+DB_CONNECTION=sqlite</code></pre>
+                <ul>
+                    <li>
+                        You can ...
+                        <ul>
+                            <li>also override parts of the connection config (e.g. just the encoding or password)</li>
+                            <li>abandon the <code>DB_CONNECTION=sqlite</code> if you agree with the default connection in <code>config/database.php</code> </li>
+                        </ul>
+                    </li>
+                    <li>
+                        but you cannot delete <code>.env</code>
+                    </li>
+                </ul>
+            </section>
+
+        </section>
+
+
+        <!-- Laravel Routing -->
+        <section>
+            <section>
+                <h2>01.3<br>Laravel Routing</h2>
+                <!--p style="font-size: 75%; line-height: 100%;">Note: the next slides are illustrated in this demo: <code>assets/ws2-sws-fiddles-laravel/00.basics/</code> (<code>composer install</code> required) <a href="assets/ws2-sws-fiddles-laravel/00.basics/">&rarr;</a> <br/><span style="font-size: 50%; line-height: 100%;">It includes basic examples of routing, views, Blade templates, Raw Queries, Query Builder and Eloquent.</span></p-->
+            </section>
+
+            <section>
+                <h2>Routing</h2>
+                <ul>
+                    <li>
+                        The routes of your web app are defined in <code>routes/web.php</code>
+                    </li>
+                    <li>
+                        What's a route?
+                        <ul>
+                            <li>A route is a combination of a <strong>pattern</strong> and an <strong>HTTP method</strong></li>
+                            <li>A route is handled by a <strong>handling function</strong> which returns/does x/y</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em">
+                        <a href="https://laravel.com/docs/8.x/routing#basic-routing">Router methods</a> very similar to bramus/router
+                    </li>
+                    <li>
+                        Router method available for any HTTP verb (get, post, put, ...)
+                        <pre class="bigger"><code class="hljs php">Route::get('foo', function () {
+    return 'Hello World';
+});</code></pre>
+                    </li>
+                </ul>
+                <footer style="line-height: 1"><em>Note: only GET and POST are <a href="https://softwareengineering.stackexchange.com/questions/114156/why-are-there-are-no-put-and-delete-methods-on-html-forms#answer-211790">allowed</a> in plain web forms</em></footer>
+            </section>
+
+            <section>
+                <h2>Example</h2>
+                <pre class="bigger"><code class="hljs php">Route::get('/', function () {
+	// show something (e.g. return a blob of HTML)
+});
+
+Route::get('/about', function () {
+	// show something else (e.g. return a blob of HTML)
+});
+
+Route::post('/', function () {
+	// do something (e.g. insert into database, send e-mail)
+});
+</code></pre>
+                <footer style="line-height: 1"><em>Note: POST requests are only accepted when a <a
+                    href="https://laravel.com/docs/8.x/csrf">CSRF</a> token is included in the request - we'll talk about that later on </em></footer>
+            </section>
+
+            <section>
+                <h2>HTTP method combinations</h2>
+                <ul>
+                    <li style="margin-top: 1em">
+                        HTTP verb combinations
+                        <pre class="bigger"><code class="hljs php">Route::match(['get', 'post'], '/', function () { &hellip;
+
+Route::any('foo', function () { &hellip;</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+
+            <section>
+                <h2>Dynamic Routing</h2>
+                <ul>
+                    <li>
+                        Working with <a href="https://laravel.com/docs/8.x/routing#route-parameters">Route
+                        parameters</a>
+                        <ul>
+                            <li>The parameters will be passed into your route's Closure</li>
+                        </ul>
+                        <pre class="bigger"><code class="hljs php">Route::get('posts/{post}/comments/{comment}', function ($postId, $commentId) {
+    return 'Post ' . $postId;
+});</code></pre>
+                    </li>
+                    <li>
+                        Optional parameters</a>
+                        <pre class="bigger"><code class="hljs php">Route::get('user/{name?}', function ($name = 'John') {
+    return $name;
+});</code></pre>
+                    </li>
+                </ul>
+                <footer><em>Important: in these examples we do not prevent XSS</em></footer>
+            </section>
+
+            <section>
+                <h2>Regex constraints</h2>
+                <ul>
+                    <li>
+                        Constrain parameters using the <code>where</code> method
+                        <pre class="bigger"><code class="hljs php">Route::get('user/{id}/{name}', function ($id, $name) {
+    //
+})
+->where(['id' => '[0-9]+', 'name' => '[a-zA-Z]+']);</code></pre>
+                    </li>
+                    <li>You can add <a href="https://laravel.com/docs/8.x/routing#parameters-regular-expression-constraints">global constraints</a> too
+                        <ul>
+                            <li>For example: for each <em>id</em> parameter in a dynamic route</li>
+                            <li>Location: boot method of your RouteServiceProvider (typically <code>app/Providers/RouteServiceProvider.php</code>)</li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </section>
+
+
+            <section>
+                <h2>The HTTP Request (1)</h2>
+
+                <ul>
+                    <li>
+                        The <a href="https://laravel.com/docs/8.x/requests">HTTP Request</a>
+                        <ul>
+                            <li>is an instance of <code>Illuminate\Http\Request</code></li>
+                            <li>is typically obtained in your code by type hinting:
+                                <pre class="bigger"><code class="hljs php">use Illuminate\Http\Request;
+
+Route::post('register', function(Request $request) {
+	$email = $request-&gt;input('email', 'not provided');
+	$name = $request-&gt;cookie('name');
+	$iKnowItsTrue = $request-&gt;isMethod('post');
+	if ($request-&gt;has('name')) {
+    &hellip;
+});</code></pre>
+                            </li>
+                            <li>the input method handles any type of input parameter: POST parameters, GET parameters, ... and even JSON input (if the Content-Type is set properly)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>The HTTP Request (2)</h2>
+
+                <ul>
+                    <li>
+                        The <a href="https://laravel.com/docs/8.x/requests">HTTP Request</a>
+                        <ul>
+                            <li>use a <code>.</code> to dig into arrays (whether JSON or not)</li>
+                            <pre class="bigger"><code class="hljs php">$name = $request-&gt;input('products.0.name');
+$names = $request-&gt;input('products.*.name');	</code></pre>
+                            </li>
+                            <li>dynamic properties
+                                <pre class="bigger"><code class="hljs php">$name = $request-&gt;name; // same as: $request&gt;input('name');</code></pre>
+                            </li>
+                            <li>handling file uploads
+                                <pre class="bigger"><code class="hljs php">if ($request->hasFile('additional_documents')) {
+    $files = $request->file('additional_documents');
+    foreach ($files as $file) {
+        $file->store('users/' . $userId . '/docs'); // folder relative to Filesystem root
+        // want to specify file name? $file->storeAs()
+    }
+}</code></pre>
+                            </li>
+                            <li>Want more? <a href="https://laravel.com/api/8.x/Illuminate/Http/Request.html">Request API</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>The HTTP Response (1)</h2>
+
+                <ul>
+                    <li>
+                        The <a href="https://laravel.com/docs/8.x/responses">HTTP Response</a>
+                        <ul>
+                            <li>is an instance of <code>Illuminate\Http\Response</code></li>
+                            <li>can be returned in your code
+                                <ul>
+                                    <li>as a string (automatic conversion): <code class="hljs php">return 'Hello World';</code></li>
+                                    <li>as a JSON response: <code class="hljs php">return ['name' => 'Abigail', 'state' => 'CA'];</code></li>
+                                    <li>as a Response object: <pre class="bigger"><code class="hljs php">return (new Response($content, $status));</code></pre></li>
+                                    <li>idem, with helper (no use-statement needed):<pre class="bigger"><code class="hljs php">return response($content, $status));</code></pre></li>
+                                    <li>idem, with chained methods:
+                                        <pre class="bigger"><code class="hljs php">return response($content)
+                ->header('Content-Type', $type)
+                ->cookie('name', 'value');</code></pre>
+                                    </li>
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>The HTTP Response (2)</h2>
+
+                <ul>
+                    <li>
+                        The <a href="https://laravel.com/docs/8.x/responses">HTTP Response</a>
+                        <ul>
+                            <li>is an instance of <code>Illuminate\Http\Response</code></li>
+                            <li>can be returned in your code
+                                <ul>
+                                    <li>as a view: <pre class="bigger"><code class="hljs php">return view('greeting', ['name' => 'James']);</code></pre> &mdash; it involves rendering the <code>resources/views/greeting.blade.php</code> template</li>
+                                    <li>idem, with chained HTTP response methods: <pre class="bigger"><code class="hljs php">return response()->view('greeting', $data)->&hellip;;</code></pre></li>
+                                    <li>JSON, with chained HTTP response methods: <pre class="bigger"><code class="hljs php">return response()->json(['name' => 'Abigail', 'state' => 'CA'])->&hellip;;</code></pre></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>The HTTP Response (3)</h2>
+
+                <ul>
+                    <li>
+                        The <a href="https://laravel.com/docs/8.x/responses">HTTP Response</a>
+                        <ul>
+                            <li>is an instance of <code>Illuminate\Http\Response</code></li>
+                            <li>can be returned in your code
+                                <ul>
+                                    <li>as a forced file download: <pre class="bigger"><code class="hljs php">return response()->download($pathToFile);</code></pre></li>
+                                    <li>as a file displayed in the browser: <pre class="bigger"><code class="hljs php">return response()->file($pathToFile);</code></pre></li>
+                                    <li>as a <code>RedirectResponse</code> instance: <pre class="bigger"><code class="hljs php">return redirect('home/dashboard');</code></pre></li>
+                                    <li>idem, after invalid form submission: <pre class="bigger"><code class="hljs php">return back()->withInput();</code></pre></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Custom HTTP error pages</h2>
+
+                <ul>
+                    <li>
+                        Some exceptions describe HTTP error codes from the server
+                        <ul>
+                            <li>e.g. page not found <code>404</code> (when there is no matching route), internal error (caused by developer) <code>500</code>, &hellip;</li>
+                            <li>raise them yourself by the <a href="https://laravel.com/docs/8.x/helpers#method-abort">abort()</a> helper</li>
+                            <li>these <a href="https://laravel.com/docs/8.x/errors#http-exceptions">exceptions</a> are rendered by the <a href="https://laravel.com/docs/8.x/errors#the-exception-handler">exception handler</a> which by default
+                                <ul>
+                                    <li>renders a <a href="https://laravel.com/docs/8.x/errors#custom-http-error-pages"><em>custom</em></a> error page if you define: <code>resources/views/errors/404.blade.php</code> for error code <code>404</code> and so on </li>
+                                    <li>PHP errors are rendered by <a href="https://laravel-news.com/ignition">Ignition</a> (if your app is in debug mode)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+
+        </section>
+
+
+        <!-- Views and templates -->
+        <section>
+            <section>
+                <h2>Views and templates</h2>
+            </section>
+
+            <section>
+                <h2>Views</h2>
+
+                <ul>
+                    <li>
+                        Presentation logic: "templates" stored in <code>resources/views</code>
+                        <ul>
+                            <li>A simple view using the Blade syntax e.g. <code>resources/views/subdir/greeting.blade.php</code>
+                                <pre class="bigger"><code class="hljs php">&lt;html&gt;
+    &lt;body&gt;
+        &lt;h1&gt;Hello, {{ $name }}&lt;/h1&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre></li>
+                            <li>The <code>view</code> helper returns an instance of <code>Illuminate\View\View</code>, to which you can pass variables.
+                                <pre class="bigger"><code class="hljs php">return view('subdir.greeting', ['name' => 'Eddy']);
+// alt.: return view('subdir.greeting')->with('name', 'Eddy');	</code></pre></li>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <footer><em>Note: the passed variables are stored in the instance, but the view is not rendered at this point.</em></footer>
+            </section>
+
+            <section>
+                <h2>Blade templates</h2>
+
+                <ul>
+                    <li>
+                        <a href="https://laravel.com/docs/8.x/blade">Blade templates</a> are compiled by the Blade template engine
+                        <ul>
+                            <li>File extension: <code>.blade.php</code></li>
+                            <li>File location, view instantiation (omit <code>.blade.php</code>!) and variable passing: see previous slide (Views).</li>
+                            <li>Compiled into plain PHP code and cached until modified</li>
+                            <li>&rarr; you will be debugging compiled views in <code>storage/framework/views</code></li>
+                            <li>Blade syntax very different from Twig, but closer to PHP</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Blade syntax (1)</h2>
+
+                <ul>
+                    <li>
+                        Displaying data
+                        <pre class="bigger"><code class="hljs php">Hello, {{ $name }}.</code></pre>
+                        <ul>
+                            <li>{{ Statements }} automatically sent through <code>htmlentities</code> to prevent XSS-attacks.</li>
+                            <li>Mind the <code>$</code></li>
+                            <li>Any PHP code can be included e.g. <code>{{ time() }}</code> <small>and forget about Twig filters</small></li>
+                            <li><code>{{ $name or 'Default' }}</code> is syntactic sugar for <code>{{ isset($name) ? $name : 'Default' }}</code></li>
+                            <li>Unescaped statements:
+                                <pre class="bigger"><code class="hljs php">Hello, {!! $name !!}.</code></pre></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Blade syntax (2)</h2>
+
+                <ul>
+                    <li>
+                        Control structures
+                        <pre class="bigger"><code>@if (count($records) === 1)
+    I have one record!
+@elseif (count($records) > 1)
+    I have multiple records!
+@else
+    I don't have any records!
+@endif
+
+@foreach ($events as $event)
+    &lt;p&gt;This is user {{ $event->id }} ({{ $loop->iteration }} / {{ $loop->count }})&lt;/p&gt;
+@endforeach</code></pre>
+                        <ul>
+                            <li>Structures don't work without <code>()</code></li>
+                            <li>Check the <a href="https://laravel.com/docs/8.x/blade#control-structures">docs</a> for more syntax information</li>
+                            <li>Associative array by index: just <code>$event['id']</code></li>
+                            <li>Object fields: just <code>$event->id</code></li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Blade syntax (3)</h2>
+
+                <ul>
+                    <li>
+                        <a href="https://laravel.com/docs/8.x/blade#template-inheritance">Template inheritance</a>: sections
+                        <pre class="bigger"><code class="hljs html">&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;App Name - @yield('title')&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        @section('sidebar')
+            This is the master sidebar.
+        @show
+        &lt;div class="container"&gt;
+            @yield('content')
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        <pre class="bigger"><code class="hljs html">@extends('layouts.master')
+
+@section('title', 'Page Title')
+
+@section('sidebar')
+    @parent
+    &lt;p&gt;This is appended to the master sidebar.&lt;/p&gt;
+@endsection
+
+@section('content')
+    &lt;p&gt;This is my body content.&lt;/p&gt;
+@endsection</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Blade vs. clean URLs</h2>
+                <ul>
+                    <li>
+                        Linking from <code>route/1/</code> to <code>route/2/</code> would generate a browser link to <code>route/1/route/2</code> &rightarrow; helpers
+                        <ul>
+                            <li><a href="https://laravel.com/docs/8.x/helpers#method-asset">asset()</a> - Use <code>{{ asset('css/common.css') }}</code> to generate a path in your template to an asset in your <code>public</code> folder</li>
+                            <li><a href="https://laravel.com/docs/8.x/helpers#method-url">url()</a> - Use <code>{{ url('artists/' . $id) }}</code> to generate a path to a route</li>
+                            <li><a href="https://laravel.com/docs/8.x/helpers#method-route">route()</a> - Use <code>{{ route('admin::dashboard') }}</code> to generate a path to a <a href="https://laravel.com/docs/8.x/routing#named-routes">named route</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+        </section>
+
+
+        <!-- Coding practices -->
+        <section>
+            <section>
+                <h2>Coding practices</h2>
+            </section>
+
+            <section>
+                <h2>Coding practices</h2>
+
+                <ul>
+                    <li>
+                        Laravel has many (hidden) features, libraries, syntactic sugar, recipes &hellip;
+                        <ul>
+                            <li><strong>providing elegant solutions to many common problems</strong></li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        So stop thinking in plain PHP when writing code &mdash; how?
+                        <ul>
+                            <li>by getting introduced to these features (next slides)</li>
+                            <li>by reading the docs and <em>good</em> code examples</li>
+                            <li>by experience</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>#1 Facades and helpers</h2>
+
+                <ul>
+                    <li>
+                        <a href="https://laravel.com/docs/8.x/facades">Facades</a>
+                        <ul>
+                            <li>Static interfaces to basic Laravel classes available e.g. <code>Route</code>, <code>View</code></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="https://laravel.com/docs/8.x/helpers">Helper functions</a>
+                        <ul>
+                            <li><em>Historical</em> array helpers &mdash; complement PHP's array functions e.g.
+                                <a href="https://laravel.com/docs/8.x/helpers#method-array-pluck">Arr::pluck()</a>
+                                <a href="https://laravel.com/docs/8.x/helpers#method-array-flatten">Arr::flatten()</a>
+                                <a href="https://laravel.com/docs/8.x/helpers#method-array-set">Arr::set()</a>
+                                <a href="https://laravel.com/docs/8.x/helpers#method-array-sort">Arr::sort()</a>
+                            </li>
+                            <li><em>Historical</em> string helpers &mdash; complement PHP's string functions
+                            </li>
+                            <li>Fluent string helpers &mdash; same but with chaining e.g.
+                                <a href="https://laravel.com/docs/8.x/helpers#method-fluent-str-is">is()</a>
+                                <a href="https://laravel.com/docs/8.x/helpers#method-fluent-str-contains">contains()</a>
+                                <a href="https://laravel.com/docs/8.x/helpers#method-fluent-str-plural">plural()</a>
+                            </li>
+                            <li>Paths &mdash; internal configuration file paths
+                            </li>
+                            <li>URLs &mdash; for generating URLs
+                            </li>
+                            <li>Misc &mdash; Facade function shorthands (e.g. <a href="https://laravel.com/docs/8.x/helpers#method-today">today()</a>,
+                                <a href="https://laravel.com/docs/8.x/helpers#method-response">response()</a>) as well as other functions - check these:
+                                <a href="https://laravel.com/docs/8.x/helpers#method-dd">dd()</a>
+                                <a href="https://laravel.com/docs/8.x/helpers#method-optional">optional()</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+
+            <section>
+                <h2>#2 Collections</h2>
+
+                <ul>
+                    <li>
+                        A <a href="https://laravel.com/docs/8.x/collections">collection</a> (<code>Illuminate\Support\Collection</code>) is a convenient wrapper for working with arrays of data
+
+                        <ul>
+                            <li>Avoid complex (plain PHP) loops</li>
+                            <li>Method chaining &mdash; example <pre class="bigger"><code class="hljs php">$collection = collect(['taylor', 'abigail', null])->map(function ($name) {
+    return strtoupper($name);
+})
+->reject(function ($name) {
+    return empty($name);
+});</code></pre></li>
+                            <li><a href="https://www.youtube.com/watch?v=crSUWtRYw-M">&#128250; Watch Adam Wathan on Laracon EU 2016</a></li>
+                            <li>Check it out:
+                                <a href="https://laravel.com/docs/8.x/collections#method-map">map()</a>
+                                <a href="https://laravel.com/docs/8.x/collections#method-filter">filter()</a>
+                                <a href="https://laravel.com/docs/8.x/collections#method-reduce">reduce()</a>
+                                <a href="https://laravel.com/docs/8.x/collections#method-flatten">flatten()</a>
+                                <a href="https://laravel.com/docs/8.x/collections#method-flatmap">flatMap()</a>
+                                <a href="https://laravel.com/docs/8.x/collections#method-prepend">prepend()</a>
+                                <a href="https://laravel.com/docs/8.x/collections#method-pluck">pluck()</a>
+                                <a href="https://laravel.com/docs/8.x/collections#method-where">where()</a>
+                                <a href="https://laravel.com/docs/8.x/collections#method-all">all()</a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li>Handling large datasets? <a href="https://laravel.com/docs/8.x/collections#lazy-collections">Lazy collections</a></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>#3 Carbon</h2>
+
+                <ul>
+                    <li>
+                        Laravel comes with <a href="http://carbon.nesbot.com/docs/">Carbon</a><pre class="bigger"><code class="hljs php">use Carbon\Carbon;</code></pre>
+                        <ul>
+                            <li>The Carbon class extends the PHP <a href="http://www.php.net/manual/en/class.datetime.php">DateTime</a> class
+                            </li>
+                            <li>Very extensive API (read the docs !)
+                                <pre class="bigger"><code class="hljs php">$dt = Carbon::yesterday();
+
+echo $dt->diffInMinutes($dt->copy()->addWeekDays(50));
+
+Carbon::setLocale('de');
+echo Carbon::now()->addYear()->diffForHumans();    // in 1 Jahr
+</code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </section>
+
+        <!-- 4 Database features -->
+        <section>
+            <section>
+                <h2>Getting started with databases</h2>
+            </section>
+
+            <section>
+                <h2>Recap: config</h2>
+
+                <ul>
+                    <li>
+                        Supported DBMS systems by Laravel
+                        <ul>
+                            <li>MySQL</li>
+                            <li>Postgres</li>
+                            <li>SQLite</li>
+                            <li>SQL Server</li>
+                        </ul>
+                    </li>
+                    <li>
+                        DB configuration: see <a href="#/2">previous slides on configuration</a>
+                        <ul>
+                            <li>Note: you can have <a href="https://laravel.com/docs/8.x/database#introduction">separate configs</a> for reading/writing</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Raw SQL Queries (1)</h2>
+
+                <ul>
+                    <li>
+                        In Laravel you can run <a href="https://laravel.com/docs/8.x/database#running-queries">raw SQL queries</a>
+                        <pre class="bigger"><code class="hljs php">$users = DB::select('select * from users where active = ?', [1]);
+
+foreach ($users as $user) {
+    echo $user->name;
+}</code></pre>
+                        <ul>
+                            <li>Parameter binding prevents against <strong>SQL injection</strong></li>
+                            <li><code>DB::select</code> returns an array of <code>StdClass</code> objects with <a href="http://stackoverflow.com/questions/829823/can-you-create-instance-properties-dynamically-in-php">dynamic properties</a> (column name or SQL alias)</li>
+                            <li>Named bindings
+                                <pre class="bigger"><code class="hljs php">$results = DB::select('select * from users where id = :id', ['id' => 1]);</code></pre>
+                            </li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Raw SQL Queries (2)</h2>
+
+                <ul>
+                    <li>
+                        In Laravel you can run <a href="https://laravel.com/docs/8.x/database#running-queries">raw SQL queries</a>
+
+                        <ul>
+
+                            <li>Similar functions for insert/update/delete
+                                <pre class="bigger"><code class="hljs php">$affected = DB::update('update users set votes = 100 where name = ?', ['John']);</code></pre>
+                            </li>
+                            <li>General statements
+                                <pre class="bigger"><code class="hljs php">DB::statement('drop table users');</code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+        </section>
+
+        <!-- The END -->
+        <section>
+            <section>
+                <h2>Questions?</h2>
+                <footer>
+                    <em><a href="http://www.ikdoeict.be/">ikdoeict.be</a> &mdash; <a href="mailto:joris.maervoet@odisee.be">joris.maervoet@odisee.be</a></em>
+                </footer>
+            </section>
+        </section>
+
+
+
+        <!-- Sources -->
+        <section id="sources">
+            <section>
+                <h2>Sources</h2>
+
+
+                <ul>
+                    <li><a href="https://laravel.com/docs/8.x/installation">Laravel docs: Installation</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/configuration">Laravel docs: Configuration</a></li>
+                    <li><a href="https://scotch.io/tutorials/understanding-laravel-environment-variables">Tutorial on environment config</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/structure">Laravel docs: Application structure</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/routing">Laravel docs: Routing</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/responses">Laravel docs: Responses</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/views">Laravel docs: Views</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/blade">Laravel docs: Blade Templates</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/database">Laravel docs: Databases: Getting Started</a></li>
+                    <li><a href="https://laravel.com/docs/5.2/quickstart">Laravel tutorial on a task list project - basic</a> version 5.2!</li>
+                    <li><a href="https://laravel.com/docs/5.2/quickstart-intermediate">Laravel tutorial on a task list project - intermediate</a> version 5.2!</li>
+
+                    <li><a href="https://laravel.com/docs/8.x/lifecycle">Laravel docs: Request Lifecycle</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/providers">Laravel docs: Service Providers</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/container">Laravel docs: Service Container</a></li>
+                </ul>
+            </section>
+        </section>
+    </div>
+
+</div>
+
+<script src="dist/reveal.js"></script>
+<script src="plugin/zoom/zoom.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/search/search.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script>
+
+    // Also available as an ES module, see:
+    // https://revealjs.com/initialization/
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        center: true,
+        hash: true,
+        slideNumber: true,
+
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [ RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight ]
+    });
+
+</script>
+<script src="toc.js"></script>
+
+</body>
+</html>

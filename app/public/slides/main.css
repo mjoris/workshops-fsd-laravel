@@ -1,0 +1,255 @@
+/* Reveal lay-out changes */
+.reveal .slides { /* change the font-size */
+    font-size: 70%;
+}
+
+code.hljs { /* but restore the font-size of the code blocks */
+    font-size: 100%;
+}
+
+.slide-background-content {  /* make background images transparent for readability */
+    opacity: 0.3;
+}
+
+/* introducing hide-when-not-current class for disappearing fragments */
+:not(.current-fragment).hide-when-not-current {
+    display: none;
+}
+
+/* custom code elements */
+code {
+    background: rgba(255,255,255,0.3);
+    font-size: 0.55em;
+}
+
+.has-light-background code {
+    background: rgba(0,0,255,0.2);
+}
+
+del code, code.nok {
+    color: #C55;
+}
+
+ins code, code.ok {
+    color: #008800;
+}
+
+/* zoomable components */
+.zoomable-12:hover {
+    transform: scale(1.2);
+}
+
+.zoomable-15:hover {
+    transform: scale(1.5);
+}
+
+.zoomable-20:hover {
+    transform: scale(2);
+}
+
+/* slides with columns */
+.columns .column {
+    float: left;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.columns .column img {
+    max-width: 100%;
+}
+
+.columns .column-12 {
+    width: 50%;
+}
+
+.columns .column-13 {
+    width: 33.333%;
+}
+
+/* warnings */
+/* TODO */
+
+/* quick fixes */
+.reveal table.doctable th, .reveal table.doctable td {
+    text-align: center;
+    width: 2em;
+}
+/*********************************************
+ * TABLE OF CONTENTS
+ *********************************************/
+
+.reveal .toc {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: -4px;
+    z-index: 1000;
+}
+
+.reveal .toc nav {
+    padding: 10px;
+    width: 280px;
+    max-height: 545px;
+    max-height: 100vh;
+    overflow-y: auto;
+    z-index: 99999;
+    background: #555a5f;
+    letter-spacing: 0.5px;
+    opacity: 0.3;
+    white-space: nowrap;
+    color: #fff;
+}
+
+.reveal .toc nav a {
+    color: #ffffff;;
+}
+
+.reveal .toc nav a:hover {
+    color: #d7d0cf;
+}
+
+.reveal .toc nav:hover {
+    opacity: 0.97;
+    background: #b5533c;
+    box-shadow: 3px 3px 7px #1c1e20;
+}
+
+.reveal .toc nav > p {
+    font-size: 14px;
+    padding: 3px;
+    line-height: 20px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.reveal .toc nav > ul {
+    line-height: 20px;
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.reveal .toc nav > ul > li {
+    padding: 5px 0;
+    font-size: 16px;
+    padding-left: 5px;
+    position: relative;
+    list-style: none;
+}
+
+.reveal .toc nav > ul > li > ul {
+    margin: 0;
+    padding: 4px 0 0 20px;
+    opacity: 0.7;
+}
+
+.reveal .toc nav > ul > li > ul > li {
+    font-size: 12px;
+    position: relative;
+    list-style: none;
+}
+
+.reveal .toc nav:hover ul {
+    display: block;
+}
+
+.reveal .toc nav .pagenr {
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    color: #ccc;
+}
+
+.reveal .toc nav > ul > li > ul > li a {
+    border-bottom: 1px dotted #ccc;
+}
+
+/*********************************************
+ * OVERLAY
+ *********************************************/
+
+#overlayBack {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #000;
+    opacity: 0.7;
+    z-index: 1000;
+}
+
+#overlayContent {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 1001;
+    background: #EFEFEF;
+    box-shadow: rgba(0, 0, 0, 0.296875) 0px 0px 6px 0px;
+}
+
+.reveal code.hljs + input[type=submit] {
+    float: right;
+
+}
+
+/*********************************************
+ * TOOLTIP
+ *********************************************/
+
+.reveal .hastooltip {
+    position: relative;
+}
+
+.reveal .hastooltip .tooltip {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-image: url('assets/comments.png');
+    background-position: bottom right;
+    background-repeat: no-repeat;
+    width: 60px;
+    height: 60px;
+    z-index: 110;
+}
+
+.reveal .tooltip div {
+    display: none;
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    font-size: 50%;
+    line-height: 1.48;
+    min-width: 420px;
+    opacity: 0.9;
+    border: 2px solid #ccc;
+    padding: 20px;
+    background-color: #ffc;
+    background-image: -webkit-linear-gradient(rgba(255,255,255,.5), rgba(255,255,180,0));
+    background-image: -moz-linear-gradient(rgba(255,255,255,.5), rgba(255,255,180,0));
+    background-image: -ms-linear-gradient(rgba(255,255,255,.5), rgba(255,255,180,0));
+    background-image: -o-linear-gradient(rgba(255,255,255,.5), rgba(255,255,180,0));
+    background-image: linear-gradient(rgba(255,255,255,.5), rgba(255,255,180,0));
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+    text-shadow: 0 1px 0 rgba(255,255,255,.4);
+    color: #333;
+}
+
+.reveal .tooltip:hover div {
+    display: block;
+}
+
+.reveal .tooltip ul {
+    margin: 5px 5px 5px 15px;
+}
+
+.reveal .tooltip ul li {
+    margin-left: 10px;
+}
+
+.reveal .tooltip div *:last-child {
+    margin-bottom: 0;
+}
