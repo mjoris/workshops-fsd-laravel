@@ -147,7 +147,7 @@
                 </ul>
             </section>
             <section>
-                <h2>Laravel programming &hellip;</h2>
+                <h2>Laravel Programming &hellip;</h2>
                 <p>&hellip; might feel like handling <strong>black boxes</strong></p>
                 <p>But after a while, you will learn to dig into / intervene in them.</p>
                 <p>&mdash;</p>
@@ -158,7 +158,7 @@
                 </small>
             </section>
             <section>
-                <h2>PHP recaps and updates</h2>
+                <h2>PHP Recaps and Updates</h2>
                 <ul>
                     <li>
                         <a href="http://php.net/manual/en/language.oop5.traits.php">Traits</a>
@@ -189,7 +189,7 @@
                 </ul>
             </section>
             <section>
-                <h2>Course outline</h2>
+                <h2>Course Outline</h2>
                 <ul>
                     <li>Laravel basics: configuration, routing, Request/Response, Blade (templates)</li>
                     <li>MVC: Query Builder, Eloquent (ORM), Controllers, Migrations/Seeders</li>
@@ -272,27 +272,29 @@
             </section>
 
             <section>
-                <h2><small>(Already installed)</small> <a href="https://laravel.com/docs/8.x/structure">project structure</a> (1)</h2>
+                <h2>Project Structure (1)</h2>
+                <p><small>(<a href="https://laravel.com/docs/8.x/structure">Laravel docs</a>)</small></p>
                 <ul style="font-size: 75%">
                     <li>
                         <code>public/</code> &mdash; Public files
                         <ul>
                             <li>the document root of your web server points to this folder!</li>
-                            <li><code class="special">index.php</code> &mdash; Request Entry Point</li>
+                            <li><code class="special">index.php</code> &mdash; Request Entry Point - please don't touch it</li>
                             <li>add your assets: <code>css/</code> <span style="font-size: 70%">&amp;</span> <code>js/</code> <span style="font-size: 70%">&amp;</span> <code>img/</code> <span style="font-size: 70%">&amp;</span> <code>files/</code> <span style="font-size: 70%">&amp;</span> &hellip;</li>
-                            <li><code>.htaccess</code> (<a href="03.url.design.html#/2">or the like</a>)</li>
+                            <li><code>.htaccess</code> (or alike)</li>
                         </ul>
                     </li>
                     <li>
                         <code>routes/</code> &mdash; Routes
                         <ul>
-                            <li><code class="special">api.php</code> &mdash; Your API routes</li>
-                            <li><code class="special">console.php</code> &mdash; Your Artisan console routes</li>
                             <li><code class="special">web.php</code> &mdash; Your web routes</li>
+                            <li><code class="special">api.php</code> &mdash; Your (stateless) API routes</li>
+                            <li><code class="special">console.php</code> &mdash; Your Artisan console routes</li>
+                            <li><code class="special">channels.php</code> &mdash; Your channels for event broadcasting (websockets)</li>
                         </ul>
                     </li>
                     <li>
-                        <code>app/</code> &mdash; <a href="http://www.php-fig.org/psr/psr-4/">PSR-4</a> classes of your application &mdash; 4&hellip;12 <a href="https://laravel.com/docs/8.x/structure#the-app-directory">subfolders</a> e.g.
+                        <code>app/</code> &mdash; <a href="http://www.php-fig.org/psr/psr-4/">PSR-4</a> classes of your application &mdash; 5&hellip;13 <a href="https://laravel.com/docs/8.x/structure#the-app-directory">subfolders</a> e.g.
                         <ul>
                             <li><code>Console/</code> &mdash; Your Artisan commands</li>
                             <li><code>Http/</code> &mdash; Your controllers and middleware</li>
@@ -307,7 +309,7 @@
             </section>
 
             <section>
-                <h2><small>(Already installed)</small> <a href="https://laravel.com/docs/8.x/structure">project structure</a> (2)</h2>
+                <h2>Project Structure (2)</h2>
                 <ul style="font-size: 70%">
                     <li>
                         <code>bootstrap/</code> &mdash; Bootstrap and autoloading
@@ -346,7 +348,8 @@
             </section>
 
             <section>
-                <h2>The Request Lifecycle <small>how Laravel works</small></h2>
+                <h2>The Request Lifecycle</h2>
+                <p><em>How Laravel works</em><br><small>(<a href="https://laravel.com/docs/8.x/lifecycle">Laravel docs</a>)</small></p>
                 <ul>
                     <li>Webserver hands over the request to <code>public/index.php</code></li>
                     <li>It loads Composer's autoloader</li>
@@ -374,16 +377,9 @@
                         Available commands and help
                         <pre class="bigger"><code class="hljs bash">$ php artisan list</code></pre>
                     </li>
-                    </li>
                     <li>
                         Help on a specific command
                         <pre class="bigger"><code class="hljs bash">$ php artisan help serve</code></pre>
-                    </li>
-                    </li>
-                    <li>
-                        Host project on PHP's built-in development server
-                        <pre class="bigger"><code class="hljs bash">$ php artisan serve --port=8080</code></pre>
-                    </li>
                     </li>
                     <li>
                         You can <a href="https://laravel.com/docs/8.x/artisan">extend Artisan with your own commands</a>
@@ -391,7 +387,7 @@
 
 
                 </ul>
-                <footer><em>Driven by Symfony Console</em></footer>
+                <footer><small>Run <code>php artisan</code> from the same environment as the webserver</small></footer>
             </section>
 
             <section>
@@ -419,11 +415,12 @@
         <!-- Configuration -->
         <section>
             <section>
-                <h2>01.3<br>Configuration</h2>
+                <h2>01.3<br>Next Step: Configuration</h2>
+                <p><em>Pay attention!</em></p>
             </section>
 
             <section>
-                <h2>Next step: configuration (1)</h2>
+                <h2>Permissions and Application Key</h2>
                 <ul>
                     <li>
                         Directory permissions
@@ -431,10 +428,10 @@
                             <li><code>storage/</code> and <code>bootstrap/cache</code> writable by web server (associated account)</li>
                         </ul>
                     </li>
-                    <li>
+                    <li style="margin-top: 1em;">
                         Application key (= IMPORTANT)
                         <ul>
-                            <li>a random and secret key, used for session security and encryption</li>
+                            <li>a random and <strong><u>secret</u></strong> key, used for session security and encryption</li>
                             <li>location: <code>.env</code> environment file</li>
                             <li>assigned for you by the Composer/Laravel installer (not when you copied the project or alike)</li>
                             <li>if necessary, generate with
@@ -445,7 +442,7 @@
             </section>
 
             <section>
-                <h2>Next step: configuration (2)</h2>
+                <h2>The <code>config</code> Folder</h2>
                 <ul>
                     <li>
                         Additional configuration
@@ -457,7 +454,7 @@
                                 <code>config/database.php</code> &mdash; Database connection configurations
                             </li>
                             <li>
-                                11 other config files e.g. <code>config/cache.php</code>, <code>config/session.php</code>, &hellip;
+                                12 other config files e.g. <code>config/cache.php</code>, <code>config/session.php</code>, &hellip;
                             </li>
                             <li>
                                 format: one big (nested) array of key-value pairs of settings e.g. <pre class="bigger"><code class="hljs php">'charset' => 'utf8mb4',</code></pre>
@@ -468,7 +465,7 @@
             </section>
 
             <section>
-                <h2>CAUTION: the <a href="https://laravel.com/docs/8.x/helpers#method-env">env()</a> function</h2>
+                <h2>The env() Function</h2>
                 <ul>
                     <li>
                         Including environment variables in the <code>config/*.php</code> files
@@ -496,24 +493,27 @@ DB_PASSWORD=secret</code></pre>
 
             <section>
                 <h2>The Environment Configuration</h2>
-                <ul>
+                <ul style="font-size: 90%;">
                     <li>
-                        Principles
-                        <ul>
-                            <li><strong>Idea:</strong> local/dev and production configurations may be different such as personal keys, Facebook Dev Credentials, e-mail component.</li>
-                            <li><strong>Mechanism:</strong> the <code>.env</code> file must/can be used to override settings in the <em>real config files</em><br/></li>
-                        </ul>
+                        <strong>In short:</strong> the <code>.env</code> file must/can be used to override settings in the
+                        <em>config files</em>
                     </li>
+
                     <li>
-                        How to use
+                        <strong>Why?</strong> local/dev/testing/production configurations may be different w.r.t. DB host, personal keys,
+                        Facebook Dev Credentials, e-mail component, &hellip;
+                    </li>
+
+                    <li style="margin-top: 0.5em;">
+                        How to <s>use</s> craft
                         <ul>
-                            <li>Put your production configuration in <code>config/*.php</code></li>
+                            <li>Have <em>some</em> configuration in <code>config/*.php</code></li>
                             <li>Override parts of it with local settings in <code>.env</code></li>
-                            <li>In most cases: keep <code>.env</code> out of version control (git &rarr; <code>.gitignore</code>). It's private. <br/> </li>
+                            <li><code>.env</code> <strong>must</strong> be kept out of version control (git &rarr; <code>.gitignore</code>).<br>It contains sensitive information: the application key is always in <code>.env</code> </li>
+                            <li><strong>Installation instructions</strong> in <code>README.md</code>: if necessary, put <code>.env</code>'s non-sensitive lines into <code>.env.example</code> and suggest to <code>cp .env.example .env</code> in the installation instructions</li>
                         </ul>
                     </li>
                 </ul>
-                <footer style="line-height: 1.5;"><em>Note: the application key is always in <code>.env</code></em><br><em>Note: alternative local configurations like <code>.env.testing</code> can be used by PHPUnit</em></footer>
             </section>
 
             <section>
@@ -547,7 +547,7 @@ return [
 APP_ENV=local
 APP_KEY=base64:WB2aLCAIUgFJCZbbg/KIA6M4Hum1bsz/s+o8hxbeW68=
 APP_DEBUG=true
-APP_URL=http://localhost
+APP_URL=http://localhost:8080
 
 LOG_CHANNEL=stack
 
@@ -557,11 +557,43 @@ DB_CONNECTION=sqlite</code></pre>
                         You can ...
                         <ul>
                             <li>also override parts of the connection config (e.g. just the encoding or password)</li>
-                            <li>abandon the <code>DB_CONNECTION=sqlite</code> if you agree with the default connection in <code>config/database.php</code> </li>
+                            <li>remove <code>DB_CONNECTION=sqlite</code> if you agree with the default connection in <code>config/database.php</code> </li>
                         </ul>
                     </li>
                     <li>
                         but you cannot delete <code>.env</code>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Our Installation and Config Manual</h2>
+                <ul style="font-size: 80%;">
+                    <li>
+                        Installing a fresh Laravel project
+                        <ol>
+                            <li>Start a new git repo &amp; clone</li>
+                            <li>Add your Docker environment (<code>docker-compose.yml</code>, <code>/docker</code>, &hellip; ) providing some <em>empty</em> project folder, of which a future subfolder <code>public</code> is set as the document root of the web container</li>
+                            <li>
+                                Run <code>docker-compose up</code>, open a bash terminal in the web container and run <br>
+                                <code>composer create-project laravel/laravel projectdir ^8.0</code>
+                            </li>
+                            <li>Craft <code>.env</code> and <code>config/*.php</code> until your project is working</li>
+                            <li>Copy the non-sensitive parts of <code>.env</code> to <code>.env.example</code></li>
+                            <li>Commit and push</li>
+                        </ol>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Installing an already existing Laravel project
+                        <ol>
+                            <li>Clone the repo</li>
+                            <li>
+                                Run <code>docker-compose up</code>, open a bash terminal in the web container and run <br>
+                                <code>composer install<br>
+                                    cp .env.example .env<br>
+                                    php artisan key:generate</code>
+                            </li>
+                        </ol>
                     </li>
                 </ul>
             </section>
