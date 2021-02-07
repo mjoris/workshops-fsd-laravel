@@ -208,12 +208,36 @@
 
             <section>
                 <h2>Docker environments</h2>
-                <ul>
+                <ul style="font-size: 90%;">
                     <li>Developers who want to use Docker as their virtual development environment with Laravel, have several options, depending on their preferences and requirements
                     <ul>
-                        <li>Laradock</li>
-                        <li>Laravel Sail</li>
-                        <li>your own docker-compose environment</li>
+                        <li><a href="https://laradock.io/">Laradock</a>
+                            <ul style="font-size: 80%;">
+                                <li>A <em>swiss knife</em> Docker environment (consisting of &gt; 60 Docker images of high quality), to be cloned once for all your web projects</li>
+                                <li>Running is as easy as <code>docker-compose up -d nginx mysql phpmyadmin workspace</code>, where the <code>workspace</code> is a separate container to run all your CLI commands</li>
+                                <li>
+                                    Cons: is not really sharing your reproducible Docker env with others
+                                    (no docker-compose definition in your project repo, few control over Docker details)
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="https://laravel.com/docs/8.x/sail">Laravel Sail</a>
+                            <ul style="font-size: 80%;">
+                                <li>The official dev env of Laravel (since 8.0)</li>
+                                <li>Internally, you run a (temporary) Sail container for the installation of a fresh Laravel project. Next, running is as easy as <code>sail up</code> and from your own terminal you can launch any of your CLI commands on a container e.g. <code>sail composer</code>.
+                                Comes with <a href="https://github.com/mailhog/MailHog">MailHog</a>.</li>
+                                <li>Cons: rather complex Docker approach in a <strong>black box</strong>, Windows support is not (yet) 100%, <code>docker-compose.yml</code> not (yet) intended for docker-without-sail, webserver image takes long to build</li>
+                            </ul>
+                        </li>
+                        <li>
+                            your own docker-compose environment
+                            <ul style="font-size: 80%;">
+                                <li>&rightarrow; what we choose in this course &rightarrow; let's have a <a
+                                    href="https://github.com/mjoris/workshops-wmfs-laravel">look</a></li>
+                                <li>Install Laravel through Composer (run from same environment as the web server)</li>
+                            </ul>
+                        </li>
                     </ul>
 
                     </li>
@@ -223,7 +247,7 @@
 
 
             <section>
-                <h2>Installation</h2>
+                <h2>Composer-based Installation</h2>
                 <ul>
                     <li>
                         Installable via Composer
@@ -242,7 +266,7 @@
                     </li>
 
                     <li style="margin-top: 1em;">
-                        If you prefer <em>beautiful</em> commands such as <code>laravel new projectname</code>, you need to check <a href="https://laravel.com/docs/8.x#installing-laravel">Laravel Installer</a> (install via Composer)
+                        If you prefer <em>beautiful</em> commands such as <code>laravel new projectname</code>, you need to check <a href="https://laravel.com/docs/8.x#the-laravel-installer">Laravel Installer</a> (install via Composer)
                     </li>
                 </ul>
             </section>
