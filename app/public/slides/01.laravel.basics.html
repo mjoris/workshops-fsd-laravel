@@ -114,6 +114,90 @@
                     </li>
                 </ul>
             </section>
+            <section data-background="#fdfdfd">
+                <h2>Prerequisites</h2>
+                <ul>
+                    <li>
+                        You should <strong>remember</strong>
+                        <ul style="font-size: 85%;">
+                            <li>how to work with Docker, git and composer</li>
+                            <li>PHP: control structures and object orientation</li>
+                            <li>our rules on URL Design</li>
+                            <li>the main principles of HTTP (request/response), forms (persistence/form checking), cookies, sessions, &hellip; </li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        You'd better <strong>forget</strong>
+                        <ul style="font-size: 85%;">
+                            <li>
+                                many low-level HTTP-/file-related PHP constructs such as
+                                <del><code>header('Location: /');</code></del>,
+                                <del><code>$_GET</code></del>,
+                                <del><code>$_POST</code></del>,
+                                <del><code>setcookie();</code></del>,
+                                <del><code>$_COOKIE</code></del>,
+                                <del><code>session_start();</code></del>,
+                                <del><code>http_response_code();</code></del>,
+                                <del><code>move_uploaded_file();</code></del>,
+                                &hellip;
+                            </li>
+                            <li>about solving your problems with arrays &#128562;</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h2>Laravel programming &hellip;</h2>
+                <p>&hellip; might feel like handling <strong>black boxes</strong></p>
+                <p>But after a while, you will learn to dig into / intervene in them.</p>
+                <p>&mdash;</p>
+                <small>
+                    Many of the functional Laravel code is located somewhere in the <code>vendor</code> folder,
+                    which of course you should not modify (not on git). Often, the code is organized into <a
+                    href="https://www.php.net/manual/en/language.oop5.traits.php">traits</a> of which you can override the methods in your own project.
+                </small>
+            </section>
+            <section>
+                <h2>PHP recaps and updates</h2>
+                <ul>
+                    <li>
+                        <a href="http://php.net/manual/en/language.oop5.traits.php">Traits</a>
+                        <ul style="font-size: 80%;">
+                            <li>Reducing some limitations of single inheritance</li>
+                            <li>Define a <strong>a set of methods</strong> via the <code>trait</code> keyword e.g. <code>trait Example {</code></li>
+                            <li>Reuse this set of methods by putting <code>use Example;</code> inside the class</li>
+                        </ul>
+                    </li>
+                    <li>
+                        The behaviour of inaccessible properties (<code>-&gt;</code>) with <a href="http://php.net/manual/en/language.oop5.overloading.php">property overloading</a>
+                        <ul style="font-size: 80%;">
+                            <li><code>__set()</code> is called when writing to non-existing properties with <code>-></code></li>
+                            <li><code>__get()</code> is called when reading non-existing properties with <code>-></code></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="https://www.php.net/manual/en/language.namespaces.rationale.php">Namespaces</a>
+                        <ul style="font-size: 80%;">
+                            <li>Define a class <code>Baz</code> within a namespace: start with <code>namespace Ikdoeict\Demo;</code></li>
+                            <li>Within <code>Baz</code>: refer to other classes of the same namespace: just by their base name</li>
+                            <li>Refer to classes outside the namespace: first import the class by <code>use Ikdoeict\Base\Model;</code> and just use <code>Model</code> after that</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 0.5em;">
+                        We'll be using <strong>PHP 8</strong>. Let's have a look <a href="https://stitcher.io/blog/new-in-php-8">what has changed &rarr;</a>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h2>Course outline</h2>
+                <ul>
+                    <li>Laravel basics: configuration, routing, Request/Response, Blade (templates)</li>
+                    <li>MVC: Query Builder, Eloquent (ORM), Controllers, Migrations/Seeders</li>
+                    <li>Forms with Validation, File Uploads, Filtering, Pagination</li>
+                    <li>Middleware and Breeze (authentication)</li>
+                    <li>Web APIs with Eloquent API Resources and authentication</li>
+                </ul>
+            </section>
         </section>
 
         <!-- Getting started with Laravel -->
@@ -123,37 +207,41 @@
             </section>
 
             <section>
-                <h2>Before we start: Docker environments</h2>
+                <h2>Docker environments</h2>
+                <ul>
+                    <li>Developers who want to use Docker as their virtual development environment with Laravel, have several options, depending on their preferences and requirements
+                    <ul>
+                        <li>Laradock</li>
+                        <li>Laravel Sail</li>
+                        <li>your own docker-compose environment</li>
+                    </ul>
+
+                    </li>
+                </ul>
             </section>
 
 
 
             <section>
-                <h2>Installation (1)</h2>
+                <h2>Installation</h2>
                 <ul>
                     <li>
                         Installable via Composer
-                        <pre class="bigger"><code class="hljs bash">$ composer create-project laravel/laravel projectname ^8.0</code></pre>
-                        <ul>
-                            <li>Version is optional - beware though: 6.x and 7.x are backwards compatible (5.x is not)</li>
-                            <li><a href="https://getcomposer.org/doc/03-cli.md#create-project">Composer docs</a>: <code>composer create-project</code> is the equivalent of doing a <code>git clone</code> followed by a <code>composer install</code> of the vendors.</li>
-                            <li>In other words:
-                                <ul>
+                        <pre class="bigger"><code class="hljs bash">$ composer create-project laravel/laravel projectdir ^8.0</code></pre>
+                        <ul style="margin-top: 0.5em;">
+                            <li><code>^8.0</code> tag is optional - semantic versioning: everything within 8.*.* range is backward compatible</li>
+                            <li><code>composer create-project</code> is the <a href="https://getcomposer.org/doc/03-cli.md#create-project">equivalent</a> of <code>git clone</code> + <code>composer install</code>.
+                            So:
+                                <ul style="font-size: 80%;">
                                     <li>It downloads the whole project structure including folders, PHP-files, an <code>.htaccess</code> file and a rather complex <code>composer.json</code> file. </li>
                                     <li>Next, all dependencies are installed in the <code>vendor</code> folder and <code>composer.lock</code> is generated.</li>
-                                    <li>So: <strong>you start with an already <em>working</em> project</strong></li>
+                                    <li>So: <strong>you start with an already <em>&plusmn; working</em> project</strong></li>
                                 </ul>
                             </li>
                         </ul>
                     </li>
 
-                </ul>
-            </section>
-
-            <section>
-                <h2>Installation (2)</h2>
-                <ul>
-                    <li>
+                    <li style="margin-top: 1em;">
                         If you prefer <em>beautiful</em> commands such as <code>laravel new projectname</code>, you need to check <a href="https://laravel.com/docs/8.x#installing-laravel">Laravel Installer</a> (install via Composer)
                     </li>
                 </ul>
