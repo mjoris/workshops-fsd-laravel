@@ -139,6 +139,7 @@
                                 <del><code>session_start();</code></del>,
                                 <del><code>http_response_code();</code></del>,
                                 <del><code>move_uploaded_file();</code></del>,
+                                <del><code>__DIR__</code></del>,
                                 &hellip;
                             </li>
                             <li>about solving your problems with arrays &#128562;</li>
@@ -633,7 +634,7 @@ DB_CONNECTION=sqlite</code></pre>
 });</code></pre>
                     </li>
                 </ul>
-                <footer style="line-height: 1"><em>Note: only GET and POST are <a href="https://softwareengineering.stackexchange.com/questions/114156/why-are-there-are-no-put-and-delete-methods-on-html-forms#answer-211790">allowed</a> in plain web forms</em></footer>
+                <footer style="line-height: 1"><small>Note: only GET and POST are <a href="https://softwareengineering.stackexchange.com/questions/114156/why-are-there-are-no-put-and-delete-methods-on-html-forms#answer-211790">allowed</a> in plain web forms</small></footer>
             </section>
 
             <section>
@@ -650,13 +651,13 @@ Route::post('/', function () {
 	// do something (e.g. insert into database, send e-mail)
 });
 </code></pre>
-                <footer style="line-height: 1"><em>Note: POST requests are only accepted when a <a
-                    href="https://laravel.com/docs/8.x/csrf">CSRF</a> token is included in the request - we'll talk about that later on </em></footer>
+                <footer style="line-height: 1"><small>Note: POST requests are only accepted when a <a
+                    href="https://laravel.com/docs/8.x/csrf">CSRF</a> token is included in the request - we'll talk about that later on </small></footer>
             </section>
 
             <section>
                 <h2>HTTP method combinations</h2>
-                <ul>
+                <ul style="width: 70%;">
                     <li style="margin-top: 1em">
                         HTTP verb combinations
                         <pre class="bigger"><code class="hljs php">Route::match(['get', 'post'], '/', function () { &hellip;
@@ -669,7 +670,7 @@ Route::any('foo', function () { &hellip;</code></pre>
 
             <section>
                 <h2>Dynamic Routing</h2>
-                <ul>
+                <ul style="width: 100%;">
                     <li>
                         Working with <a href="https://laravel.com/docs/8.x/routing#route-parameters">Route
                         parameters</a>
@@ -687,7 +688,7 @@ Route::any('foo', function () { &hellip;</code></pre>
 });</code></pre>
                     </li>
                 </ul>
-                <footer><em>Important: in these examples we do not prevent XSS</em></footer>
+                <footer><small>Important: in these examples we do not prevent XSS</small></footer>
             </section>
 
             <section>
@@ -714,12 +715,12 @@ Route::any('foo', function () { &hellip;</code></pre>
             <section>
                 <h2>The HTTP Request (1)</h2>
 
-                <ul>
+                <ul style="font-size: 95%;">
                     <li>
                         The <a href="https://laravel.com/docs/8.x/requests">HTTP Request</a>
                         <ul>
                             <li>is an instance of <code>Illuminate\Http\Request</code></li>
-                            <li>is typically obtained in your code by type hinting:
+                            <li>is typically obtained in your code by <u>type hinting + dependency injection</u>:
                                 <pre class="bigger"><code class="hljs php">use Illuminate\Http\Request;
 
 Route::post('register', function(Request $request) {
@@ -739,7 +740,7 @@ Route::post('register', function(Request $request) {
             <section>
                 <h2>The HTTP Request (2)</h2>
 
-                <ul>
+                <ul style="width: 100%;">
                     <li>
                         The <a href="https://laravel.com/docs/8.x/requests">HTTP Request</a>
                         <ul>
@@ -768,20 +769,19 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
             <section>
                 <h2>The HTTP Response (1)</h2>
 
-                <ul>
+                <ul style="width: 80%; font-size: 85%;">
                     <li>
                         The <a href="https://laravel.com/docs/8.x/responses">HTTP Response</a>
                         <ul>
                             <li>is an instance of <code>Illuminate\Http\Response</code></li>
                             <li>can be returned in your code
                                 <ul>
-                                    <li>as a string (automatic conversion): <code class="hljs php">return 'Hello World';</code></li>
-                                    <li>as a JSON response: <code class="hljs php">return ['name' => 'Abigail', 'state' => 'CA'];</code></li>
-                                    <li>as a Response object: <pre class="bigger"><code class="hljs php">return (new Response($content, $status));</code></pre></li>
+                                    <li>as a string (automatic conversion): <pre class="bigger"><code class="hljs php">return 'Hello World';</code></pre></li>
+                                    <li>as a JSON response: <pre class="bigger"><code class="hljs php">return ['name' => 'Abigail', 'state' => 'CA'];</code></pre></li>
                                     <li>idem, with helper (no use-statement needed):<pre class="bigger"><code class="hljs php">return response($content, $status));</code></pre></li>
                                     <li>idem, with chained methods:
-                                        <pre class="bigger"><code class="hljs php">return response($content)
-                ->header('Content-Type', $type)
+                                        <pre class="bigger"><code class="hljs php">return response('Hello World', 200)
+                ->header('Content-Type', 'text/plain')
                 ->cookie('name', 'value');</code></pre>
                                     </li>
 
@@ -795,7 +795,7 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
             <section>
                 <h2>The HTTP Response (2)</h2>
 
-                <ul>
+                <ul style="font-size: 85%;">
                     <li>
                         The <a href="https://laravel.com/docs/8.x/responses">HTTP Response</a>
                         <ul>
@@ -815,7 +815,7 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
             <section>
                 <h2>The HTTP Response (3)</h2>
 
-                <ul>
+                <ul style="width: 80%; font-size: 85%;">
                     <li>
                         The <a href="https://laravel.com/docs/8.x/responses">HTTP Response</a>
                         <ul>
@@ -877,13 +877,12 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
     &lt;/body&gt;
 &lt;/html&gt;</code></pre></li>
                             <li>The <code>view</code> helper returns an instance of <code>Illuminate\View\View</code>, to which you can pass variables.
-                                <pre class="bigger"><code class="hljs php">return view('subdir.greeting', ['name' => 'Eddy']);
-// alt.: return view('subdir.greeting')->with('name', 'Eddy');	</code></pre></li>
+                                <pre class="bigger"><code class="hljs php">return view('subdir.greeting', ['name' => 'Eddy']);</code></pre></li>
                             </li>
                         </ul>
                     </li>
                 </ul>
-                <footer><em>Note: the passed variables are stored in the instance, but the view is not rendered at this point.</em></footer>
+                <footer><small>Note: the passed variables are stored in the instance, but the view is not rendered at this point.</small></footer>
             </section>
 
             <section>
@@ -925,7 +924,7 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
             <section>
                 <h2>Blade syntax (2)</h2>
 
-                <ul>
+                <ul style="width: 100%;">
                     <li>
                         Control structures
                         <pre class="bigger"><code>@if (count($records) === 1)
@@ -941,7 +940,7 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
 @endforeach</code></pre>
                         <ul>
                             <li>Structures don't work without <code>()</code></li>
-                            <li>Check the <a href="https://laravel.com/docs/8.x/blade#control-structures">docs</a> for more syntax information</li>
+                            <li>Check the <a href="https://laravel.com/docs/8.x/blade#blade-directives">docs</a> for more syntax information</li>
                             <li>Associative array by index: just <code>$event['id']</code></li>
                             <li>Object fields: just <code>$event->id</code></li>
 
@@ -951,11 +950,11 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
             </section>
 
             <section>
-                <h2>Blade syntax (3)</h2>
+                <h2>Template Inheritance</h2>
 
-                <ul>
+                <ul style="width: 100%;">
                     <li>
-                        <a href="https://laravel.com/docs/8.x/blade#template-inheritance">Template inheritance</a>: sections
+                        <a href="https://laravel.com/docs/8.x/blade#layouts-using-template-inheritance">Template inheritance</a>: sections
                         <pre class="bigger"><code class="hljs html">&lt;html&gt;
     &lt;head&gt;
         &lt;title&gt;App Name - @yield('title')&lt;/title&gt;
@@ -981,6 +980,49 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
 @section('content')
     &lt;p&gt;This is my body content.&lt;/p&gt;
 @endsection</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Including Subviews</h2>
+
+                <ul style="width: 100%;">
+                    <li>
+                        Control structures
+                        <pre class="bigger"><code>&lt;div&gt;
+    @include('shared.errors')
+
+    &lt;form&gt;
+        &lt;!-- Form Contents --&gt;
+    &lt;/form&gt;
+&lt;/div&gt;</code></pre>
+                        <ul>
+                            <li>Pass additional(!) data: <code>@include('view.name', ['status' => 'complete'])</code></li>
+                            <li>Many variants e.g. <code>@includeWhen($boolean, 'view.name', ['status' => 'complete'])</code></li>
+                            <li>Associative array by index: just <code>@each('view.joboffer', $jobs, 'job')</code></li>
+                            <li>All template variables are passed to the <code>@include</code> template, but NOT if you use <code>@each</code></li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Blade with Javascript</h2>
+
+                <ul style="width: 100%;">
+                    <li>
+                        Render an array as JSON
+                        <pre class="bigger"><code>&lt;script&gt;
+    var app = @json($array);
+&lt;/script&gt;</code></pre>
+                    </li>
+                    <li>
+                        Generate curly braces for client-side templating
+                        <pre class="bigger"><code>&lt;h1&gt;Laravel&lt;/h1&gt;
+
+Hello, @{{ name }}.</code></pre>
                     </li>
                 </ul>
             </section>
@@ -1107,7 +1149,7 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
             <section>
                 <h2>#3 Carbon</h2>
 
-                <ul>
+                <ul style="width: 100%;">
                     <li>
                         Laravel comes with <a href="http://carbon.nesbot.com/docs/">Carbon</a><pre class="bigger"><code class="hljs php">use Carbon\Carbon;</code></pre>
                         <ul>
@@ -1148,7 +1190,7 @@ echo Carbon::now()->addYear()->diffForHumans();    // in 1 Jahr
                         </ul>
                     </li>
                     <li>
-                        DB configuration: see <a href="#/2">previous slides on configuration</a>
+                        DB configuration: see <a href="#/3">previous slides on configuration</a>
                         <ul>
                             <li>Note: you can have <a href="https://laravel.com/docs/8.x/database#introduction">separate configs</a> for reading/writing</li>
                         </ul>
@@ -1182,7 +1224,7 @@ foreach ($users as $user) {
             <section>
                 <h2>Raw SQL Queries (2)</h2>
 
-                <ul>
+                <ul style="width: 100%;">
                     <li>
                         In Laravel you can run <a href="https://laravel.com/docs/8.x/database#running-queries">raw SQL queries</a>
 
@@ -1212,8 +1254,6 @@ foreach ($users as $user) {
 
             <section>
                 <h2>Sources</h2>
-
-
                 <ul>
                     <li><a href="https://laravel.com/docs/8.x/installation">Laravel docs: Installation</a></li>
                     <li><a href="https://laravel.com/docs/8.x/configuration">Laravel docs: Configuration</a></li>
@@ -1224,9 +1264,6 @@ foreach ($users as $user) {
                     <li><a href="https://laravel.com/docs/8.x/views">Laravel docs: Views</a></li>
                     <li><a href="https://laravel.com/docs/8.x/blade">Laravel docs: Blade Templates</a></li>
                     <li><a href="https://laravel.com/docs/8.x/database">Laravel docs: Databases: Getting Started</a></li>
-                    <li><a href="https://laravel.com/docs/5.2/quickstart">Laravel tutorial on a task list project - basic</a> version 5.2!</li>
-                    <li><a href="https://laravel.com/docs/5.2/quickstart-intermediate">Laravel tutorial on a task list project - intermediate</a> version 5.2!</li>
-
                     <li><a href="https://laravel.com/docs/8.x/lifecycle">Laravel docs: Request Lifecycle</a></li>
                     <li><a href="https://laravel.com/docs/8.x/providers">Laravel docs: Service Providers</a></li>
                     <li><a href="https://laravel.com/docs/8.x/container">Laravel docs: Service Container</a></li>
