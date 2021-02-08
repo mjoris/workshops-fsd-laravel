@@ -212,7 +212,7 @@
                     <li>Developers who want to use Docker as their virtual development environment with Laravel, have several options, depending on their preferences and requirements
                     <ul>
                         <li><a href="https://laradock.io/">Laradock</a>
-                            <ul style="font-size: 80%;">
+                            <ul style="font-size: 70%;">
                                 <li>A <em>swiss knife</em> Docker environment (consisting of &gt; 60 Docker images of high quality), to be cloned once for all your web projects</li>
                                 <li>Running is as easy as <code>docker-compose up -d nginx mysql phpmyadmin workspace</code>, where the <code>workspace</code> is a separate container to run all your CLI commands</li>
                                 <li>
@@ -223,7 +223,7 @@
                         </li>
                         <li>
                             <a href="https://laravel.com/docs/8.x/sail">Laravel Sail</a>
-                            <ul style="font-size: 80%;">
+                            <ul style="font-size: 70%;">
                                 <li>The official dev env of Laravel (since 8.0)</li>
                                 <li>Internally, you run a (temporary) Sail container for the installation of a fresh Laravel project. Next, running is as easy as <code>sail up</code> and from your own terminal you can launch any of your CLI commands on a container e.g. <code>sail composer</code>.
                                 Comes with <a href="https://github.com/mailhog/MailHog">MailHog</a>.</li>
@@ -232,7 +232,7 @@
                         </li>
                         <li>
                             your own docker-compose environment
-                            <ul style="font-size: 80%;">
+                            <ul style="font-size: 100%;">
                                 <li>&rightarrow; what we choose in this course &rightarrow; let's have a <a
                                     href="https://github.com/mjoris/workshops-wmfs-laravel">look</a></li>
                                 <li>Install Laravel through Composer (run from same environment as the web server)</li>
@@ -572,23 +572,25 @@ DB_CONNECTION=sqlite</code></pre>
                     <li>
                         Installing a fresh Laravel project
                         <ol>
-                            <li>Start a new git repo &amp; clone</li>
-                            <li>Add your Docker environment (<code>docker-compose.yml</code>, <code>/docker</code>, &hellip; ) providing some <em>empty</em> project folder, of which a future subfolder <code>public</code> is set as the document root of the web container</li>
+                            <li>Start a new git repo and <code>git clone</code></li>
+                            <li>Add your Docker environment (<code>docker-compose.yml</code>, <code>/docker</code>, &hellip; )
+                                <br>
+                                <span style="font-size:70%;">providing some <em>empty</em> project folder, of which a future subfolder <code>public</code> is set as the document root of the web container</span></li>
                             <li>
-                                Run <code>docker-compose up</code>, open a bash terminal in the web container and run <br>
+                                Run <code>docker-compose up</code>, <code>docker-compose exec &hellip; bash</code> into the web container and run <br>
                                 <code>composer create-project laravel/laravel projectdir ^8.0</code>
                             </li>
                             <li>Craft <code>.env</code> and <code>config/*.php</code> until your project is working</li>
-                            <li>Copy the non-sensitive parts of <code>.env</code> to <code>.env.example</code></li>
+                            <li>If necessary: copy the non-sensitive parts of <code>.env</code> to <code>.env.example</code></li>
                             <li>Commit and push</li>
                         </ol>
                     </li>
                     <li style="margin-top: 1em;">
                         Installing an already existing Laravel project
                         <ol>
-                            <li>Clone the repo</li>
+                            <li><code>git clone</code> the repo</li>
                             <li>
-                                Run <code>docker-compose up</code>, open a bash terminal in the web container and run <br>
+                                Run <code>docker-compose up</code>, <code>docker-compose exec &hellip; bash</code> into the web container and run <br>
                                 <code>composer install<br>
                                     cp .env.example .env<br>
                                     php artisan key:generate</code>
@@ -605,7 +607,7 @@ DB_CONNECTION=sqlite</code></pre>
         <section>
             <section>
                 <h2>01.4<br>Laravel Routing</h2>
-                <!--p style="font-size: 75%; line-height: 100%;">Note: the next slides are illustrated in this demo: <code>assets/ws2-sws-fiddles-laravel/00.basics/</code> (<code>composer install</code> required) <a href="assets/ws2-sws-fiddles-laravel/00.basics/">&rarr;</a> <br/><span style="font-size: 50%; line-height: 100%;">It includes basic examples of routing, views, Blade templates, Raw Queries, Query Builder and Eloquent.</span></p-->
+
             </section>
 
             <section>
