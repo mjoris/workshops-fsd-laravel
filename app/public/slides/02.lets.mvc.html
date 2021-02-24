@@ -900,7 +900,7 @@ foreach ($user-&gt;tasks as $task) {
 		// foreign key: column types need to be EXACTLY the same
 		$table-&gt;unsignedBigInteger('location_id');
 		$table-&gt;foreign('location_id')-&gt;references('id')-&gt;on('locations');
-		// all at once: $table->foreignId('user_id')->constrained();
+		// all at once: $table->foreignId('location_id')->constrained();
 
 		$table-&gt;timestamps(); // LEAVE IT HERE
 	});

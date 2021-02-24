@@ -24,3 +24,6 @@ Route::get('/', function () {
 Route::get('/', function () {
     return redirect('/slides');
 });
+
+
+Route::get('/products', 'App\Http\Controllers\ProductController@overview');
