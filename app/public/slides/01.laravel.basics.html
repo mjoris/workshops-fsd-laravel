@@ -579,7 +579,7 @@ DB_CONNECTION=sqlite</code></pre>
                                 <span style="font-size:70%;">providing some <em>empty</em> project folder, of which a future subfolder <code>public</code> is set as the document root of the web container</span></li>
                             <li>
                                 Run <code>docker-compose up</code>, <code>docker-compose exec &hellip; bash</code> into the web container and run <br>
-                                <code>composer create-project laravel/laravel projectdir ^8.0</code>
+                                <code>composer create-project laravel/laravel . ^8.0</code>
                             </li>
                             <li>Craft <code>.env</code> and <code>config/*.php</code> until your project is working</li>
                             <li>If necessary: copy the non-sensitive parts of <code>.env</code> to <code>.env.example</code></li>
