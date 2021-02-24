@@ -34,6 +34,16 @@ ins code, code.ok {
     color: #008800;
 }
 
+.warning {
+    background: #ffffff;
+    color: #ff2c2d;
+    font-size: 0.75em;
+}
+
+.has-light-background .warning {
+    background: #000000;
+}
+
 /* zoomable components */
 .zoomable-12:hover {
     transform: scale(1.2);
