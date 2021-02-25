@@ -1175,6 +1175,25 @@ class TaskController extends Controller
 
         </section>
 
+        <section>
+            <section>
+                <h2>Concluding demo</h2>
+                <ul style="font-size: 85%;">
+                    <li>Let's start from a DB schema for a webshop
+                        <ul>
+                            <li><strong>products</strong> (id&#128273;, name, description, price, <span style="color: red;">brand_id</span>)</li>
+                            <li><strong>brands</strong> (id&#128273;, name)</li>
+                            <li><strong>categories</strong> (id&#128273;, name)</li>
+                            <li><strong>category_product</strong> (<span style="color: red;">category_id&#128273;</span>, <span style="color: red;">product_id&#128273;</span>)</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">Let's craft the migrations and seeders &longrightarrow;</li>
+                    <li>Let's generate the Eloquent models including <code>$fillable</code> and all relationships &longrightarrow;</li>
+                    <li>Let's try Eloquent in a simple ProductController &longrightarrow;</li>
+                </ul>
+            </section>
+        </section>
+
         <!-- The END -->
         <section>
             <section>

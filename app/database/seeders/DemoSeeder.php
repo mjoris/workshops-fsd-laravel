@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+// Migration for concluding demo 'webshop' of 02.lets.mvc
 class DemoSeeder extends Seeder
 {
     /**

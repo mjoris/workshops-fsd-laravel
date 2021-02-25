@@ -21,10 +21,10 @@ Route::get('/', function () {
 });
 */
 
-
+// When at '/', redirect to the (static) course slides
 Route::get('/', function () {
     return redirect('/slides');
 });
 
-
+// Routes for concluding demo 'webshop' of 02.lets.mvc
 Route::get('/products', [ProductController::class, 'overview']);
