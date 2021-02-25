@@ -1019,9 +1019,11 @@ $table-&gt;string('email', 191)-&gt;unique();
                     </li>
                     <li>
                         Point to its <strong>methods</strong> in <code>/routes/web.php</code>
-                        <pre class="bigger"><code class="hljs php">Route::get('/tasks', 'TaskController@index');
-Route::post('/tasks/create', 'TaskController@store');
-Route::post('/tasks/{task}/delete', 'TaskController@destroy');</code></pre>
+                        <pre class="bigger"><code class="hljs php">use App\Http\Controllers\TaskController;
+
+Route::get('/tasks', [TaskController::class, 'index']);
+Route::post('/tasks/create', [TaskController::class, 'store']);
+Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code></pre>
                     </li>
                     <li>
                         Write the appropriate method(s) in <code>*Controller</code>
@@ -1055,7 +1057,7 @@ Route::post('/tasks/{task}/delete', 'TaskController@destroy');</code></pre>
                     </li>
                     <li>
                         <a href="https://laravel.com/docs/8.x/routing#route-model-binding">Implicit model binding:</a> Eloquent will use the <code>id</code> column
-                        <pre class="bigger"><code class="hljs php">Route::post('/tasks/{task}/delete', 'TaskController@destroy');</code></pre>
+                        <pre class="bigger"><code class="hljs php">Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code></pre>
                         <pre class="bigger"><code class="hljs php">class TaskController extends Controller
 {
     &hellip;
