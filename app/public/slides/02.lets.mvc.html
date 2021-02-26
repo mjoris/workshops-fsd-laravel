@@ -1177,6 +1177,9 @@ class TaskController extends Controller
 
         <section>
             <section>
+                <h2>02.8<br>Concluding demo</h2>
+            </section>
+            <section>
                 <h2>Concluding demo</h2>
                 <ul style="font-size: 85%;">
                     <li>Let's start from a DB schema for a webshop
@@ -1191,6 +1194,81 @@ class TaskController extends Controller
                     <li>Let's generate the Eloquent models including <code>$fillable</code> and all relationships &longrightarrow;</li>
                     <li>Let's try Eloquent in a simple ProductController &longrightarrow;</li>
                 </ul>
+            </section>
+            <section>
+                <h2>Eloquent demo (1)</h2>
+                <pre class="bigger"><code class="hljs php" style="font-size: 85%" data-overlay-example="/eloquent-demo-1">    // retrieve product (data record) with ID 1
+    $product = Product::find(1);
+    dump($product->name);
+    dump($product->price);
+
+    // retrieve the product's brand (data record) through many-to-one
+    $brand = $product->brand;
+    dump('brand: ' . $brand->name);
+
+    // retrieve the product's categories (collection of data records) through many-to-many
+    $categories = $product->categories;
+    foreach ($categories as $category) {
+        dump('category: ' . $category->name);
+    }
+
+    // retrieve all products (collection of data records)
+    $products = Product::all();
+    dump('# products: ' . $products->count()); // count of collection
+    dump('# products: ' . Product::count());   // count in DB query (faster!)</code></pre>
+            </section>
+            <section>
+                <h2>Eloquent demo (2)</h2>
+                <pre class="bigger"><code class="hljs php" style="font-size: 80%" data-overlay-example="/eloquent-demo-2">    // retrieve all products of brand 1
+    $productsOfBrandOne = Product::where('brand_id', 1)->orderBy('price', 'desc')->get();
+    dump('all products of brand 1 ---');
+    dump($productsOfBrandOne->pluck('name', 'id')); // pluck of collection
+    dump($productsOfBrandOne->pluck('name', 'id')->all()); // ... as a plain array
+    dump(Product::where('brand_id', 1)->orderBy('price', 'desc')->pluck('name', 'id')); // pluck integrated in DB query
+
+
+    // retrieve all products of category 2
+    dump('all products of category 2 ---');
+    $id = 2;
+    dump(Category::find($id)->products->pluck('name')); // v1: involves 2 DB queries (key in collection is 0 !)
+    dump(Category::find($id)->products()->pluck('name')); // v2: still 2 DB queries ...
+
+    // v3: the preferable solution
+    $productsOfCategoryTwo = Product::whereHas('categories', function (Builder $query) use ($id) {
+        $query->where('id', $id);
+    })->get();
+    dump($productsOfCategoryTwo);</code></pre>
+            </section>
+            <section>
+                <h2>Eloquent demo (3)</h2>
+                <pre class="bigger"><code class="hljs php" style="font-size: 80%" data-overlay-example="/eloquent-demo-3">    // add a new product of brand 1
+    $brand1 = Brand::find(1);
+    $apple = new Product;
+    $apple->name = 'Jonagold';
+    $apple->description = 'Just a piece of fruit';
+    $apple->price = 0.85;
+    $apple->brand()->associate($brand1);
+    $apple->save();
+
+    // add another new product of brand 1 in one line
+    $brand1->products()->create(['name' => 'Pink Lady', 'description' => 'Just a piece of fruit', 'price' => 0.85]);
+    // yes ... you just saw a mass-assignment</code></pre>
+            </section>
+            <section>
+                <h2>Eloquent demo (4)</h2>
+                <pre class="bigger"><code class="hljs php" style="font-size: 85%" data-overlay-example="/eloquent-demo-4">    // product checkup: find products without category or price 0.00
+    dump('faulty products ---');
+    $faultyProductsBuilder = Product::where('price', 0.00)->orDoesntHave('categories');
+    $faultyProductStrings = $faultyProductsBuilder->get()->map(function ($product) {
+        return $product->id . '. ' . $product->name . ' (' . $product->price . '€)';
+    });
+    dump($faultyProductStrings->all());
+
+    // Let's add both categories to the first faulty product
+    $faultyProductsBuilder->first()?->categories()->sync([1, 2]); // ?-> null-safe operator
+
+    // ... and delete all apples anyway
+    Product::where('price', 0.85)->delete();</code></pre>
             </section>
         </section>
 

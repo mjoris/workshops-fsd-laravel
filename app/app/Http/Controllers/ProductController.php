@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -11,8 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
 class ProductController extends Controller
 {
 
-    public function overview() {
-
+    public function demo1()
+    {
         // retrieve product (data record) with ID 1
         $product = Product::find(1);
         dump($product->name);
@@ -32,7 +33,10 @@ class ProductController extends Controller
         $products = Product::all();
         dump('# products: ' . $products->count()); // count of collection
         dump('# products: ' . Product::count());   // count in DB query (faster!)
+    }
 
+    public function demo2()
+    {
         // retrieve all products of brand 1
         $productsOfBrandOne = Product::where('brand_id', 1)->orderBy('price', 'desc')->get();
         dump('all products of brand 1 ---');
@@ -52,7 +56,39 @@ class ProductController extends Controller
             $query->where('id', $id);
         })->get();
         dump($productsOfCategoryTwo);
+    }
 
+    public function demo3()
+    {
+        // add a new product of brand 1
+        $brand1 = Brand::find(1);
+        $apple = new Product;
+        $apple->name = 'Jonagold';
+        $apple->description = 'Just a piece of fruit';
+        $apple->price = 0.85;
+        $apple->brand()->associate($brand1);
+        $apple->save();
+
+        // add another new product of brand 1 in one line
+        $brand1->products()->create(['name' => 'Pink Lady', 'description' => 'Just a piece of fruit', 'price' => 0.85]);
+        // yes ... you just saw a mass-assignment
+    }
+
+    public function demo4()
+    {
+        // product checkup: find products without category or price 0.00
+        dump('faulty products ---');
+        $faultyProductsBuilder = Product::where('price', 0.00)->orDoesntHave('categories');
+        $faultyProductStrings = $faultyProductsBuilder->get()->map(function ($product) {
+            return $product->id . '. ' . $product->name . ' (' . $product->price . '€)';
+        });
+        dump($faultyProductStrings->all());
+
+        // Let's add both categories to the first faulty product
+        $faultyProductsBuilder->first()?->categories()->sync([1, 2]);
+
+        // ... and delete all apples anyway
+        Product::where('price', 0.85)->delete();
     }
 
 }
