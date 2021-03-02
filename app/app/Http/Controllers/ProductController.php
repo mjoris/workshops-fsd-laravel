@@ -91,4 +91,10 @@ class ProductController extends Controller
         Product::where('price', 0.85)->delete();
     }
 
+    public function overview()
+    {
+
+        return view('simple-admin.products', ['products' => Product::all()]);
+    }
+
 }
