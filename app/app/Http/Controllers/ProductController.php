@@ -93,8 +93,13 @@ class ProductController extends Controller
 
     public function overview()
     {
-
         return view('simple-admin.products', ['products' => Product::all()]);
     }
+
+    public function showCreateForm()
+    {
+        return view('simple-admin.product-add', ['brands' => Brand::all(), 'formErrors' => ['yes indeed']]);
+    }
+
 
 }

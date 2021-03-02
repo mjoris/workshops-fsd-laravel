@@ -33,3 +33,4 @@ Route::get('/eloquent-demo-3', [ProductController::class, 'demo3']);
 Route::get('/eloquent-demo-4', [ProductController::class, 'demo4']);
 
 Route::get('/products', [ProductController::class, 'overview']);
+Route::get('/products/create', [ProductController::class, 'showCreateForm']);

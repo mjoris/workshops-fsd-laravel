@@ -34,13 +34,13 @@
 </nav>
 
 <div class="container">
-    <div class="col-sm-offset-2 col-sm-8">
+
 
         @section('content')
             <p>this is where the page content goes</p>
         @show
 
-    </div>
+
 </div>
 <footer class="footer mt-auto py-3">
     <div class="container">
