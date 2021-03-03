@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>W&amp;M Full-stack – Laravel course materials</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section data-background="#b5533c">
+            <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
+            <h1>03. Forms</h1>
+        </section>
+
+
+        <!-- Named and grouped routes -->
+        <section>
+            <section>
+                <h2>03.1<br>Named and grouped routes</h2>
+            </section>
+
+
+            <section>
+                <h2>Named routes</h2>
+
+                <ul style="width: 100%;">
+                    <li>
+                        Specify a route name using the chained method <code>name</code>
+                        <pre class="bigger"><code class="hljs php">Route::get('user/profile', function () {
+    //
+})-&gt;name('profile');</code></pre>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        The same with controller actions
+                        <pre class="bigger"><code class="hljs php">Route::get('user/profile', [UserProfileController::class, 'show'])-&gt;name('profile');</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Generating URLs To Named Routes</h2>
+
+                <pre class="bigger"><code class="hljs php">// Generating URLs&hellip;
+$url = route('profile');
+
+// &hellip; for routes with parameters
+$url = route('profile', ['id' =&gt; 1]);
+
+// Generating Redirects&hellip;
+return redirect()-&gt;route('profile');</code></pre>
+
+            </section>
+
+
+            <section>
+                <h2>Route groups</h2>
+
+                <ul style="width: 100%;">
+                    <li>
+                        Specify a route (URI) prefix
+                        <pre class="bigger"><code class="hljs php">Route::prefix('admin')-&gt;group(function () {
+    Route::get('users', function () {
+        // Matches the "/admin/users" URL
+    });
+    Route::get('dashboard', function () {
+        // Matches the "/admin/dashboard" URL
+    });
+});</code></pre>
+                    </li>
+                    <li>
+                        Specify wildcard sub-domain for a route group
+                        <pre class="bigger"><code class="hljs php">Route::domain('{account}.myapp.com')-&gt;group(function () {
+    Route::get('user/{id}', function ($account, $id) {
+        //
+    });
+});</code></pre>
+                    </li>
+                </ul>
+                <footer><small>You should combine this with controllers</small></footer>
+            </section>
+        </section>
+
+        <!-- Sessions -->
+        <section>
+            <section>
+                <h2>03.2<br>Sessions</h2>
+            </section>
+            <section>
+                <h2>Sessions</h2>
+
+                <ul style="font-size: 85%">
+                    <li>
+                        By default the middleware <code>\Illuminate\Session\Middleware\StartSession</code> backs a permanent <a href="https://laravel.com/docs/8.x/session">Session</a>, only for the routes in <code>routes/web.php</code>
+                    </li>
+                    <li><strong>Principle:</strong> store data across multiple requests for the user</li>
+                    <li>
+                        <strong>Where/how is the session data stored?</strong>
+                        <ul>
+                            <li>depends on the <code>driver</code> configuration in <code>config/session.php</code></li>
+                            <li>by default it is set to <code>file</code> which means session data is stored as JSON in <code>storage/framework/sessions</code></li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Store and retrieve session variables with <br><em>put</em>, <em>get</em>, <em>has</em>, <em>exists</em>, <em>push</em>, <em>pull</em>, <em>forget</em>, <em>flush</em>&hellip; (<a href="https://laravel.com/docs/8.x/session">docs</a>)
+                        <pre class="bigger"><code class="hljs php">$value = $request-&gt;session()-&gt;get('key');
+$value = $request-&gt;session()-&gt;get('key', 'default');
+$allData = $request-&gt;session()-&gt;all();
+
+$request-&gt;session()-&gt;put('key', 'value');
+</code></pre>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h2>Flash data in the session</h2>
+
+                <ul>
+                    <li style="margin-top: 1em;">
+                        Flash a variable = store variable in the session only for the next HTTP request
+                    </li>
+                </ul>
+                        <pre class="bigger"><code class="hljs php" style="font-size: 82%;">$request-&gt;session()-&gt;flash('status', 'Task was successful!');
+
+$request-&gt;session()-&gt;reflash(); // flash all data once again!
+
+$request-&gt;session()-&gt;keep(['username', 'email']); // the same for a selection of vars
+
+$request-&gt;session()-&gt;now('status', 'Task was successful!'); // store as flashed data but only for the current request
+</code></pre>
+
+            </section>
+        </section>
+
+
+        <!-- Handling forms -->
+        <section>
+            <section>
+                <h2>03.3<br>Handling forms</h2>
+            </section>
+
+
+            <section>
+                <h2>General approach</h2>
+
+                <ul>
+                    <li>
+                        Blog post routes example
+                        <pre class="bigger"><code class="hljs php">// Display a form to create a blog post...
+Route::get('blogposts/create', 'PostController@create');
+
+// Store a new blog post...
+Route::post('blogposts/create', 'PostController@store');</code></pre>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        The first route shows a Blade template containing a form
+                    </li>
+
+                    <li>
+                        The second route
+                        <ul>
+                            <li>
+                                validates the HTTP request
+                            </li>
+                            <li>
+                                stores the blog post
+                            </li>
+                            <li>
+                                redirects the user
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>About the other HTTP Verbs</h2>
+
+                <ul>
+                    <li>
+                        Blog post routes example
+                        <pre class="bigger"><code class="hljs php">// Display a form to create a blog post...
+Route::get('blogposts/create', 'PostController@create');
+
+// Store a new blog post...
+Route::post('blogposts/create', 'PostController@store');</code></pre>
+                    </li>
+
+                    <li>
+                        Don't use the other HTTP verbs (delete, put, patch)
+                        <ul>
+                            <li>
+                                only the verbs GET and POST are allowed (see <a href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fs-method">HTML standard</a>)
+                            </li>
+                            <li>
+                                &hellip; unless you're faking the verbs with <a href="https://laravel.com/docs/8.x/routing#form-method-spoofing">form method spoofing</a>
+                            </li>
+                            <li>
+                                &hellip; unless you're building a RESTful web API
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Cross-Site Request Forgery (CSRF)</h2>
+                <ul style="width: 100%;">
+                    <li>CSRF = A serious type of attack</li>
+                </ul>
+                <blockquote style="width: 90%; margin-top: 1em;font-size: 75%;">A CSRF attack forces a logged-on victim’s browser to send a forged HTTP request, including the victim’s session cookie and any other automatically included authentication information, to a vulnerable web application. This allows the attacker to force the victim’s browser to generate requests the vulnerable application thinks are legitimate requests from the victim.</blockquote>
+                <ul style="width: 100%;">
+                    <li>Example</li>
+                </ul>
+                <pre class="bigger"><code class="hljs php" style="font-size: 85%;">&lt;form action="https://your-application.com/user/email" method="POST"&gt;
+    &lt;input type="email" value="malicious-email@example.com"&gt;
+&lt;/form&gt;
+
+&lt;script&gt;
+    document.forms[0].submit();
+&lt;/script&gt;</code></pre>
+                <ul>
+                    <li style="margin-top: 0.2em;">SOLUTION: Generate a CSRF token on each form load <em>(and limit that token to that form only)</em> and validate it too.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>CSRF Protection</h2>
+
+                <ul>
+                    <li>
+                        Include the automatically generated CSRF field/token in your (POST) form
+                        <pre class="bigger"><code class="hljs php">// Vanilla PHP
+&lt;?php echo csrf_field(); ?&gt;
+
+// Blade Template Syntax &hellip;
+@csrf
+
+// &hellip; is the equivalent of:
+&lt;input type="hidden" name="_token" value="{{ csrf_token() }}"&gt;
+</code></pre>
+                    </li>
+                    <li>
+                        The <code>VerifyCsrfToken</code> middleware (part of the <code>web</code> group) is already activated and does the checking
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Read the <a href="https://laravel.com/docs/8.x/csrf">Laravel docs on CSRF Protection</a> on excluding CSRF protection and CSRF support for JS frameworks
+                    </li>
+                </ul>
+            </section>
+
+
+
+            <section>
+                <h2>A simple form v1 (1)</h2>
+
+                <ul style="font-size: 85%">
+                    <li>
+                        The Blade template
+                        <pre class="bigger"><code class="hljs">@include('common.errors') {{-- visualizes the $errors array --}}
+
+&lt;form method="POST" action="{{ url('blogposts/create') }}" accept-charset="UTF-8"&gt;
+    @csrf
+    &lt;div class="form-group"&gt;
+        &lt;label for="title"&gt;Title:&lt;/label&gt;
+        &lt;input class="form-control" name="title" type="text"
+               value="{{ old('title', '') }}" id="title"&gt;
+    &lt;/div&gt;
+
+    &lt;div class="form-group"&gt;
+        &lt;label for="content"&gt;Content:&lt;/label&gt;
+        &lt;textarea class="form-control" rows="10" name="content" cols="50" id="content"&gt;
+            {{ old('content', '') }}
+        &lt;/textarea&gt;
+    &lt;/div&gt;
+
+    &lt;input class="btn btn-primary pull-right" type="submit" value="submit"&gt;
+
+&lt;/form&gt;
+</code></pre>
+                    </li>
+                    <li>
+                        The helper method <a href="https://laravel.com/docs/8.x/helpers#method-old">old</a> retrieves an <a href="https://laravel.com/docs/8.x/requests#old-input">old input value</a> flashed into the session
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>A simple form v1 (2)</h2>
+
+                <ul style="font-size: 85%;width: 80%;">
+                    <li>
+                        The controller
+                        <pre class="bigger"><code class="hljs php">public function create()
+{
+	return view('blogpost.add');
+}
+
+public function store(Request $request)
+{
+	// building oldskool form errors &hellip;
+	$errors = array();
+
+	if (!(($request-&gt;has('title')) && (strlen($request-&gt;title) &gt; 0))) {
+		$errors[] = 'The title field is required.';
+	} else if (strlen($request-&gt;title) &gt; 125) {
+		$errors[] = 'The title may not be greater than 125 characters.';
+	} else if (Blogpost::where('title', $request-&gt;title)-&gt;exists()) {
+		$errors[] = 'The title has already been taken.';
+	}
+
+	if (!(($request-&gt;has('content')) && (strlen($request-&gt;content) &gt; 0))) {
+		$errors[] = 'The content field is required.';
+	}
+
+	&hellip;</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>A simple form v1 (3)</h2>
+
+                <ul style="font-size: 85%;width: 85%;">
+                    <li>
+                        The controller
+                        <pre class="bigger"><code class="hljs php">public function store(Request $request)
+{
+	// building oldskool form errors &hellip;
+	&hellip;
+
+	if (count($errors) &gt; 0) {
+		// flash the form errors in the session
+		$request-&gt;session()-&gt;flash('errors', $errors);
+
+		// flash the request inputs in the session and take previous route
+		$request-&gt;flash();
+		return back();
+		// NOTE: flashing the request inputs was necessary since the user is REDIRECTED
+
+		// also possible: return back()-&gt;withInput();
+
+	} else {
+		Blogpost::create($request-&gt;all()); // mass assignment
+		return redirect('blogposts/success');
+	}
+}
+</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+
+            <section>
+                <h2>Validation (1)</h2>
+
+                <ul>
+                    <li>
+                        In our controller, the <code>validate</code> method
+                        <ul>
+                            <li>
+                                takes the HTTP request and desired validation rules
+                            </li>
+                            <li>
+                                redirects the user back to his previous location upon failure (+ auto-flash of errors and input values)
+                            </li>
+                        </ul>
+                        <pre class="bigger"><code class="hljs php">public function store(Request $request)
+{
+    $request-&gt;validate([
+        'title' =&gt; 'required|unique:blogposts|max:125',
+        'content' =&gt; 'required',
+    ]);
+
+    // The blog post is valid, store in database...
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Validation (2)</h2>
+
+                <ul>
+                    <li>
+                        Anticipating validation in your Blade templates
+                        <ul>
+                            <li>
+                                The <code>ShareErrorsFromSession</code> middleware (part of the <code>web</code> group) assures an <code>$errors</code> variable is available in your views
+                            </li>
+                            <li>
+                                Enjoy the richness of <a href="https://laravel.com/docs/8.x/validation#available-validation-rules">the rules available</a>
+                            </li>
+                        </ul>
+                        <pre class="bigger"><code class="hljs php" style="font-size: 85%;">'start_date' =&gt; 'required|date|after:tomorrow',
+'finish_date' =&gt; 'required|date|after:start_date',
+
+'photo' =&gt; 'image|mimes:jpeg,png', // is an image of any type and its content is jpeg or png
+'avatar' =&gt; 'dimensions:min_width=100,min_height=200', // image with specified dimensions
+
+'state' =&gt; 'exists:states,abbreviation', // exists in column abbreviation of table states
+'email' =&gt; 'email:rfc,dns' // has email format and valid domain (requires extra package)
+
+// for optional fields !!!!!!
+// since we have TrimStrings and ConvertEmptyStringsToNull middleware running
+'publish_at' =&gt; 'nullable|date'</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Validation (3)</h2>
+
+                <ul>
+                    <li>
+                        Read the <a href="https://laravel.com/docs/8.x/validation">Laravel docs on Validation</a> on
+                        <ul>
+                            <li>
+                                Stopping On First Validation Failure (bail)
+                            </li>
+                            <li>
+                                Validating arrays
+                            </li>
+                            <li>
+                                <strong>Form Request = classes encapsulating the validation and authorization logic</strong>
+                            </li>
+                            <li>
+                                Working With (field related) Error Messages
+                            </li>
+                            <li>
+                                Customizing Error Messages
+                            </li>
+                            <li>
+                                Available Validation Rules
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </section>
+
+            <section>
+                <h2>A simple form v2 (1)</h2>
+
+                <ul style="font-size: 85%;width: 85%;">
+                    <li>
+                        The new version of the controller
+                        <pre class="bigger"><code class="hljs php">public function create()
+{
+	return view('blogpost.add');
+}
+
+public function store(Request $request)
+{
+	$request-&gt;validate([
+		'title' =&gt; 'required|unique:blogposts|max:125',
+		'content' =&gt; 'required'
+	]);
+
+	Blogpost::create($request-&gt;all());
+
+	return redirect('blogposts/success');
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>A simple form v2 (2)</h2>
+
+                <ul style="font-size: 85%;width: 85%;">
+                    <li>
+                        Change <code>common/errors.blade.php</code> such that it visualizes an <em>$errors</em> <strong>MessageBag</strong>
+                        <pre class="bigger"><code class="hljs">@if ($errors-&gt;any())
+    &lt;!-- Form Error List --&gt;
+    &lt;div class="alert alert-danger"&gt;
+        &lt;strong&gt;Whoops! Something went wrong!&lt;/strong&gt;
+
+        &lt;ul&gt;
+            @foreach ($errors-&gt;all() as $error)
+                &lt;li&gt;{{ $error }}&lt;/li&gt;
+            @endforeach
+        &lt;/ul&gt;
+    &lt;/div&gt;
+@endif</code></pre>
+                    </li>
+                    <li>This instance of <code>Illuminate\Support\MessageBag</code> also supports field-based retrieval, and has a specific Blade directive:
+                        <pre class="bigger"><code class="hljs">&lt;input id="title" type="text" class="@error('title') is-invalid @enderror"&gt;
+
+@error('title')
+    &lt;div class="alert alert-danger"&gt;{{ $message }}&lt;/div&gt;
+@enderror</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <!--section>
+                <h2>Collective's Forms &amp HTML</h2>
+
+                <ul>
+                    <li>
+                        In Laravel 4, it was possible to generate HTML form code using Laravel shorthands
+                        <ul>
+                            <li>
+                                <strong>Forms &amp HTML</strong> (<a href="https://github.com/LaravelCollective/docs/blob/6.0/html.md">docs</a>) has been removed from the core framework and is currently maintained by <a href="https://laravelcollective.com/">Laravel Collective</a>
+                            </li>
+                            <li>
+                                You need to install it through Composer
+                            </li>
+                            <li>
+                                <a href="https://github.com/LaravelCollective/html/releases">Releases ordered by Laravel version</a> will be replaced by Laravel version agnostic releases
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <footer><em>This is not a mandatory library!</em></footer>
+            </section>
+
+            <section style="font-size: 85%">
+                <h2>A simple form v3</h2>
+
+                <ul style="font-size: 85%">
+                    <li>
+                        The new version of the Blade template
+                        <pre class="bigger"><code class="hljs php">@include('common.errors') {{-- visualizes the $errors collection --}}
+
+{!! Form::open(['url' =&gt; 'blogposts/create', 'method' =&gt; 'post']) !!}
+
+&lt;div class="form-group"&gt;
+	{!! Form::label('title', 'Title:') !!}
+	{!! Form::text('title', '', ['class' =&gt; 'form-control']) !!}
+&lt;/div&gt;
+
+&lt;div class="form-group"&gt;
+	{!! Form::label('content', 'Content:') !!}
+	{!! Form::textarea('content', '', ['class' =&gt; 'form-control', 'rows' =&gt; '10']) !!}
+&lt;/div&gt;
+
+{!! Form::submit('submit', ['class' =&gt; 'btn btn-primary pull-right']) !!}
+{!! Form::close() !!}
+</code></pre>
+                    </li>
+                    <li>
+                        Advantage: csrf_field() and old() are generated for you !!!
+                    </li>
+                </ul>
+            </section-->
+
+        </section>
+
+        <!-- Working with files -->
+        <section>
+            <section>
+                <h2>03.4<br>File( upload)s</h2>
+            </section>
+
+
+            <section>
+                <h2>File Storage &ne; public folder</h2>
+
+                <ul>
+                    <li>
+                        The <a href="https://laravel.com/docs/8.x/structure#the-public-directory">public folder</a> contains the assets (img, css, js, &hellip;)
+                        <ul style="font-size: 80%">
+                            <li>Assets directly accessible from the web server (link it with <code>asset()</code>)</li>
+                            <li><em>By default,</em> you cannot handle (= store, edit, list, &hellip;) files there</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        <a href="https://laravel.com/docs/8.x/filesystem">File Storage</a> is an abstraction layer which allows you to handle files on local and remote (cloud) systems in a uniform way
+                        <ul style="font-size: 80%">
+                            <li>
+                                To be configured in <code>config/filesystems.php</code>
+                            </li>
+                            <li>
+                                Organized as <strong>disks</strong> = configuration combination of a <em>driver</em> and a <em>location</em>.
+                                For example, the <code>local</code> driver interacts with the local file system.
+                            </li>
+                            <li>Any of the disks can be used from your code, but you need to specify a default disk</li>
+
+
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>The disks</h2>
+
+                <ul>
+                    <li>
+                        The <code>local</code> disk
+                        <ul style="font-size: 80%">
+                            <li>Uses the <code>local</code> driver and its root is <code>storage/app</code></li>
+                            <li>Is the default disk in a fresh Laravel project</li>
+                            <li>Files saved on this disk, cannot be served from the web server later on</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        The <code>public</code> disk
+                        <ul style="font-size: 80%">
+                            <li>Uses the <code>local</code> driver and its root is <code>storage/app/public</code></li>
+                            <li><code>storage/app/public</code> is neither located inside the web server's document root but &hellip;</li>
+                            <li>
+                                Luckily, you can create* a symbolic link <code>public/storage</code> to <code>storage/app/public</code>  &#9786;
+                                <pre class="bigger"><code class="hljs bash">$ php artisan storage:link
+The [public/storage] directory has been linked.</code></pre>
+                            </li>
+                            <li>
+                                Keep on using the <code>asset()</code> helper:
+                                <pre class="bigger"><code class="hljs">{{ asset('storage/file.txt') }}</code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <footer><small>* you need to create the symbolic link, because a git project cannot contain a symbolic link (and is OS-specific)</small></footer>
+            </section>
+
+
+            <section style="font-size: 90%">
+                <h2>File uploads</h2>
+                <ul>
+                    <li>
+                        Checklist
+                        <ol>
+                            <li style="margin-top: 0.3em;">Set the <code>public</code> disk as the default disk in <code>config/filesystems.php</code></li>
+                            <li style="margin-top: 0.3em;">Create a symbolic link to <code>storage/app/public</code> or configure Filesystem</li>
+                            <li style="margin-top: 0.3em;">In your form (Views): check your <code>enctype</code> attribute (see
+                                <a href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/05.forms.html#/6/2">this course</a>)  </li>
+                            <li style="margin-top: 0.3em;">Access the uploaded file through the HTTP request object (<a href="01.laravel.basics.html#/4/7">code example</a>)</li>
+                            <li style="margin-top: 0.3em;">Validation: check on file (MIME) type and eventually file size, dimension, &hellip;
+                                <ul>
+                                    <li>
+                                        Use a <code>*</code> with multiple file uploads e.g. <code>documents.*</code>
+                                    </li>
+                                    <li>
+                                        <strong>Check the type. Don't let *.php (and many others) pass! </strong>
+                                        Hint: <code>image</code> is a rule too
+                                    </li>
+                                </ul>
+                            </li>
+                            <li style="margin-top: 0.3em;">Of course you need to <a href="https://laravel.com/docs/8.x/filesystem#file-uploads">store the file upload</a>
+                                <ul>
+                                    <li>
+                                        <code>store()</code> will assign a unique ID filename. Most of the time, it's a good practice. (think of duplicates)
+                                    </li>
+                                    <li>
+                                        If the path (relative to Filesystem root) does not exist, the folders are created (think of a clean directory structure)
+                                    </li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </li>
+                </ul>
+            </section>
+        </section>
+
+        <!-- Filtering -->
+        <section>
+            <section>
+                <h2>03.5<br>Filtering</h2>
+                <p><img src="assets/03/filter.png" alt="" title="" width="600" class="noborder" /></p>
+            </section>
+
+            <section>
+                <h2>Filtering?</h2>
+                <ul>
+                    <li>
+                        Allow a visitor to refine a set of results
+                        <ul>
+                            <li>A form with checkboxes, dropdowns, etc. per defining property of the result set</li>
+                            <li>Typically placed on the left hand side, next to the results</li>
+                            <li>It is necessary to persist the form values (!)</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 0.5em;">
+                        Typically in combination with
+                        <ul>
+                            <li>Pagination</li>
+                            <li>Sorting on specific properties of the result set (asc/desc)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Filtering scenarios</h2>
+                <ul>
+                    <li>
+                        Filter via <code>GET</code> params
+                        <ul>
+                            <li>Pro: links can be shared/bookmarked</li>
+                            <li>Con: links become cluttered</li>
+                            <li>Con: filter not preserved after having navigated away</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Filter via <code>Session</code> params
+                        <ul>
+                            <li>Pro: links don't become cluttered</li>
+                            <li>Pro: filter preserved after having navigated away</li>
+                            <li>Con: links can't be shared/bookmarked</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Some Laravel filtering hints</h2>
+                <ul style="font-size: 75%">
+
+                    <li>
+                        In the controller
+                        <ul>
+                            <li>Validate your input data e.g. <code>'brand_id' =&gt; 'exists:brands'</code></li>
+                            <li><code>Session</code> scenario: add your inputs to the session</li>
+                            <li>For each activated filter field, apply a <em>chainable</em> method e.g. <br/><code>if (&hellip;) $products-&gt;where('brand_id', $request-&gt;brand_id);</code> (or use
+                                <a href="https://laravel.com/docs/8.x/queries#conditional-clauses">when</a>)
+                                <ul>
+                                    <li><strong>Pitfall: in SQL, AND has precedence over OR.</strong> This happens when you chain <code>where()</code> and <code>orWhere()</code> serially. Use
+                                        <a href="https://laravel.com/docs/8.x/queries#parameter-grouping">(or)where grouping</a> instead.</li>
+                                    <li><strong>Pitfall:</strong> <em>chaining</em> a method changes the state of the Builder object</li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </li>
+
+                </ul>
+
+            </section>
+        </section>
+
+        <!-- Pagination -->
+        <section>
+            <section>
+                <h2>03.6<br>Pagination</h2>
+                <p style="margin-top: 2.5em;"><img src="assets/03/pagination.jpg" alt="" title="" width="600" /></p>
+            </section>
+
+            <section>
+                <h2>Pagination?</h2>
+                <ul>
+                    <li>
+                        When having too many items to show, split them into several pages
+                        <ul>
+                            <li>e.g. search results, filter results</li>
+                            <li>Paginator typically placed beneath the results</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Examples</h2>
+                <ul>
+                    <li style="margin-top: 1em">
+                        Bad examples:
+                        <p style="text-align: center"><img src="assets/03/pagination-bad-2.jpg" alt="" title="" width="447" /><br /><img src="assets/03/pagination-bad-1.png" alt="" title="" width="447" /></p>
+                    </li>
+                    <li>
+                        Good example:
+                        <div class="hastooltip" style="width: 550px; margin: 0 auto;">
+                            <p style="text-align: center"><img src="assets/03/pagination-good-flickr.png" alt="" title="" width="447" /></p>
+                            <div class="tooltip">
+                                <div>
+                                    <ul>
+                                        <li>Always indicate how many results there are</li>
+                                        <li>Always indicate how many pages there are</li>
+                                        <li>
+                                            Show a reasonable number of pages
+                                            <ul>
+                                                <li>The number row automgically adjusts itself based on the current page</li>
+                                                <li>First two and last two pages always shown</li>
+                                                <li>All, except the current page, clickable</li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            Always indicate current active page
+                                            <ul>
+                                                <li>Don't link it though!</li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            Always show next/previous buttons
+                                            <ul>
+                                                <li>Only clickable when necessary</li>
+                                            </ul>
+                                        </li>
+                                        <li>Don't show First/Last links (no direct value)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Pagination internals</h2>
+                <ul>
+                    <li>
+                        From <u>database</u>: Total number of items
+                    </li>
+                    <li>
+                        Number of items to show per page
+                    </li>
+                    <li>
+                        Parameter in <u>url</u>: current page <em>(default = 1)</em>
+                    </li>
+                    <li>
+                        To <u>calculate</u>: number of pages
+                        <pre class="bigger"><code class="hljs php">$numPages = ceil($numItems / $numItemsPerPage);</code></pre>
+                    </li>
+                    <li>
+                        From <u>database</u>: a subset of items (ORDER BY, LIMIT)
+                    </li>
+                    <li>
+                        A pagination rendering strategy
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Pagination in Laravel (1)</h2>
+                <ul>
+                    <li>
+                        Use the <code>paginate</code> method with Query Builder or Eloquent
+                        <ul>
+                            <li>
+                                detects <code>?page</code> query string argument on the HTTP request
+                            </li>
+                            <li>
+                                gets the items from the DB through proper limit and offset
+                            </li>
+                            <li>
+                                returns a paginator object which is loopable like a result set
+                            </li>
+                        </ul>
+                        <pre class="bigger"><code class="hljs php">public function index() // controller method
+{
+    $users = User::where('votes', '&gt;', 100)-&gt;paginate(15);
+    // uncomment next line to change the paginator's target URL
+    // $users-&gt;setPath('custom/url');
+    return view('user.index', ['users' =&gt; $users]);
+}</code></pre>
+                    </li>
+                    <li style="margin-top: 1em">Don't use <code>simplePaginate</code>: it will only generate prev/next buttons</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Pagination in Laravel (2)</h2>
+                <ul>
+                    <li>
+                        Simple (Tailwind CSS compatible) display in Blade
+                        <pre class="bigger"><code class="hljs">&lt;div class="container"&gt;
+@foreach ($users as $user)
+    {{ $user->name }}
+@endforeach
+&lt;/div&gt;
+
+{{ $users->links() }}
+</code></pre>
+                    </li>
+                    <li>
+                        It's up to you to find a better strategy than rendering all the page links
+                        <ul>
+                            <li>
+                                Use the pagination methods in separate pagination templates: <a href="https://laravel.com/docs/8.x/pagination#customizing-the-pagination-view">howto</a>
+                            </li>
+                            <li>Appending GET parameters to the links: <a href="https://laravel.com/docs/8.x/pagination#appending-query-string-values">howto</a></li>
+                            <li>
+                                Watch this <a href="https://gist.github.com/bramus/5d8f2e0269e57dff5136">clever algorithm</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </section>
+
+        </section>
+
+        <!-- Advanced code generation hints -->
+        <!--section>
+            <section>
+                <h2>Advanced code generation hints</h2>
+            </section>
+
+            <section>
+                <h2>Resource controllers</h2>
+                <ul style="font-size: 90%">
+                    <li>
+                        Assign all your <em>CRUD</em> routes to a controller in a single line of code
+                        <ul>
+                            <li>Generate the controller:
+                                <pre class="bigger"><code class="hljs bash">$ php artisan make:controller PhotoController --resource</code></pre>
+                            </li>
+                            <li>Register the routes:
+                                <pre class="bigger"><code class="hljs php">Route::resource('photos', 'PhotoController'); // available options: 'only', 'except'</code></pre>
+                            </li>
+                            <li>Result:
+                                <table style="font-size: 50%; line-height: 1; margin-left: 4.3em; background-color: #2aabd2;">
+                                    <thead>
+                                    <tr style="font-weight: bold;background-color: #1b6d85;">
+                                        <th style="padding: 1px;">Verb</th>
+                                        <th style="padding: 1px;">URI</th>
+                                        <th style="padding: 1px;">Action</th>
+                                        <th style="padding: 1px;">Route Name</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>GET</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos</code></td>
+                                        <td>index</td>
+                                        <td>photos.index</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GET</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span>create</code></td>
+                                        <td>create</td>
+                                        <td>photos.create</td>
+                                    </tr>
+                                    <tr>
+                                        <td>POST</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos</code></td>
+                                        <td>store</td>
+                                        <td>photos.store</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GET</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span></code></td>
+                                        <td>show</td>
+                                        <td>photos.show</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GET</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span><span class="token operator">/</span>edit</code></td>
+                                        <td>edit</td>
+                                        <td>photos.edit</td>
+                                    </tr>
+                                    <tr>
+                                        <td>PUT/PATCH</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span></code></td>
+                                        <td>update</td>
+                                        <td>photos.update</td>
+                                    </tr>
+                                    <tr>
+                                        <td>DELETE</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span></code></td>
+                                        <td>destroy</td>
+                                        <td>photos.destroy</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </li>
+                            <li>In a web app, you will need to spoof the methods DELETE, PUT and PATCH</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Collective's Form Model Binding</h2>
+                <ul style="font-size: 90%">
+                    <li>
+                        Populate an HTML form based on the contents of a model
+                        <ul>
+                            <li>Start the form by
+                                <pre class="bigger"><code class="hljs php">{!! Form::model($user, ['route' => ['user.update', $user->id]]) !!}</code></pre>
+                            </li>
+                            <li>Flash data has precedence over the contents !
+
+                            </li>
+                            <li>Don't forget to <code>Form::close</code></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </section-->
+
+        <!-- The END -->
+        <section>
+            <section>
+                <h2>Questions?</h2>
+                <footer>
+                    <em><a href="http://www.ikdoeict.be/">ikdoeict.be</a> &mdash; <a href="mailto:joris.maervoet@odisee.be">joris.maervoet@odisee.be</a></em>
+                </footer>
+            </section>
+
+            <section>
+                <h2>Sources</h2>
+                <ul>
+                    <li><a href="https://laravel.com/docs/8.x/routing#route-groups">Laravel docs: Route Groups</a></li>
+                    <!--li><a href="https://github.com/LaravelCollective/docs/blob/6.0/html.md">Laravel Collective docs: Forms &amp; HTML</a></li-->
+                    <li><a href="https://laravel.com/docs/8.x/filesystem">Laravel docs: File Storage</a> </li>
+                    <li><a href="https://laravel.com/docs/8.x/pagination">Laravel docs: Pagination</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/session">Laravel docs: Session</a></li>
+                </ul>
+            </section>
+        </section>
+
+
+    </div>
+
+</div>
+
+<script src="dist/reveal.js"></script>
+<script src="plugin/zoom/zoom.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/search/search.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script>
+
+    // Also available as an ES module, see:
+    // https://revealjs.com/initialization/
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        center: true,
+        hash: true,
+        slideNumber: true,
+
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [ RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight ]
+    });
+
+
+</script>
+<script src="toc.js"></script>
+<script src="overlay.js"></script>
+
+</body>
+</html>
