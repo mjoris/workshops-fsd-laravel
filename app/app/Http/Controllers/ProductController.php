@@ -96,9 +96,39 @@ class ProductController extends Controller
         return view('simple-admin.products', ['products' => Product::all()]);
     }
 
+    /*
+    public function show($id)
+    {
+        $product = Product::findOrFail($id);
+        return view('simple-admin.product-detail', ['product' => $product]);
+    }
+    */
+
+    public function show(Product $product)
+    {
+        return view('simple-admin.product-detail', ['product' => $product]);
+    }
+
     public function showCreateForm()
     {
-        return view('simple-admin.product-add', ['brands' => Brand::all(), 'formErrors' => ['yes indeed']]);
+        return view('simple-admin.product-add', ['brands' => Brand::all()]);
+    }
+
+    public function create(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|unique:products|max:125',
+            'price' => 'required|numeric|min:0.10',
+            'description' => 'nullable',
+            'brand_id' => 'required|exists:brands,id'
+        ]);
+
+
+
+        Product::create($request->all());
+
+        return redirect('products   ');
+
     }
 
 

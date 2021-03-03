@@ -1,11 +1,11 @@
-@if ($formErrors)
+@if ($errors->any())
     <!-- Display Validation Errors -->
     <!-- Form Error List -->
     <div class="alert alert-danger">
         <strong>Something went wrong.</strong>
         <br><br>
         <ul>
-            @foreach ($formErrors as $formError)
+            @foreach ($errors->all() as $formError)
                 <li>{{ $formError }}</li>
             @endforeach
         </ul>

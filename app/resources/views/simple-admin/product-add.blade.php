@@ -14,32 +14,33 @@
                 @include('simple-admin.errors')
 
 
-                <form action="products/create" method="post" class="form-horizontal" enctype="multipart/form-data">
+                <form action="{{ url('products/create') }}" method="post" class="form-horizontal" enctype="multipart/form-data">
+                    @csrf
 
                     <div class="form-group">
                         <label for="name" class="col-sm-4 control-label">Name</label>
                         <div class="col-sm-8">
-                            <input type="text" name="name" id="name" class="form-control" value="{{ '' }}">
+                            <input type="text" name="name" id="name" class="form-control" value="{{ old('name', '') }}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="price" class="col-sm-4 control-label">Price</label>
                         <div class="col-sm-8">
-                            <input type="number" min="1" step="any" name="price" id="price" class="form-control" value="{{ '0.00' }}">
+                            <input type="number" min="1" step="any" name="price" id="price" class="form-control" value="{{ old('price', 0.00) }}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="description" class="col-sm-4 control-label">Description</label>
                         <div class="col-sm-8">
-                            <textarea name="description" id="description" class="form-control" >{{ '' }}</textarea>
+                            <textarea name="description" id="description" class="form-control" >{{ old('description', '') }}</textarea>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="brand" class="col-sm-4 control-label">Brand</label>
                         <div class="col-sm-8">
-                            <select name="brand" id="brand" class="form-control">
+                            <select name="brand_id" id="brand_id" class="form-control">
                                 @foreach ($brands as $brand)
-                                    <option value="{{ $brand->id }}" @if (false) selected="selected" @endif>{{ $brand->name }}</option>
+                                    <option value="{{ $brand->id }}" @if (old('brand_id', '') == $brand->id) selected="selected" @endif>{{ $brand->name }}</option>
                                 @endforeach
                             </select>
                         </div>
