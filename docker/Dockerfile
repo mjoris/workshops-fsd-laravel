@@ -5,5 +5,6 @@ RUN a2enmod rewrite
 RUN apt-get update && apt-get install -y libzip-dev zip && docker-php-ext-install zip && docker-php-ext-install bcmath && docker-php-ext-install pdo_mysql
 RUN apt-get install -y locales locales-all
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl -sL https://deb.nodesource.com/setup_15.x | bash - && apt-get install -y nodejs
 WORKDIR /var/www
 VOLUME /usr/local/etc/php
