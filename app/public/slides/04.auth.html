@@ -41,6 +41,142 @@
                 <h2>04.1<br>Form Requests</h2>
             </section>
 
+            <section>
+                <h2>Form Request</h2>
+
+                <ul>
+                    <li>
+                        Definition: custom class encapsulating validation and authorization logic
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        Typically for 1 form
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        It's called a request because <code>FormRequest extends Request</code>
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        Objective: don't clutter your controller code with long and complex validation (example: fold-out form)
+                    </li>
+
+
+                </ul>
+                <footer><small>The use of form requests is not obligatory in the project</small></footer>
+            </section>
+            <section>
+                <h2>Creating a Form Request</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        How to create a <em>form request</em>?
+                        <pre class="bigger"><code class="hljs bash">php artisan make:request StorePostRequest</code></pre>
+                    </li>
+                    <li style="margin-top: 0.7em;">
+                        &longrightarrow; a <em>form request</em> class is created in <code>app/Http/Requests</code>
+                        <pre class="bigger"><code class="hljs php" style="height: 22em;">class StorePostRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return false;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            //
+        ];
+    }
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Specify rules()</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        Example
+                        <pre class="bigger"><code class="hljs php">/**
+ * Get the validation rules that apply to the request.
+ *
+ * @return array
+ */
+public function rules()
+{
+    return [
+        'title' =&gt; 'required|unique:posts|max:255',
+        'body' =&gt; 'required',
+    ];
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Specify authorize()</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        Example
+                        <pre class="bigger"><code class="hljs php">/**
+ * Determine if the user is authorized to make this request.
+ *
+ * @return bool
+ */
+public function authorize()
+{
+    // assuming my 'users' table has an enum column 'role'
+    return $this-&gt;user()-&gt;role == 'blogger';
+}</code></pre>
+                    </li>
+                    <li>Most likely, you wil interact with your authorization <strong>gates</strong> and <strong>policies</strong> here &longrightarrow; we'll see this later on in this workshop</li>
+                    <li>If you plan to put your authorization logic elsewhere, just write <code>return true;</code> </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Applying the Form Request</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        Just type-hint the <em>form request</em> on your controller. Yes, that's all.
+                        <pre class="bigger"><code class="hljs php">/**
+ * Store a new blog post.
+ *
+ * @param  \App\Http\Requests\StorePostRequest  $request
+ * @return Illuminate\Http\Response
+ */
+public function store(StorePostRequest $request)
+{
+    // The incoming request is valid and authorized ...
+    Blogpost::create($request->all());
+}</code></pre>
+                    </li>
+                    <li>You see? <code>FormRequest extends Request</code></li>
+                    <li>When the <code>rules()</code> fail, the errors and input values are flashed into the session and the user is redirected </li>
+                    <li>When the <code>authorize()</code> fails, a <code>403</code> page is shown </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Further Customization</h2>
+
+                <ul style="width: 85%;">
+                    <li>Customizing <a href="https://laravel.com/docs/8.x/validation#customizing-the-error-messages"> the error messages and attribute names (!)</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/validation#preparing-input-for-validation">Preparing</a> the input for validation</li>
+                </ul>
+            </section>
+
 
         </section>
 
