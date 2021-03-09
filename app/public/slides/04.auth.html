@@ -372,6 +372,30 @@ class CheckRole
             </section>
 
             <section>
+                <h2>Step 1B: Seeding</h2>
+
+                <ul>
+                    <li>
+                        Optional: if you want to seed your database with 1 or more <strong><u>test</u></strong> users, tailor a <code>UserSeeder</code> to the users table's model
+                        <pre class="bigger"><code class="hljs php">class UserSeeder extends Seeder
+{
+
+    public function run()
+    {
+        DB::table('users')-&gt;insert([
+            'name' =&gt; Str::random(10),
+            'email' =&gt; 'theboss@gmail.com',
+            'password' =&gt; Hash::make('Azerty123'),
+            // add more column values here e.g. a role, a company_id, ...
+        ]);
+    }
+
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
                 <h2>Step 2: Eloquent</h2>
 
                 <ul>
