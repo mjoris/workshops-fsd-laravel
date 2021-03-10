@@ -186,6 +186,120 @@ public function store(StorePostRequest $request)
                 <h2>04.2<br>Blade Components</h2>
             </section>
 
+            <section>
+                <h2>Blade Components</h2>
+
+                <ul>
+                    <li>
+                        System similar to Blade sections, layouts and includes
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        2 types of components: class based and anonymous
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        A component is like a Blade subtemplate, and a class based component is also backed by a class
+                    </li>
+                </ul>
+                <footer><small>The use of Blade components is not obligatory in the project</small></footer>
+            </section>
+            <section>
+                <h2>Creating a Class Based Component</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        How to create a <em>class based component</em>?
+                        <pre class="bigger"><code class="hljs bash">php artisan make:component Alert</code></pre>
+
+                        &longrightarrow; creates a view template in <code>resources/views/components</code>
+                        <br>
+                        &longrightarrow; creates a component class in <code>app/View/Components</code>
+                        <pre class="bigger"><code class="hljs php">class Alert extends Component
+{
+    public function __construct()
+    {
+        //
+    }
+
+    public function render()
+    {
+        return view('components.alert');
+    }
+}</code></pre>
+                    </li>
+                    <li>
+                        Example with subdirectories:
+                        <pre class="bigger"><code class="hljs bash">php artisan make:component Forms/Input</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Rendering components</h2>
+
+                <ul style="width: 85%;font-size: 80%;">
+                    <li>
+                        Example
+                        <pre class="bigger"><code class="hljs html">&lt;x-alert/&gt;
+&lt;x-forms.input/&gt;</code></pre>
+                    </li>
+                    <li>
+                        Passing data by HTML attributes (variable attributes start with <code>:</code>) &hellip;
+                        <pre class="bigger"><code class="hljs html">&lt;x-alert type="error" :message="$message"/&gt;</code></pre>
+                    </li>
+                    <li>
+                        &hellip; to be passed to the component's constructor:
+                        <pre class="bigger"><code class="hljs php">class Alert extends Component
+{
+    public $type;
+    public $message;
+
+    public function __construct($type, $message)
+    {
+        $this-&gt;type = $type;
+        $this-&gt;message = $message;
+    }</code></pre>
+                    </li>
+                    <li>Public fields (/methods) are available in the component's view: <pre class="bigger"><code class="hljs html">&lt;div class="alert alert-{{ $type }}"&gt;
+    {{ $message }}
+&lt;/div&gt;</code></pre></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Slots</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        Slots are the <em>sections</em> of a component
+                    </li>
+                    <li>
+                        Let's say we have in <code>/resources/views/components/alert.blade.php</code>
+                        <pre class="bigger"><code class="hljs html">&lt;span class="alert-title"&gt;{{ $title }}&lt;/span&gt;
+
+&lt;div class="alert alert-danger"&gt;
+    {{ $slot }}
+&lt;/div&gt;</code></pre>
+                    </li>
+                    <li>
+                        Injecting content into the component:
+                        <pre class="bigger"><code class="hljs html">&lt;x-alert&gt;
+    &lt;x-slot name="title"&gt;
+        Server Error
+    &lt;/x-slot&gt;
+
+    &lt;strong&gt;Whoops!&lt;/strong&gt; Something went wrong!
+&lt;/x-alert&gt;</code></pre></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Blade Components: Interested?</h2>
+                <ul>
+                    <li>This was just a simple introduction. Read more in the <a
+                        href="https://laravel.com/docs/8.x/blade#components">docs</a></li>
+                </ul>
+            </section>
+
 
         </section>
 
