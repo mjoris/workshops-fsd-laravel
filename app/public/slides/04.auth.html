@@ -677,10 +677,10 @@ class CheckRole
 
             <section>
                 <h2>Step 3: Install Laravel Breeze</h2>
-
                 <ul>
                     <li>
                         <strong>Step 3:</strong> install Breeze and make Artisan <em>scaffold</em> complete configuration for you
+                        <p><span class="warning">Caution:</span> <code>routes/web.php</code> will be overwritten! </p>
                     </li>
                 </ul>
                         <pre class="bigger"><code class="hljs bash">$ composer require laravel/breeze --dev
@@ -740,6 +740,9 @@ $ npm run dev
                             </li>
                         </ul>
                     </li>
+                    <li style="margin-top: 1.5em;">
+                        <strong>Step 5B:</strong> plug the <code>guest</code> middleware to each action requiring <strong>not</strong> being authenticated
+                    </li>
                 </ul>
             </section>
             <section>
@@ -785,7 +788,7 @@ Auth::logout();</code></pre>
                     <li>
                         Laravel Breeze generated in your project: &longrightarrow; let's have a look
                         <ul style="font-size: 80%;">
-                            <li>14 <a href="https://github.com/laravel/breeze/blob/1.x/stubs/default/routes/auth.php">routes</a> bundled into <code>routes/auth.php</code> to be included from <code>routes/web.php</code></li>
+                            <li>14 <a href="https://github.com/laravel/breeze/blob/1.x/stubs/default/routes/auth.php">routes</a> bundled into <code>routes/auth.php</code> included from a new(!) <code>routes/web.php</code></li>
                             <li>8 <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/App/Http/Controllers/Auth">controllers</a> for any of the HTML Forms e.g. <code>AuthenticatedSessionController</code> for login  </li>
                             <li>1 <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/App/Http/Requests/Auth">form request</a> </li>
                             <li>2 trivial <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/App/View/Components">Blade component classes</a></li>
@@ -858,6 +861,8 @@ Auth::logout();</code></pre>
         <section>
             <section>
                 <h2>04.6<br>Authorization</h2>
+                <p><em>to be continued &hellip;</em></p>
+                <p>let's have a quick look at the <a href="https://laravel.com/docs/8.x/authorization">docs</a></p>
 
             </section>
         </section>
