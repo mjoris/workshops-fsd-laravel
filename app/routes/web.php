@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,5 +35,7 @@ Route::get('/eloquent-demo-4', [ProductController::class, 'demo4']);
 Route::get('/products', [ProductController::class, 'overview']);
 Route::get('/products/{product}', [ProductController::class, 'show'])->where(['product' => '[0-9]+']);
 
-Route::get('/products/create', [ProductController::class, 'showCreateForm']);
-Route::post('/products/create', [ProductController::class, 'create']);
+Route::get('/products/create', [ProductController::class, 'showCreateForm'])->middleware(['auth']);
+Route::post('/products/create', [ProductController::class, 'create'])->middleware(['auth']);
+
+require __DIR__.'/auth.php';

@@ -17,17 +17,19 @@
 <nav class="navbar navbar-default">
     <div class="container">
         <div class="navbar-header"><!-- Just an image -->
-            <a class="navbar-brand" href="index.php"><img src="{{ asset('simple-admin/img/ikdoeict.png') }}" height="20" alt="ikdoeict alt logo"></a>
-            <a class="navbar-brand" href="index.php">@yield('title')</a>
+            <a class="navbar-brand" href="{{ url('products') }}"><img src="{{ asset('simple-admin/img/ikdoeict.png') }}" height="20" alt="ikdoeict alt logo"></a>
+            <a class="navbar-brand" href="{{ url('products') }}">@yield('title')</a>
         </div>
         @auth
-            <form class="navbar-form navbar-right" method="post" action="{{ url('/logout') }}">
-                <button type="submit" class="btn btn-default">Uitloggen</button>
+            <form class="navbar-form navbar-right" method="post" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn btn-default">Log out</button>
             </form>
         @endauth
         @guest
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="{{ url('/login') }}">Inloggen</a></li>
+                <li><a href="{{ route('login') }}">Log in</a></li>
+                <li><a href="{{ route('register') }}">Register</a></li>
             </ul>
         @endguest
     </div>
