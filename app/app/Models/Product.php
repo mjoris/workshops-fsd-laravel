@@ -21,4 +21,10 @@ class Product extends Model
     {
         return $this->belongsTo(Brand::class);
     }
+
+    // added in slides series 04.auth
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

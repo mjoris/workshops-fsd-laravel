@@ -20,6 +20,7 @@ class CreateProductsTable extends Migration
             $table->text('description');
             $table->decimal('price', 8, 2);
             $table->foreignId('brand_id')->constrained();
+            $table->foreignId('user_id')->constrained(); // added in slides series 04.auth
             $table->timestamps();
         });
     }

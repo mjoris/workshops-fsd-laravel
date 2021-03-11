@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 // Eloquent model for concluding demo 'webshop' of 02.lets.mvc
 class ProductController extends Controller
@@ -123,11 +124,11 @@ class ProductController extends Controller
             'brand_id' => 'required|exists:brands,id'
         ]);
 
+        $product = new Product($request->all());
+        $product->user()->associate(Auth::user()); // added in slides series 04.auth
+        $product->save();
 
-
-        Product::create($request->all());
-
-        return redirect('products   ');
+        return redirect('products');
 
     }
 
