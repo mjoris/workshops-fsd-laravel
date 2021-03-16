@@ -567,6 +567,9 @@ class CheckRole
                                 Starter Kits: packages <em>scaffolding</em> the entire authentication layer (controllers, views, routes, &hellip;)
                                 <ul>
                                     <li>
+                                        <a href="https://github.com/laravel/ui">Laravel UI</a> 3.x (considered as <em>obsolete</em>)
+                                    </li>
+                                    <li>
                                         <a href="https://laravel.com/docs/8.x/starter-kits#laravel-breeze">Laravel Breeze</a> &longrightarrow; we'll use Breeze in the next slides
                                     </li>
                                     <li>
@@ -861,10 +864,251 @@ Auth::logout();</code></pre>
         <section>
             <section>
                 <h2>04.6<br>Authorization</h2>
-                <p><em>to be continued &hellip;</em></p>
-                <p>let's have a quick look at the <a href="https://laravel.com/docs/8.x/authorization">docs</a></p>
-
             </section>
+
+
+
+            <section>
+                <h2>Authorization Introduction</h2>
+
+                <ul>
+                    <li>
+                        Laravel's <a href="https://laravel.com/docs/8.x/authorization">Authorization</a>
+                        <ul style="font-size: 85%;">
+                            <li>
+                                Principle: <strong>once</strong> a user is authenticated, allow or prevent user <strong>actions</strong> against a given <strong>resource</strong>
+                            </li>
+
+                            <li>
+                                Most commonly, it is about <u>C</u>reating, <u>R</u>eading, <u>U</u>pdating or <u>D</u>eleting a specific Eloquent model
+                                <ul>
+                                    <li>a user might (not) be entitled to do so because
+                                        <ul>
+                                            <li>(s)he has a certain <strong>role</strong> (e.g. admin, customer)</li>
+                                            <li>(s)he is (not) the <strong>owner</strong> of the resource</li>
+                                        </ul>
+                                </ul>
+                            </li>
+                            <li>With Laravel's <a href="https://laravel.com/docs/8.x/authorization">Authorization</a>, you can check this in a <strong>structured</strong> way</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        2 mechanisms
+                        <ul style="font-size: 85%;">
+                            <li><strong>Gates:</strong> simple mechanism where you express an authorization feature as a function
+                            </li>
+                            <li><strong>Policies:</strong> group all authorization logic by resource</li>
+                            <li>It's fine to mix them</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+
+            <section>
+                <h2>Gates: Definition</h2>
+
+                <ul>
+                    <li>
+                        To be defined in <code>boot()</code> of <code>App\Providers\AuthServiceProvider</code>
+                    </li>
+                    <li>
+                        First parameter <strong>must</strong> be of type <code>User</code> (will be bound to the Eloquent model of the authenticated user)
+                        <pre class="bigger"><code class="hljs php">use App\Models\Post;
+use App\Models\User;
+use Illuminate\Support\Facades\Gate;
+
+public function boot()
+{
+    $this-&gt;registerPolicies();
+
+    Gate::define('update-post', function (User $user, Post $post) {
+        return $user-&gt;id === $post-&gt;user_id;
+    });
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Authorizing with Gates</h2>
+
+                <ul style="font-size: 85%;">
+                    <li>
+                        At the start of your controller method:
+                        <pre class="bigger"><code class="hljs php">if (! Gate::allows('update-post', $post)) {
+    abort(403);
+}
+
+// Update the post...</code></pre>
+                    </li>
+                    <li>
+                        Same, shorter version:
+                        <pre class="bigger"><code class="hljs php">Gate::authorize('update-post', $post);
+// Update the post...</code></pre>
+                    </li>
+                    <li>Alternately, if you are in a <strong>form request</strong>, <code>authorize()</code> will automatically generate <code>403</code> when it fails
+                        <pre class="bigger"><code class="hljs php">public function authorize()
+{
+    return Gate::allows('update-post', $post);
+}</code></pre>
+                    </li>
+                    <li>Check single permissions with <code>Gate::allows()</code> and <code>Gate::denies()</code></li>
+                    <li>Check combinations of permissions with <code>Gate::check()</code>, <code>Gate::any()</code> and <code>Gate::none()</code> </li>
+                    <li>Check for other users with <code>Gate::forUser($user)</code></li>
+                </ul>
+            </section>
+
+
+            <section>
+                <h2>Creating a Policy</h2>
+
+                <ul style="font-size: 85%; width: 90%;">
+                    <li>Example: you want to write the authorization logic for your <code>App\Models\Product</code> model</li>
+                    <li style="margin-top: 0.7em;">
+                        <strong>First step:</strong> create an empty policy class
+                        <pre class="bigger"><code class="hljs bash">php artisan make:policy ProductPolicy --model=Product</code></pre>
+                        The option <code>--model</code> adds example methods related to viewing, creating, updating, and deleting a <code>Product</code>
+                    </li>
+                    <li style="margin-top: 0.7em;">
+                        &longrightarrow; the  class is created in <code>app/Policies</code>
+                    </li>
+                    <li style="margin-top: 0.7em;">
+
+                        <strong>Registering the policy?</strong>
+                        <ul>
+                            <li><u>Not needed</u>, as the policy class name = <code>model class name</code> + <code>Policy</code> (auto-discovery) </li>
+                            <li>If you have another naming convention, you can register the policy in <code>App\Providers\AuthServiceProvider</code></li>
+                        </ul>
+                        <pre class="bigger"><code class="hljs php">class AuthServiceProvider extends ServiceProvider
+{
+    // The policy mappings for the application.
+    protected $policies = [
+        Product::class =&gt; ProductPolicy::class,
+    ];</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Writing a Policy</h2>
+
+                <pre class="bigger"><code class="hljs php" style="font-size: 85%;line-height: 1.2;">&lt;?php
+namespace App\Policies;
+
+use App\Models\Product;
+use App\Models\User;
+
+class ProductPolicy
+{
+    /**
+     * Determine if the given product can be updated by the user.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Product  $post
+     * @return bool
+     */
+    public function update(User $user, Product $product)
+    {
+        return $user-&gt;id === $product-&gt;user_id;
+    }
+
+    /**
+     * Determine if the given user can create products.
+     *
+     * @param  \App\Models\User  $user
+     * @return bool
+     */
+    public function create(User $user)
+    {
+        return $user-&gt;role == 'admin';
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>Authorizing with Policies (1)</h2>
+
+                <ul style="font-size: 80%;">
+                    <li>
+                        You will use <code>can()</code> and <code>cannot()</code>
+                        <br>
+                        <strong>Important:</strong> if no policy method found, they look for a <strong><u>gate</u></strong>
+                    </li>
+                    <li style="margin-top: 0.7em;">
+                        At the start of your controller method:
+                        <pre class="bigger"><code class="hljs php">if ($request-&gt;user()-&gt;cannot('update', $product)) { // Auth::user() is fine too ;-)
+    abort(403);
+}
+// Update the product...</code></pre>
+                    </li>
+                    <li>
+                        Same, shorter version:
+                        <pre class="bigger"><code class="hljs php">$this-&gt;authorize('update', $product);
+// Update the product...</code></pre>
+                    </li>
+                    <li>Alternately, if you are in a <strong>form request</strong>, <code>authorize()</code> will automatically generate <code>403</code> when it fails
+                        <pre class="bigger"><code class="hljs php">public function authorize()
+{
+    $product = Product::find($this->product_id); // given product_id is an input value of the Request
+    return $this->user()->can('update', $product);
+}</code></pre>
+                    </li>
+                    <li>
+                        For actions that don't require model instances, you specify the class:
+                        <br>
+                        <code>if ($request-&gt;user()-&gt;cannot('create', Product::class))</code>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Authorizing with Policies (2)</h2>
+                <ul style="width: 70%;">
+                    <li>
+                        Better: authorize via the <code>can</code> middleware &#128512;
+                        <pre class="bigger"><code class="hljs php">use App\Models\Product;
+
+Route::put('/product/{product}', function (Product $product) {
+    // The current user may update the product...
+})-&gt;middleware('can:update,product');
+
+Route::post('/product', function () {
+    // The current user may create products...
+})-&gt;middleware('can:create,App\Models\Product');</code></pre>
+                    </li>
+
+                </ul>
+            </section>
+
+
+
+            <section>
+                <h2>Blade's @can and @cannot</h2>
+                <ul style="width: 85%;">
+                    <li>
+                        Work for both gates and policies:
+                        <pre class="bigger"><code class="hljs html">@can('update', $post)
+    &lt;!-- The current user can update the post... --&gt;
+@elsecan('create', App\Models\Post::class)
+    &lt;!-- The current user can create new posts... --&gt;
+@else
+    &lt;!-- ... --&gt;
+@endcan
+
+@cannot('update', $post)
+    &lt;!-- The current user cannot update the post... --&gt;
+@elsecannot('create', App\Models\Post::class)
+    &lt;!-- The current user can now create new posts... --&gt;
+@endcannot</code></pre>
+                    </li>
+
+                </ul>
+            </section>
+
+
+
+
         </section>
 
 

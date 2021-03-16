@@ -8,6 +8,7 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 // Eloquent model for concluding demo 'webshop' of 02.lets.mvc
 class ProductController extends Controller
@@ -112,11 +113,15 @@ class ProductController extends Controller
 
     public function showCreateForm()
     {
+        Gate::authorize('add-product');
+
         return view('simple-admin.product-add', ['brands' => Brand::all()]);
     }
 
     public function create(Request $request)
     {
+        Gate::authorize('add-product');
+
         $request->validate([
             'name' => 'required|unique:products|max:125',
             'price' => 'required|numeric|min:0.10',
