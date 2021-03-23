@@ -12,6 +12,8 @@ class Product extends Model
 
     protected $fillable = ['name', 'description', 'price', 'brand_id'];
 
+    protected $hidden = ['user_id', 'brand_id'];
+
     public function categories()
     {
         return $this->belongsToMany(Category::class);

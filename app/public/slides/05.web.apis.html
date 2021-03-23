@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>W&amp;M Full-stack – Laravel course materials</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section data-background="#b5533c">
+            <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
+            <h1>05. Web APIs</h1>
+        </section>
+
+
+        <!-- Eloquent: the next level -->
+        <section>
+            <section>
+                <h2>05.1<br>Eloquent: the Next Level</h2>
+            </section>
+
+            <section>
+                <h2>What you already know (1)</h2>
+
+                <ul>
+                    <li>
+                        In <code>app/Models</code> you define &plusmn; 1 model (e.g. <code>Smurf</code>) per table (e.g. <code>smurfs</code>)
+                        <ul>
+                            <li style="margin-top: 1em;">
+                                Having an empty model class means a set of assumptions apply on the table name, the PK, the timestamps, &hellip;
+                                <br>
+                                &longrightarrow; exceptions? override class fields, functions, &hellip;
+                            </li>
+                            <li style="margin-top: 1em;">
+                                1 to 1 relationship: define by <code>hasOne()</code> and <code>belongsTo()</code>
+                            </li>
+                            <li>
+                                1 to many relationship: define by <code>hasMany()</code> and <code>belongsTo()</code>
+                            </li>
+                            <li>
+                                many to many relationship: define by <code>belongsToMany()</code> at both sides
+                            </li>
+                            <li>
+                                &longrightarrow; exceptional FK column names? add parameters!
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </section>
+            <section>
+                <h2>What you already know (2)</h2>
+
+                <ul style="font-size: 80%">
+                    <li>
+                        Best Eloquent practices always start from the Eloquent model class!
+                        <ul>
+                            <li style="margin-top: 0.5em;">
+                                Only few static methods directly cause a DB query yielding a result
+                                <pre class="bigger"><code class="hljs php">Smurf::all()     // returns an Eloquent collection of Smurf objects
+Smurf::find(666) // returns a Smurf object
+Smurf::count()   // returns an integer</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                Most static methods return a Builder object (you are just building a query!)
+                                <pre class="bigger"><code class="hljs php">Smurf::where('age', '>', 315)
+Smurf::select('id', 'age')</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                On a builder object you can chain another Builder method, returning the <strong>very same</strong> Builder object
+                                <pre class="bigger"><code class="hljs php">$smurfs = Smurf::where('age', '>', 315)->where('color', 'blue')->select('id', 'age')->orderBy('age', 'desc');</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                Following methods transform a Builder object into a result (executing a DB query)
+                                <pre class="bigger"><code class="hljs php">$smurfs->get()        // returns an Eloquent collection of Smurf objects
+$smurfs->count()      // returns an integer
+$smurfs->first()      // returns a Smurf object
+$smurfs->find(666)    // returns a Smurf object
+$smurfs->value('age') // returns a value
+$smurfs->pluck('age') // returns a plain old array</code></pre>
+                            </li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>What you already know (3)</h2>
+
+                <ul style="font-size: 80%;">
+                    <li>
+                        Don't get confused !
+                        <ul>
+                            <li style="margin-top: 0.5em;">
+                                On Eloquent collections you can chain a big number of collection methods (yes! some of them have the same name as &hellip;)
+                                <pre class="bigger"><code class="hljs php">$smurfs->get()->count()                 // Better: $smurfs->count()
+$smurfs->get()->where('age', '>', 320)  // Better: fix this in the Builder part</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                An Eloquent collection extends a collection in the sense that it has captured which field was the PK
+                                <pre class="bigger"><code class="hljs php">Smurf::all()->find(666)        // Better: Smurf::find(666)
+$smurfs->get()->contains(88);  // Better: $smurfs->where('id', 88)->exists();</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                A relation can be plugged on an Eloquent <strong>object</strong> in 2 ways:
+                                <pre class="bigger"><code class="hljs php">Smurf::find(666)->friends   // executes a query and returns an Eloquent collection
+Smurf::find(666)->friends() // only returns a Builder object ...</code></pre>
+                            </li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Eager Loading</h2>
+                <ul style="font-size: 85%;">
+                    <li>By default, related models are <em>lazy</em> loaded</li>
+                    <li>
+                        When looping over a set objects and accessing their relationships as
+                        properties might generate a high number of DB queries:
+                        <pre class="bigger"><code class="hljs php">$books = Book::all(); // collection of 25 books
+
+foreach ($books as $book) {
+    echo $book-&gt;author-&gt;name; // generating a DB query each time
+}</code></pre>
+                    </li>
+                    <li>
+                        The method <code>with()</code> supports <a href="https://laravel.com/docs/8.x/eloquent-relationships#eager-loading"><strong>eager loading</strong></a> and <em>adds a question to</em> prefetch the related model objects in the Builder object:
+                        <pre class="bigger"><code class="hljs php">$books = Book::with('author')-&gt;get(); // generates 2 queries
+
+foreach ($books as $book) {
+    echo $book-&gt;author-&gt;name; // no DB query
+}</code></pre>
+                    </li>
+                    <li>
+                        Multiple relationships: <code>Book::with(['author', 'publisher'])-&gt;get();</code>
+                    </li>
+                    <li>
+                        Nested relationships: <code>Book::with('author.contacts')-&gt;get();</code>
+                    </li>
+                    <li>
+                        Constraining columns: <code>Book::with('author:id,name')-&gt;get();</code>
+                    </li>
+                </ul>
+
+            </section>
+
+            <section>
+                <h2>(Local) Query Scopes</h2>
+                <ul style="width: 100%; font-size: 85%;">
+                    <li><a href="https://laravel.com/docs/8.x/eloquent#local-scopes">Local scopes</a> enable the reuse of frequently used query <strong>Builder</strong> parts</li>
+
+
+                </ul>
+                <pre class="bigger"><code class="hljs php">class User extends Model
+{
+    public function scopeActive($query)
+    {
+        return $query-&gt;where('active', 1);
+    }
+
+    public function scopeOfType($query, $type)
+    {
+        return $query-&gt;where('type', $type);
+    }
+}</code></pre>
+                <pre class="bigger"><code class="hljs php">use App\Models\User;
+
+$users = User::ofType('admin')-&gt;active()-&gt;orderBy('created_at')-&gt;get();
+
+$users = User::ofType('admin')-&gt;orWhere-&gt;active()-&gt;get(); // orWhere specifically for scopes </code></pre>
+            </section>
+
+            <section>
+                <h2>Accessors &amp; Mutators</h2>
+                <ul style="width: 100%; font-size: 80%;">
+                    <li>2 applications (<a
+                        href="https://laravel.com/docs/8.x/eloquent-mutators#accessors-and-mutators">docs</a>)
+                        <ul>
+                            <li>Override default attribute behaviour (such as <code>$user-&gt;first_name</code>), typically for data transformation  </li>
+                            <li>Define custom attributes (such as <code>$user-&gt;full_name</code>) while there is no such column or relation</li>
+                        </ul>
+                    </li>
+                    <li>How? Define a <code>get{Attribute}Attribute()</code> and <code>set{Attribute}Attribute()</code></li>
+                    <li>Attention: attribute name in <code>snake_case</code> vs. method name part in <code>PascalCase</code></li>
+                </ul>
+                <pre class="bigger"><code class="hljs php">class User extends Model
+{
+    public function getFirstNameAttribute($value) {
+        return ucfirst($value);
+    }
+
+    public function setFirstNameAttribute($value) {
+        $this-&gt;attributes['first_name'] = strtolower($value);
+    }
+
+    public function getFullNameAttribute() {
+        return $this-&gt;first_name . ' ' . $this-&gt;last_name;
+    }
+}</code></pre>
+                <pre class="bigger"><code class="hljs php">$user = User::find(1);
+$firstName = $user-&gt;first_name;
+$user-&gt;first_name = 'Bart';
+echo($user-&gt;full_name);</code></pre>
+
+            </section>
+
+            <section>
+                <h2>Accessors &amp; Mutators: nice example</h2>
+                <ul style="width: 100%; font-size: 80%;">
+                    <li>Suppose you have a DB model for a multi-language web shop
+                        <ul>
+                            <li>products(id, price)</li>
+                            <li>languages(id, code)</li>
+                            <li>product_descriptions(id, product_id, language_id, name, description)</li>
+                        </ul>
+                    </li>
+                    <li>Design a <code>$product-&gt;name</code> attribute, encapsulating the (app or session) locale </li>
+
+                </ul>
+                <pre class="bigger"><code class="hljs php">class Product extends Model
+{
+    public function getNameAttribute()
+    {
+        $currentLanguage = Language::where('code', '=', App::currentLocale())-&gt;first();
+
+        $description = $this-&gt;descriptions()
+                            -&gt;where('language_id', '=', $currentLanguage-&gt;language_id)
+                            -&gt;first();
+
+        return $description ? $description-&gt;name : '';
+    }
+}</code></pre>
+
+            </section>
+
+            <section>
+                <h2>Casting</h2>
+                <ul style="width: 100%; font-size: 80%;">
+                    <li>You don't need accessors &amp; mutators to implement <a href="https://laravel.com/docs/8.x/eloquent-mutators#attribute-casting">auto-casting of attributes</a>
+                    </li>
+                    <li>Check the documentation for the supported cast types</li>
+
+                </ul>
+                <pre class="bigger"><code class="hljs php">class User extends Model
+{
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_admin' =&gt; 'boolean',
+        'options' =&gt; 'array', // handy when the column options constains JSON
+        'date_of_birth' =&gt; 'datetime:Y-m-d',
+        // created_at and updated_at are already known as datetime
+    ];
+
+}</code></pre>
+
+            </section>
+
+        </section>
+
+
+
+        <!-- Web API Conventions -->
+        <section>
+            <section>
+                <h2>05.2<br>Web API Conventions</h2>
+            </section>
+
+            <section>
+                <h2>Recap</h2>
+                <ul>
+                    <li>
+                        You remember &hellip;
+                        <ul style="font-size: 90%;">
+                            <li>how to design the Web API <strong>end points</strong> taking into account <a href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/12.webapis.html#/3/3">resource hierarchy and consistency</a>  </li>
+                            <li style="margin-top: 0.7em;">you should only use GET-parameters for <a href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/12.webapis.html#/3/4">filtering, sorting, pagination and passing a PK</a></li>
+                            <li style="margin-top: 0.7em;">when to accept  <a
+                                href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/12.webapis.html#/3/6">which HTTP verb</a></li>
+                            <li style="margin-top: 0.7em;">when to return <a
+                                href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/12.webapis.html#/3/9">which HTTP status code</a></li>
+                            <li style="margin-top: 0.7em;">we'll be using <a
+                                href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/12.webapis.html#/3/11">JSON</a>, both in the response and in the request body</li>
+
+                        </ul>
+                    </li>
+                </ul>
+
+            </section>
+        </section>
+
+        <!-- Web API Basics with Laravel -->
+        <section>
+            <section>
+                <h2>05.3<br>Web API Basics with Laravel</h2>
+            </section>
+
+            <section>
+                <h2>Before we start: Testing</h2>
+                <ul style="font-size: 80%;">
+                    <li>Use a Web API testing tool such as Postman or Insomnia</li>
+                    <li>The <code>Accept: application/json</code> header is very important to Laravel: if you don't indicate you expect JSON, Laravel will send you HTML pages</li>
+                    <li>The <code>Content-Type: application/json</code> header is required when your request contains JSON in the body</li>
+                    <li>Set the format to JSON when sending data</li>
+                </ul>
+                <figure class="zoomable-12">
+                    <img src="assets/05/insomnia1.png" alt="Insomnia example 1" height="300">
+                </figure>
+            </section>
+
+            <section>
+                <h2>Web API routing</h2>
+                <ul>
+                    <li>
+                        Put all your Web API routes in <code>routes/api.php</code>
+                        <ul>
+                            <li>The routes in this file are assigned the prefix <code>/api/</code> !!! </li>
+                            <li style="margin-top: 1em;">Web API communication is assumed to be <strong>stateless</strong>, so the middlewares applied to <code>routes/api.php</code> are different from those applied to <code>routes/web.php</code>
+                                <br>
+                                <small>(there is no session control, cookie encryption nor CRSF protection, but there is API throttling in stead)</small> </li>
+
+                            <li style="margin-top: 1em;">You actually &plusmn; know how to program Web API endpoints:
+                                <br>just continue using Controllers, Validation, Eloquent, &hellip; </li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>A Very First Example</h2>
+
+                <ul style="width: 100%; font-size: 90%;">
+                    <li>Let's define in <code>routes/api.php</code></li>
+
+                </ul>
+                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function ($id) {
+
+    $product = Product::findOrFail($id);
+
+    return $product;
+
+})-&gt;where('id', '[0-9]+');</code></pre>
+
+                <ul style="width: 100%; font-size: 90%;">
+                    <li style="margin-top: 0.5em;">When the product exists, the Eloquent model object <code>$product</code> will automatically be serialized into JSON and converted into a <code>Response</code> object</li>
+
+                    <li style="margin-top: 0.5em;">When the product doesn't exist, <code>findOrFail()</code> launches a <code>NotFoundHttpException</code> resulting in a <code>404</code> response</li>
+
+                </ul>
+                <footer><small>Of course, you'd better use controllers</small></footer>
+            </section>
+
+            <section>
+                <h2>Eloquent Serialization (1)</h2>
+
+                <ul style="width: 100%; font-size: 90%;">
+                    <li><a href="https://laravel.com/docs/8.x/eloquent-serialization">Eloquent Serialization</a> determines how exactly the eloquent model is converted into JSON</li>
+                    <li>Use <code>$hidden</code> in the Eloquent model class to exclude properties:</li>
+                </ul>
+                <pre class="bigger"><code class="hljs php">class Product extends Model
+{
+    use HasFactory;
+
+    protected $hidden = ['user_id', 'brand_id'];
+    ...</code></pre>
+
+                <ul style="width: 100%; font-size: 90%;">
+                    <li>
+                        Likewise, in the Eloquent model class,
+                        <ul>
+                            <li><code>protected $visible</code> can be used if you prefer an <em>allow</em> list in stead of <code>$hidden</code></li>
+                            <li><code>protected $appends</code> can be used to define a list of <strong>accessor</strong> properties to be included</li>
+                            <li>date formats can be altered in <code>protected $casts</code></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Eloquent Serialization (2)</h2>
+
+                <ul style="width: 100%; font-size: 90%;">
+                    <li>Only <strong>loaded</strong> relationships are (resursively) converted to JSON</li>
+                </ul>
+                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function ($id) {
+
+    $product = Product::with('brand')-&gt;findOrFail($id);
+
+    return $product;
+
+})-&gt;where('id', '[0-9]+');</code></pre>
+
+                <ul style="width: 100%; font-size: 90%;">
+                    <li>
+                        You can still override Eloquent settings "at run-time":
+                    </li>
+                </ul>
+                <pre class="bigger"><code class="hljs php">$product->makeVisible('user_id')
+$product->makeHidden('price')
+$product->append('description')</code></pre>
+            </section>
+
+            <section>
+                <h2>Error Messages</h2>
+                <figure class="zoomable-20">
+                    <img src="assets/05/insomnia2.png" alt="Insomnia example 2" height="170">
+                </figure>
+                <ul style="font-size: 80%;width: 80%;">
+                    <li>Often have the correct HTTP status code</li>
+                    <li>Are only in JSON when the request contains the <code>Accept: application/json</code> header</li>
+                    <li>Do not contain the full stack trace when <code>APP_DEBUG=false</code> in <code>.env</code></li>
+                    <li>Can nevertheless be customized <a href="https://laraveldaily.com/laravel-api-404-response-return-json-instead-of-webpage-error/">by overriding</a>
+                    <code>render($request, Throwable $exception)</code> in <code>app/Exceptions/Handler.php</code></li>
+                </ul>
+            </section>
+
+
+            <section>
+                <h2>Wrapping</h2>
+
+                <ul style="font-size: 80%;width: 80%;">
+                    <li>Just saw that error response? It was inside a <code>message</code> field of a JSON object</li>
+                    <li>Some API consumers prefer a uniform response structure
+                        <br>
+                        &longrightarrow; always return a single JSON object with fields like <code>message</code>, <code>data</code> and <code>meta</code>
+                    </li>
+                </ul>
+                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function ($id) {
+
+    $product = Product::with('brand')-&gt;findOrFail($id);
+
+    return ['data' =&gt; $product];
+
+})-&gt;where('id', '[0-9]+');</code></pre>
+
+            </section>
+
+            <section>
+                <h2>A CR<s>UD</s> Example</h2>
+                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function ($id) {
+
+    $product = Product::with('brand')-&gt;findOrFail($id);
+    return ['data' =&gt; $product];
+                    
+})-&gt;where('id', '[0-9]+');
+
+Route::get('/products', function () {
+
+    return ['data' =&gt; Product::with('brand')-&gt;get()];
+});
+
+Route::post('/products', function (Request $request) {
+
+    $request-&gt;validate([
+        'name' =&gt; 'required|unique:products|max:125',
+        'price' =&gt; 'required|numeric|min:0.10',
+        'description' =&gt; 'required',
+        'brand_id' =&gt; 'required|exists:brands,id'
+    ]);
+    $product = new Product($request-&gt;all());
+    $product-&gt;user_id = 1; // we don't have authentication yet
+    $product-&gt;save();
+    return ['message' =&gt; 'The product has been created'];
+});</code></pre>
+                <footer><small>Of course, you'd better use controllers</small></footer>
+
+            </section>
+
+            <section>
+                <h2>Hint: Resource Controllers</h2>
+                <ul style="font-size: 90%;width: 80%;">
+                    <li>Again: you'd better put your code in controllers, having 1 controller per resource</li>
+                    <li style="margin-top: 1em;">The methods and structure of these controllers and corresponding routes will be very similar</li>
+                    <li style="margin-top: 1em;">Streamline your controllers with <a href="https://laravel.com/docs/8.x/controllers#resource-controllers">Resource Controllers</a></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>"Web" Resource Controllers</h2>
+                <ul style="font-size: 80%">
+                    <li>
+                        Assign all your <em>CRUD</em> routes to a controller in a single line of code
+                        <ul>
+                            <li>Generate the controller:
+                                <pre class="bigger"><code class="hljs bash">$ php artisan make:controller PhotoController --resource</code></pre>
+                            </li>
+                            <li>Register the routes:
+                                <pre class="bigger"><code class="hljs php">Route::resource('photos', PhotoController::class); // chain methods like only(), except()</code></pre>
+                            </li>
+                            <li>Result:
+                                <table style="font-size: 50%; line-height: 1; margin-left: 4.3em; background-color: #2aabd2;">
+                                    <thead>
+                                    <tr style="font-weight: bold;background-color: #1b6d85;">
+                                        <th style="padding: 1px;">Verb</th>
+                                        <th style="padding: 1px;">URI</th>
+                                        <th style="padding: 1px;">Action</th>
+                                        <th style="padding: 1px;">Route Name</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>GET</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos</code></td>
+                                        <td>index</td>
+                                        <td>photos.index</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GET</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span>create</code></td>
+                                        <td>create</td>
+                                        <td>photos.create</td>
+                                    </tr>
+                                    <tr>
+                                        <td>POST</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos</code></td>
+                                        <td>store</td>
+                                        <td>photos.store</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GET</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span></code></td>
+                                        <td>show</td>
+                                        <td>photos.show</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GET</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span><span class="token operator">/</span>edit</code></td>
+                                        <td>edit</td>
+                                        <td>photos.edit</td>
+                                    </tr>
+                                    <tr>
+                                        <td>PUT/PATCH</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span></code></td>
+                                        <td>update</td>
+                                        <td>photos.update</td>
+                                    </tr>
+                                    <tr>
+                                        <td>DELETE</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span></code></td>
+                                        <td>destroy</td>
+                                        <td>photos.destroy</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </li>
+                            <li>In a web app, you will need to spoof the methods DELETE, PUT and PATCH</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>"API" Resource Controllers</h2>
+                <ul style="font-size: 80%">
+                    <li>
+                        Assign all your <em>CRUD</em> routes to a controller in a single line of code
+                        <ul>
+                            <li>Generate the controller:
+                                <pre class="bigger"><code class="hljs bash">$ php artisan make:controller PhotoController --api</code></pre>
+                            </li>
+                            <li>Register the routes:
+                                <pre class="bigger"><code class="hljs php">Route::apiResource('photos', PhotoController::class); // chain methods like only(), except()</code></pre>
+                            </li>
+                            <li>Result:
+                                <table style="font-size: 50%; line-height: 1; margin-left: 4.3em; background-color: #2aabd2;">
+                                    <thead>
+                                    <tr style="font-weight: bold;background-color: #1b6d85;">
+                                        <th style="padding: 1px;">Verb</th>
+                                        <th style="padding: 1px;">URI</th>
+                                        <th style="padding: 1px;">Action</th>
+                                        <th style="padding: 1px;">Route Name</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>GET</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos</code></td>
+                                        <td>index</td>
+                                        <td>photos.index</td>
+                                    </tr>
+                                    <tr>
+                                        <td>POST</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos</code></td>
+                                        <td>store</td>
+                                        <td>photos.store</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GET</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span></code></td>
+                                        <td>show</td>
+                                        <td>photos.show</td>
+                                    </tr>
+                                    <tr>
+                                        <td>PUT/PATCH</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span></code></td>
+                                        <td>update</td>
+                                        <td>photos.update</td>
+                                    </tr>
+                                    <tr>
+                                        <td>DELETE</td>
+                                        <td><code class=" hljs php"><span class="token operator">/</span>photos<span class="token operator">/</span><span class="token punctuation">{</span>photo<span class="token punctuation">}</span></code></td>
+                                        <td>destroy</td>
+                                        <td>photos.destroy</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </li>
+                            <li>Extend with <a href="https://laravel.com/docs/8.x/controllers#restful-nested-resources">Nested Resources</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+
+
+
+        </section>
+
+        <!-- Eloquent API Resources -->
+        <section>
+            <section>
+                <h2>05.4<br>Eloquent API Resources</h2>
+            </section>
+
+            <section>
+                <h2>Introduction</h2>
+                <ul>
+                    <li>In certain situations, defining one single JSON response per Eloquent model is not satisfactory</li>
+                    <li style="margin-top: 1em;"><a href="https://laravel.com/docs/8.x/eloquent-resources">Eloquent API Resources</a> forms a transformation layer between your Eloquent models and JSON responses</li>
+                    <li style="margin-top: 1em;">You will define <code>Resource</code> classes, defining a transformation between an Eloquent model and a JSON response</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Creating a Resource</h2>
+
+                <ul style="width: 85%;font-size: 90%;">
+                    <li>
+                        How to create such a transformation?
+                        <pre class="bigger"><code class="hljs bash">php artisan make:resource ProductResource</code></pre>
+                    </li>
+                    <li style="margin-top: 0.7em;">
+                        &longrightarrow; a <em>resource</em> class is created in <code>app/Http/Resources</code>
+                        <br>
+                        &longrightarrow; in <code>toArray($request)</code>, include all attributes for this transformation
+                        <pre class="bigger"><code class="hljs php">class ProductResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return [
+            'id' =&gt; $this-&gt;id,
+            'name' =&gt; $this-&gt;name,
+            'price' =&gt; $this-&gt;price,
+            'brand' =&gt; new BrandResource($this-&gt;brand),
+            'categories' =&gt; CategoryResource::collection($this-&gt;categories),
+        ];
+    }
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Creating a Resource Collection</h2>
+
+                <ul style="width: 85%;font-size: 90%;">
+                    <li>
+                        How to create a transformation for collections of models?
+                        <pre class="bigger"><code class="hljs bash">php artisan make:resource ProductCollection</code></pre>
+
+                        <small>class name ending on <code>Collection</code> or add the flag <code>--collection</code></small>
+                    </li>
+                    <li style="margin-top: 0.7em;">
+                        &longrightarrow; a <em>resource collection</em> class is created in <code>app/Http/Resources</code>
+                        <br>
+                        &longrightarrow; in <code>toArray($request)</code>, define how you want your collection to be transformed
+                        <pre class="bigger"><code class="hljs php">class ProductCollection extends ResourceCollection
+{
+    /**
+     * Transform the resource collection into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return [
+            'data' =&gt; $this-&gt;collection,
+            'links' =&gt; [
+                'self' =&gt; 'link-value',
+            ],
+        ];
+    }
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Basic Usage</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        Example in your <code>routes/api.php</code>
+                        <pre class="bigger"><code class="hljs php">use App\Http\Resources\ProductResource;
+use App\Models\Product;
+
+Route::get('/products/{id}', function ($id) {
+    return new ProductResource(Product::findOrFail($id));
+});
+
+Route::get('/products', function () {
+    return ProductResource::collection(Product::all());
+});</code></pre>
+                    </li>
+                    <li>By default, all data is <strong>wrapped</strong> in a <code>data</code> key (configurable)</li>
+                    <li>When passing a <strong>paginated</strong> result, the response contains <code>meta</code> and <code>links</code> keys describing the paginator's state</li>
+                    <li>Read more about <a href="https://laravel.com/docs/8.x/eloquent-resources#conditional-attributes">conditional attributes</a> and
+                        <a href="https://laravel.com/docs/8.x/eloquent-resources#conditional-relationships">conditional relationships</a></li>
+                </ul>
+            </section>
+
+
+        </section>
+
+        <!-- Web API Basics with Laravels -->
+        <section>
+            <section>
+                <h2>05.5<br>Web API Authenticaton</h2>
+                <p><em>Coming soon &hellip;</em></p>
+            </section>
+
+
+        </section>
+
+
+
+        <!-- The END -->
+        <section>
+            <section>
+                <h2>Questions?</h2>
+                <footer>
+                    <em><a href="http://www.ikdoeict.be/">ikdoeict.be</a> &mdash; <a href="mailto:joris.maervoet@odisee.be">joris.maervoet@odisee.be</a></em>
+                </footer>
+            </section>
+            <section>
+                <h2>Sources</h2>
+                <ul>
+                    <li><a href="https://laravel.com/docs/8.x/eloquent-mutators">Laravel docs: Eloquent Mutators and Casting</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/eloquent-serialization">Laravel docs: Eloquent Serialization</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/eloquent-resources">Laravel docs: Eloquent API Resources</a></li>
+
+                </ul>
+            </section>
+        </section>
+
+
+    </div>
+
+</div>
+
+<script src="dist/reveal.js"></script>
+<script src="plugin/zoom/zoom.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/search/search.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script>
+
+    // Also available as an ES module, see:
+    // https://revealjs.com/initialization/
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        center: true,
+        hash: true,
+        slideNumber: true,
+
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [ RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight ]
+    });
+
+
+</script>
+<script src="toc.js"></script>
+<script src="overlay.js"></script>
+
+</body>
+</html>
