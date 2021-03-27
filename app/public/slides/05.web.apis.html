@@ -466,7 +466,7 @@ $product->append('description')</code></pre>
 
     $product = Product::with('brand')-&gt;findOrFail($id);
     return ['data' =&gt; $product];
-                    
+
 })-&gt;where('id', '[0-9]+');
 
 Route::get('/products', function () {
@@ -741,7 +741,9 @@ Route::get('/products/{id}', function ($id) {
 });
 
 Route::get('/products', function () {
-    return ProductResource::collection(Product::all());
+    return new ProductCollection(Product::all());
+    // if you don't have a ProductCollection:
+    // ProductResource::collection(Product::all());
 });</code></pre>
                     </li>
                     <li>By default, all data is <strong>wrapped</strong> in a <code>data</code> key (configurable)</li>
