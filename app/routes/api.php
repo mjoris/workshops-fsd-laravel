@@ -20,7 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
+/*
 Route::get('/products/{id}', function ($id) {
     $product = Product::findOrFail($id);
     return $product;
@@ -29,8 +29,8 @@ Route::get('/products/{id}', function ($id) {
 Route::get('/products', function () {
     return Product::all();
 });
+*/
 
-/*
 Route::get('/products/{id}', function ($id) {
     $product = Product::with('brand')->findOrFail($id);
     return ['data' => $product];
@@ -39,7 +39,7 @@ Route::get('/products/{id}', function ($id) {
 Route::get('/products', function () {
     return ['data' => Product::with('brand')->get()];
 });
-*/
+
 
 Route::post('/products', function (Request $request) {
 
