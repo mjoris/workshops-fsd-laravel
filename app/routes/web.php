@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProductController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -39,3 +40,21 @@ Route::get('/products/create', [ProductController::class, 'showCreateForm'])->mi
 Route::post('/products/create', [ProductController::class, 'create'])->middleware(['auth']);
 
 require __DIR__.'/auth.php';
+
+
+Route::post('/sanctum/login', function (Request $request) {
+    $credentials = $request->only('email', 'password');
+
+    if (Auth::attempt($credentials)) {
+        // $request->session()->regenerate();
+        return response(['message' => 'The user has been authenticated successfully'], 200);
+    }
+    return response(['message' => 'The provided credentials do not match our records.'], 401);
+
+});
+
+Route::post('/sanctum/logout', function (Request $request) {
+    Auth::guard('web')->logout();
+    $request->session()->invalidate();
+    return response(['message' => 'The user has been logged out successfully'], 200);
+});

@@ -3,6 +3,8 @@
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,8 +42,9 @@ Route::get('/products', function () {
     return ['data' => Product::with('brand')->get()];
 });
 
-
 Route::post('/products', function (Request $request) {
+
+    Gate::authorize('add-product');
 
     $request->validate([
         'name' => 'required|unique:products|max:125',
@@ -51,20 +54,12 @@ Route::post('/products', function (Request $request) {
     ]);
 
     $product = new Product($request->all());
-    $product->user_id = 1; // we don't have authentication yet
+    $product->user()->associate(Auth::user());
     $product->save();
     return ['message' => 'The product has been created'];
+})->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')->get('/secret1', function (Request $request) {
+    return $request->user();
 });
-
-/*
-Route::post('/login', function (Request $request) {
-    $credentials = $request->only('email', 'password');
-
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        return response(['message' => 'The user has been authenticated successfully'], 401);
-    }
-    return ['message' => 'The provided credentials do not match our records.'];
-
-});*/
 
