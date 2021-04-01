@@ -763,14 +763,17 @@ Route::get('/products', function () {
             </section>
 
             <section>
-                <h2>Laravel Sanctum</h2>
+                <h2>Laravel Passport and Laravel Sanctum</h2>
 
                 <ul>
                     <li>
+                        <strong>Laravel Passport</strong> the official <a href="https://laravel.com/docs/8.x/passport">library</a> implementing pseudo-authentication with OAuth 2.0, the industry-standard protocol
+                    </li>
+                    <li style="margin-top: 1em;">
                         <strong>Laravel Sanctum</strong>: the official <em>lightweight</em> Web API Authentication library
                     </li>
                     <li style="margin-top: 1em;">
-                        Supporting 2 types of authentication
+                        Sanctum supports 2 types of authentication
                         <ul style="font-size: 85%;">
                             <li>
                                 <strong>API Token Authentication</strong>: your application can issue API tokens, having a very long expiration time, to end users (typically developers). When a 3rd party application makes a request to your Web API, the token should be included in the <code>Authorization</code> header
@@ -925,7 +928,7 @@ Route::get('/products', function () {
     $product-&gt;save();
 
     return ['message' =&gt; 'The product has been created'];
-                            
+
 })-&gt;middleware('auth:sanctum');</code></pre>
 
                     </li>
