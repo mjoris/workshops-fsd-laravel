@@ -36,6 +36,8 @@ From the Bash terminal in the php-web container, run the following commands:
 composer install
 cp .env.example .env
 php artisan key:generate
+php artisan migrate
+php artisan db:seed --class DemoSeeder
 ```
 * Browse to [http://localhost:8080](http://localhost:8080)
 * Stop the environment in your terminal/cmd by pressing <code>Ctrl+C</code>
