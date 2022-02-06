@@ -185,7 +185,7 @@
                         </ul>
                     </li>
                     <li style="margin-top: 0.5em;">
-                        We'll be using <strong>PHP 8</strong>. Let's have a look <a href="https://stitcher.io/blog/new-in-php-8">what has changed &rarr;</a>
+                        We'll be using <strong>PHP 8.1</strong>. Let's have a look <a href="https://stitcher.io/blog/new-in-php-81">what has changed &rarr;</a>
                     </li>
                 </ul>
             </section>
@@ -195,8 +195,8 @@
                     <li>Laravel basics: configuration, routing, Request/Response, Blade (templates)</li>
                     <li>MVC: Query Builder, Eloquent (ORM), Controllers, Migrations/Seeders</li>
                     <li>Forms with Validation, File Uploads, Filtering, Pagination</li>
-                    <li>Middleware and Breeze (authentication)</li>
-                    <li>Web APIs with Eloquent API Resources and authentication</li>
+                    <li>Web APIs with Eloquent API Resources</li>
+                    <li>Middleware, authentication and authorization</li>
                 </ul>
             </section>
         </section>
@@ -252,8 +252,9 @@
                 <ul>
                     <li>
                         Installable via Composer
-                        <pre class="bigger"><code class="hljs bash">$ composer create-project laravel/laravel projectdir ^8.0</code></pre>
+                        <pre class="bigger"><code class="hljs bash">$ composer create-project laravel/laravel &lt;path&gt; ^8.0</code></pre>
                         <ul style="margin-top: 0.5em;">
+                            <li><code>&lt;path&gt;</code> is the actual directory where you want to install Laravel, e.g. <code>.</code></li>
                             <li><code>^8.0</code> tag is optional - semantic versioning: everything within 8.*.* range is backward compatible</li>
                             <li><code>composer create-project</code> is the <a href="https://getcomposer.org/doc/03-cli.md#create-project">equivalent</a> of <code>git clone</code> + <code>composer install</code>.
                             So:
@@ -306,7 +307,7 @@
 
 
                 </ul>
-                <footer><em>Note: Make sure only the contents of <code>public/</code> are accessible over HTTP(s)!</em></footer>
+                <footer><em>Note: Make sure only the contents of <code>public/</code> is accessible over HTTP(s)!</em></footer>
             </section>
 
             <section>
@@ -455,7 +456,7 @@
                                 <code>config/database.php</code> &mdash; Database connection configurations
                             </li>
                             <li>
-                                12 other config files e.g. <code>config/cache.php</code>, <code>config/session.php</code>, &hellip;
+                                13 other config files e.g. <code>config/cache.php</code>, <code>config/session.php</code>, &hellip;
                             </li>
                             <li>
                                 format: one big (nested) array of key-value pairs of settings e.g. <pre class="bigger"><code class="hljs php">'charset' => 'utf8mb4',</code></pre>
