@@ -44,6 +44,11 @@ ins code, code.ok {
     background: #000000;
 }
 
+.reveal ::selection {
+    color: #fff;
+    background: #4d7e65;
+    text-shadow: none; }
+
 /* zoomable components */
 .zoomable-12:hover {
     transform: scale(1.2);
