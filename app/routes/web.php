@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductControllerWithAuth;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -33,11 +34,24 @@ Route::get('/eloquent-demo-2', [ProductController::class, 'demo2']);
 Route::get('/eloquent-demo-3', [ProductController::class, 'demo3']);
 Route::get('/eloquent-demo-4', [ProductController::class, 'demo4']);
 
+
+// Routes for concluding demo 'webshop' of 03.forms
 Route::get('/products', [ProductController::class, 'overview']);
 Route::get('/products/{product}', [ProductController::class, 'show'])->where(['product' => '[0-9]+']);
 
-Route::get('/products/create', [ProductController::class, 'showCreateForm'])->middleware(['auth']);
-Route::post('/products/create', [ProductController::class, 'create'])->middleware(['auth']);
+Route::get('/products/create', [ProductController::class, 'showCreateForm']);
+Route::post('/products/create', [ProductController::class, 'create']);
+
+
+// Routes for concluding demo 'webshop' of 05.auth
+/*
+Route::get('/products', [ProductControllerWithAuth::class, 'overview']);
+Route::get('/products/{product}', [ProductControllerWithAuth::class, 'show'])->where(['product' => '[0-9]+']);
+
+Route::get('/products/create', [ProductControllerWithAuth::class, 'showCreateForm'])->middleware(['auth']);
+Route::post('/products/create', [ProductControllerWithAuth::class, 'create'])->middleware(['auth']);
+*/
+
 
 require __DIR__.'/auth.php';
 

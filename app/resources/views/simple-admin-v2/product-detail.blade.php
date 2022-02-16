@@ -1,4 +1,4 @@
-@extends('simple-admin.app')
+@extends('simple-admin-v2.app')
 
 @section('title', 'Webshop administration')
 
@@ -16,6 +16,10 @@
                 <p>
                     Brand: {{ $product->brand->name }}
                 </p>
+                <p>
+                    Created by: {{ $product->user->name }}
+                </p>
+
             </div>
         </div>
 

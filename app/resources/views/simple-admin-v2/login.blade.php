@@ -1,4 +1,4 @@
-@extends('simple-admin.app')
+@extends('simple-admin-v2.app')
 
 @section('title', 'Webshop administration')
 
@@ -6,28 +6,20 @@
     <div class="col-sm-offset-2 col-sm-8">
         <div class="panel panel-default">
             <div class="panel-heading">
-                Please register
+                Please log in
             </div>
             <div class="panel-body">
 
                 @include('simple-admin.errors')
 
-                <form action="{{ route('register')}}" method="POST" class="form-horizontal">
+                <form action="{{ route('login')}}" method="POST" class="form-horizontal">
                     @csrf
-
-                    <div class="form-group">
-                        <label for="name" class="col-sm-3 control-label">Name</label>
-
-                        <div class="col-sm-9">
-                            <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" required="required" autofocus="autofocus">
-                        </div>
-                    </div>
 
                     <div class="form-group">
                         <label for="email" class="col-sm-3 control-label">Email</label>
 
                         <div class="col-sm-9">
-                            <input type="text" name="email" id="email" class="form-control" value="{{ old('email') }}" required="required">
+                            <input type="text" name="email" id="email" class="form-control" value="{{ old('email') }}" required="required" autofocus="autofocus">
                         </div>
                     </div>
                     <div class="form-group">
@@ -39,10 +31,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="password_confirmation" class="col-sm-3 control-label">Confirm password</label>
+                        <label for="remember_me" class="col-sm-3 control-label">Remember me</label>
 
-                        <div class="col-sm-9">
-                            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" value="" autocomplete="off">
+                        <div class="col-sm-8">
+                            <div class="radio">
+                                <input type="checkbox" name="remember" id="remember_me">
+                            </div>
+
                         </div>
                     </div>
 
@@ -56,11 +51,11 @@
                     </div>
                 </form>
                 <p class="text-left">
-                    <a href="{{ route('login') }}">
-                        Already registered?
-                    </a>
-                </p>
-            </div>
-        </div>
-    </div>
+                {{--a href="{{ route('password.request') }}">
+                    Forgot your password?
+                </a--}}
+</p>
+</div>
+</div>
+</div>
 @endsection

@@ -1,4 +1,4 @@
-@extends('simple-admin.app')
+@extends('simple-admin-v2.app')
 
 @section('title', 'Webshop administration')
 
@@ -7,9 +7,11 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 Products
+                @can ('add-product')
                 <a class="btn btn-sm btn-default text-right" href="{{ url('products/create') }}" role="button">
                     <i class="fa fa-btn fa-plus"></i><span class="button-text">Create</span>
                 </a>
+                @endcan
             </div>
             <div class="panel-body">
 
