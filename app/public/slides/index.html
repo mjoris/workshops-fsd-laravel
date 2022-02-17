@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="dist/reset.css">
 	<link rel="stylesheet" href="dist/reveal.css">
 	<link rel="stylesheet" href="dist/theme/black.css" id="theme">
+    <link rel="stylesheet" href="main.css">
 
 	<!-- Theme used for syntax highlighting of code -->
 	<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
@@ -52,6 +53,11 @@
         .reveal footer small {
             font-size: 0.4em;
         }
+
+        .reveal .slides { /* undo font-size in main.css */
+            font-size: 100%;
+        }
+
     </style>
 </head>
 <body>

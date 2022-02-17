@@ -11,6 +11,12 @@ code.hljs { /* but restore the font-size of the code blocks */
     opacity: 0.3;
 }
 
+.reveal .slide-background.present[data-background-hash="#b5533cnullnullnullnullnullnullnullnullnull"] {
+    /* show https://bartdelrue.github.io/balls/ when background set to #b5533 */
+    /* yes this is tricky */
+    background-image: radial-gradient(circle at -29% 0%, #00000031 52%, transparent 52.05%),radial-gradient(circle at -5% -50%, #00000021 51%, transparent 51.05%),radial-gradient(circle at 62% 6%, #00000028 54%, transparent 54.05%) !important;
+}
+
 /* introducing hide-when-not-current class for disappearing fragments */
 :not(.current-fragment).hide-when-not-current {
     display: none;
@@ -268,3 +274,4 @@ ins code, code.ok {
 .reveal .tooltip div *:last-child {
     margin-bottom: 0;
 }
+
