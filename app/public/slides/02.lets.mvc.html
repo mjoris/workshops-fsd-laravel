@@ -434,11 +434,11 @@ DB::table('flights')-&gt;upsert([
 
                 <ul>
                     <li>
-                        ORM: each database table has a corresponding "Model" which is used to interact with it (<a
+                        ORM: &plusmn; each database table has a corresponding "Model" which is used to interact with (<a
                         href="https://laravel.com/docs/8.x/eloquent">Eloquent docs</a>)
                     </li>
                     <li>
-                        First step: generate the models with Artisan <span class="warning">(! uppercase)</span>
+                        First step: generate the models with Artisan <span class="warning">(! uppercase &amp; eng. singular)</span>
                         <pre class="bigger"><code class="hljs bash">$ php artisan make:model Event</code></pre>
                         <ul>
                             <li>It generates the (pretty empty) class <code>Event</code> extending <code>Illuminate\Database\Eloquent\Model</code> in the <code>app/Models/</code> directory</li>
@@ -476,7 +476,7 @@ class Event extends Model
 
                 <ul>
                     <li>
-                        Next step: mark <em>unexpected table characteristics</em> in your model
+                        Next step: mark <em>unexpected table characteristics</em> in your model <code>app/Models/Event.php</code>
                         <ul>
                             <li>The model assumes that there is a table <code>events</code> (plural!) in the database, unless you add
                                 <pre class="bigger"><code class="hljs php">protected $table = 'my_other_table_name';</code></pre>
@@ -532,7 +532,7 @@ foreach (Event::all() as $event) {
     echo $event-&gt;name;
 }</code></pre>
                             </li>
-                            <li>Rely on Query Builder for many other (chained) methods
+                            <li>Rely on <strong>Query Builder</strong> for many other (chained) methods
                                 <pre class="bigger"><code class="hljs php">$events = Event::where('active', 1)
            -&gt;orderBy('name', 'desc')
            -&gt;take(10)
@@ -563,6 +563,38 @@ $activeEvent = Event::where('active', 1)->firstOrFail();</code></pre>
                         </ul>
                     </li>
                 </ul>
+            </section>
+
+            <section>
+                <h2>Builder object or DB query result?</h2>
+                        <ul style="font-size: 80%;width: 100%;">
+                            <li style="margin-top: 0.5em;">
+                                Static methods directly causing a DB query yielding a result
+                                <pre class="bigger"><code class="hljs php">Event::all()          // returns an Eloquent collection of Event objects
+Event::find(15)       // returns an Event object
+Event::findOrFail(15) // returns an Event object
+Event::count()        // returns an integer</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                Static methods returning a Builder object (you are just building a query!)
+                                <pre class="bigger"><code class="hljs php">Event::where('active', 1)
+Event::select('id', 'name')</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                Chaining of Builder methods, returning the <strong>very same</strong> Builder object
+                                <pre class="bigger"><code class="hljs php">$events = Event::where('capacity', '>', 315)->where('active', 1)->select('id', 'name')->orderBy('capacity', 'desc');</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                Methods transforming a Builder object into a result (executing a DB query)
+                                <pre class="bigger"><code class="hljs php">$events->get()         // returns an Eloquent collection of Event objects
+$events->count()       // returns an integer
+$events->first()       // returns an Event object
+$events->find(15)      // returns an Event object
+$events->value('name') // returns a value
+$events->pluck('name') // returns a plain old array</code></pre>
+                            </li>
+
+                        </ul>
             </section>
 
             <section>
@@ -600,7 +632,7 @@ $event-&gt;delete();
                     <li>
                         Mass assignment
                         <ul style="font-size: 90%;">
-                            <li>Definition: use a method to save a new model in a single line
+                            <li>Definition: use a method that accepts a <span style="text-decoration: underline">list of column-value pairs</span> to create/edit a model instance
                                 <pre class="bigger"><code class="hljs php">$user = User::create(['name' =&gt; 'Franky Pallemans', 'company' =&gt; 'Cynalco']);</code></pre>
                             </li>
                             <li>It enables to pass all parameter/value-pairs of the HTTP request's querystring to the create method (think of &hellip; a registration form)
@@ -619,26 +651,24 @@ $event-&gt;delete();
                 <ul>
                     <li>
                         Mass assignment vulnerability protection
-                        <ul>
-                            <li>It is required to
+                        <ul style="font-size: 85%;">
+                            <li style="margin-top: 0.5em;">It is required to
                                 <ul>
                                     <li>blacklist: <code>protected $guarded = ['role'];</code>
                                     </li>
                                     <li>or whitelist: <code>protected $fillable = ['name', 'company'];</code> &rarr; <strong>our choice</strong>
                                     </li>
                                 </ul>
-                                the mass assignable attributes in the model class
+                                the <em>&lsquo;mass assignable&rsquo;</em> attributes in the model class
                             </li>
 
-                            <li>Attention: when you pass a blacklisted/not-whitelisted parameter to the create method
+                            <li style="margin-top: 0.5em;">Attention: when you pass a blacklisted/not-whitelisted parameter to a <em>&lsquo;vulnerable&rsquo;</em> method
                                 <ul>
-                                    <li>You don't get an error
-                                    </li>
-                                    <li>Laravel just drops that parameter</code>
+                                    <li>You don't get an error: Laravel just drops that parameter</code>
                                     </li>
                                 </ul>
                             </li>
-                            <li>It only applies to vulnerable methods so you can still
+                            <li style="margin-top: 0.5em;">It only applies to vulnerable methods so you can still
                                 <pre class="bigger"><code class="hljs php">$user-&gt;role = 'administrator';
 $user-&gt;save();</code></pre>
                             </li>
@@ -651,12 +681,16 @@ $user-&gt;save();</code></pre>
             <section>
                 <h2>More mass-assignment methods</h2>
 
-                <ul style="width: 100%;">
+                <ul style="width: 100%;font-size: 85%;">
                     <li>
-                        Apply <code>fill()</code> on a model instance
+                        Model constructor with parameter
                         <pre class="bigger"><code class="hljs php">use App\Models\Event;
 
-$event = new Event;
+$event = new Event(['name' => 'Pukkelpop 2021']);</code></pre>
+                    </li>
+                    <li>
+                        Apply <code>fill()</code> on a model instance
+                        <pre class="bigger"><code class="hljs php">$event = new Event;
 $event-&gt;fill(['name' => 'Pukkelpop 2021']);</code></pre>
                     </li>
                     <li>
@@ -739,27 +773,26 @@ foreach ($user-&gt;tasks as $task) {
                         Interesting facts
                         <ul>
 
-                            <li>In the previous example
-                                <pre class="bigger"><code class="hljs php">$user-&gt;tasks</code></pre>
+                            <li style="margin-top: 0.5em;">
+                                <code>$user-&gt;tasks</code>
                                 returns a collection of task objects (data)
+                                <br>&rarr; actually special sort of collection: an <a
+                                href="https://laravel.com/docs/8.x/eloquent-collections">Eloquent Collection</a> <br>&rarr; <em>keep on chaining</em>
                             </li>
-                            <li>Actually, what you didn't know: Eloquent return a special sort of collection: an <a
-                                href="https://laravel.com/docs/8.x/eloquent-collections">Eloquent Collection</a> &rarr; <em>keep on chaining</em>
+                            <li style="margin-top: 0.5em;">
+                                <code>$user-&gt;tasks()</code>
+                                returns a query builder object <br> &rarr; <em>keep on chaining</em> <br> &rarr; master relations with <a href="https://laravel.com/docs/8.x/eloquent-relationships#inserting-and-updating-related-models">create(), save() and associate()</a>
                             </li>
-                            <li>In the previous example
-                                <pre class="bigger"><code class="hljs php">$user-&gt;tasks()</code></pre>
-                                returns a query builder object &rarr; <em>keep on chaining</em>
-                            </li>
-
-                            <li style="margin-top: 1em;">
-                                <strong>Many-to-many relationships</strong>: before you start:
-                                <br>
-                                <span class="warning">never</span> make a separate model for the intermediate (= pivot) table
-
-                            </li>
-
 
                         </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        &longrightarrow; Let's have a look at
+                        <a href="https://laravel.com/docs/8.x/eloquent-relationships#many-to-many">many-to-many relationships</a> and
+                        <a href="https://laravel.com/docs/8.x/eloquent-relationships#updating-many-to-many-relationships">how to update them</a>
+                        <br>
+                        remember: <span class="warning">never</span> make a separate model for the intermediate (= pivot) table
+
                     </li>
                 </ul>
 
