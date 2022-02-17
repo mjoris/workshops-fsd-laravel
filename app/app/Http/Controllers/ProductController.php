@@ -121,11 +121,17 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|unique:products|max:125',
             'price' => 'required|numeric|min:0.10',
-            'description' => 'nullable',
+            'description' => 'nullable', // because of ConvertEmptyStringsToNull
             'brand_id' => 'required|exists:brands,id'
         ]);
 
         $product = new Product($request->all());
+
+        // description might be NULL, but this is not allowed in the DB model
+        if (! $request->filled('description')) {
+            $product->description = '';
+        }
+
         $product->save();
 
         return redirect('products');

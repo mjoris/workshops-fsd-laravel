@@ -37,7 +37,13 @@ class ProductControllerWithAuth extends Controller
         ]);
 
         $product = new Product($request->all());
-        $product->user()->associate(Auth::user()); // new
+
+        // description might be NULL, but this is not allowed in the DB model
+        if (! $request->filled('description')) {
+            $product->description = '';
+        }
+
+        $product->user()->associate(Auth::user()); // new !!
         $product->save();
 
         return redirect('products');
