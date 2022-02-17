@@ -29,6 +29,7 @@
         <section data-background="#b5533c">
             <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
             <h1>03. Forms</h1>
+            <footer>More precisely: server-side rendered forms</footer>
         </section>
 
 
@@ -676,13 +677,14 @@ The [public/storage] directory has been linked.</code></pre>
         <!-- Filtering -->
         <section>
             <section>
-                <h2>03.5<br>Filtering</h2>
-                <p><img src="assets/03/filter.png" alt="" title="" width="600" class="noborder" /></p>
+                <h2>03.5<br>Server-side filtering &amp; pagination</h2>
+
             </section>
 
             <section>
                 <h2>Filtering?</h2>
-                <ul>
+
+                <ul style="font-size: 80%;">
                     <li>
                         Allow a visitor to refine a set of results
                         <ul>
@@ -699,6 +701,7 @@ The [public/storage] directory has been linked.</code></pre>
                         </ul>
                     </li>
                 </ul>
+                <p><img src="assets/03/filter.png" alt="" title="" width="300" class="noborder zoomable-20" /></p>
             </section>
 
             <section>
@@ -724,37 +727,49 @@ The [public/storage] directory has been linked.</code></pre>
             </section>
 
             <section>
-                <h2>Some Laravel filtering hints</h2>
-                <ul style="font-size: 75%">
+                <h2>Filtering in Laravel</h2>
+                <ul style="font-size: 75%; width: 100%;">
 
                     <li>
                         In the controller
                         <ul>
                             <li>Validate your input data e.g. <code>'brand_id' =&gt; 'exists:brands'</code></li>
-                            <li><code>Session</code> scenario: add your inputs to the session</li>
-                            <li>For each activated filter field, apply a <em>chainable</em> method e.g. <br/><code>if (&hellip;) $products-&gt;where('brand_id', $request-&gt;brand_id);</code> (or use
-                                <a href="https://laravel.com/docs/8.x/queries#conditional-clauses">when</a>)
-                                <ul>
-                                    <li><strong>Pitfall: in SQL, AND has precedence over OR.</strong> This happens when you chain <code>where()</code> and <code>orWhere()</code> serially. Use
-                                        <a href="https://laravel.com/docs/8.x/queries#parameter-grouping">(or)where grouping</a> instead.</li>
-                                    <li><strong>Pitfall:</strong> <em>chaining</em> a method changes the state of the Builder object</li>
-                                </ul>
+                            <li>Eloquent: points of attention
+                                <pre class="bigger"><code class="hljs php">$products = Product::query(); // returning a neutral Builder object
+
+if ($request-&gt;has('brand_id')) { // might be some other condition
+    $products-&gt;where('brand_id', $request-&gt;brand_id); // chaining changes the state of the Builder object anyway !
+}
+
+// syntactic sugar using when()
+// assume $request-&gt;category_id is false-ish when the user didn't select a category
+$products-&gt;when($request-&gt;category_id, function ($query, $categoryId)  {
+    return $query-&gt;where('category_id', $categoryId);
+});
+
+// NEVER DO THIS:
+// $products-&gt;where('size', 'L')-&gt;orWhere('size', 'XL')
+// WHY?
+// In SQL, AND has precedence over OR, so:
+// ... WHERE ((brand_id = 4) AND (category_id = 7) AND (size = 'L')) OR (size = 'XL')
+
+// use logical grouping in stead
+$products-&gt;where(function ($query) {
+    $query-&gt;where('size', 'L')
+          -&gt;orWhere('size', 'XL')
+});
+
+// or more simple: whereIn
+$products-&gt;whereIn('color', ['red', 'blue']);
+</code></pre>
                             </li>
 
                         </ul>
                     </li>
-
                 </ul>
 
             </section>
-        </section>
 
-        <!-- Pagination -->
-        <section>
-            <section>
-                <h2>03.6<br>Pagination</h2>
-                <p style="margin-top: 2.5em;"><img src="assets/03/pagination.jpg" alt="" title="" width="600" /></p>
-            </section>
 
             <section>
                 <h2>Pagination?</h2>
@@ -767,6 +782,7 @@ The [public/storage] directory has been linked.</code></pre>
                         </ul>
                     </li>
                 </ul>
+                <p style="margin-top: 2.5em;"><img src="assets/03/pagination.jpg" alt="" title="" width="600" /></p>
             </section>
 
             <section>
