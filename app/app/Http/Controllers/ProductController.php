@@ -113,15 +113,11 @@ class ProductController extends Controller
 
     public function showCreateForm()
     {
-        // Gate::authorize('add-product');
-
         return view('simple-admin.product-add', ['brands' => Brand::all()]);
     }
 
     public function create(Request $request)
     {
-        // Gate::authorize('add-product'); // added in slides series 04.auth
-
         $request->validate([
             'name' => 'required|unique:products|max:125',
             'price' => 'required|numeric|min:0.10',
@@ -130,7 +126,6 @@ class ProductController extends Controller
         ]);
 
         $product = new Product($request->all());
-        // $product->user()->associate(Auth::user()); // added in slides series 04.auth
         $product->save();
 
         return redirect('products');
