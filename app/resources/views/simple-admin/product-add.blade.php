@@ -26,7 +26,7 @@
                     <div class="form-group">
                         <label for="price" class="col-sm-4 control-label">Price</label>
                         <div class="col-sm-8">
-                            <input type="number" min="1" step="any" name="price" id="price" class="form-control" value="{{ old('price', 0.00) }}">
+                            <input type="number" min="0" step="any" name="price" id="price" class="form-control" value="{{ old('price', 0.00) }}">
                         </div>
                     </div>
                     <div class="form-group">
