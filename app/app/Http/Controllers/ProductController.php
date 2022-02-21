@@ -53,7 +53,7 @@ class ProductController extends Controller
         dump(Category::find($id)->products->pluck('name')); // v1: involves 2 DB queries (key in collection is 0 !)
         dump(Category::find($id)->products()->pluck('name')); // v2: still 2 DB queries ...
 
-        // v3: the preferable solution
+        // v3: involves only 1 DB query
         $productsOfCategoryTwo = Product::whereHas('categories', function (Builder $query) use ($id) {
             $query->where('id', $id);
         })->get();
