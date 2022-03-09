@@ -743,7 +743,7 @@ Route::get('/products/{id}', function ($id) {
 Route::get('/products', function () {
     return new ProductCollection(Product::all());
     // if you don't have a ProductCollection:
-    // ProductResource::collection(Product::all());
+    // return ProductResource::collection(Product::all());
 });</code></pre>
                     </li>
                     <li>By default, all data is <strong>wrapped</strong> in a <code>data</code> key (configurable)</li>

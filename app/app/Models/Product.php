@@ -12,6 +12,7 @@ class Product extends Model
 
     protected $fillable = ['name', 'description', 'price', 'brand_id'];
 
+    // added in slides series 04.web.apis
     protected $hidden = ['user_id', 'brand_id'];
 
     public function categories()
@@ -24,7 +25,7 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    // added in slides series 04.auth
+    // added in slides series 05.auth
     public function user()
     {
         return $this->belongsTo(User::class);
