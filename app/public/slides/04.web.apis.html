@@ -28,14 +28,14 @@
     <div class="slides">
         <section data-background="#b5533c">
             <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
-            <h1>05. Web APIs</h1>
+            <h1>04. Web APIs</h1>
         </section>
 
 
         <!-- Eloquent: the next level -->
         <section>
             <section>
-                <h2>05.1<br>Eloquent: the Next Level</h2>
+                <h2>04.1<br>Eloquent: the Next Level</h2>
             </section>
 
             <section>
@@ -288,7 +288,7 @@ echo($user-&gt;full_name);</code></pre>
         <!-- Web API Conventions -->
         <section>
             <section>
-                <h2>05.2<br>Web API Conventions</h2>
+                <h2>04.2<br>Web API Conventions</h2>
             </section>
 
             <section>
@@ -316,7 +316,7 @@ echo($user-&gt;full_name);</code></pre>
         <!-- Web API Basics with Laravel -->
         <section>
             <section>
-                <h2>05.3<br>Web API Basics with Laravel</h2>
+                <h2>04.3<br>Web API Basics with Laravel</h2>
             </section>
 
             <section>
@@ -644,7 +644,7 @@ Route::post('/products', function (Request $request) {
         <!-- Eloquent API Resources -->
         <section>
             <section>
-                <h2>05.4<br>Eloquent API Resources</h2>
+                <h2>04.4<br>Eloquent API Resources</h2>
             </section>
 
             <section>
@@ -756,190 +756,8 @@ Route::get('/products', function () {
 
         </section>
 
-        <!-- Web API Basics with Laravels -->
-        <section>
-            <section>
-                <h2>05.5<br>Web API Authentication</h2>
-            </section>
-
-            <section>
-                <h2>Laravel Passport and Laravel Sanctum</h2>
-
-                <ul>
-                    <li>
-                        <strong>Laravel Passport</strong> the official <a href="https://laravel.com/docs/8.x/passport">library</a> implementing pseudo-authentication with OAuth 2.0, the industry-standard protocol
-                    </li>
-                    <li style="margin-top: 1em;">
-                        <strong>Laravel Sanctum</strong>: the official <em>lightweight</em> Web API Authentication library
-                    </li>
-                    <li style="margin-top: 1em;">
-                        Sanctum supports 2 types of authentication
-                        <ul style="font-size: 85%;">
-                            <li>
-                                <strong>API Token Authentication</strong>: your application can issue API tokens, having a very long expiration time, to end users (typically developers). When a 3rd party application makes a request to your Web API, the token should be included in the <code>Authorization</code> header
-                            </li>
-                            <li style="margin-top: 1em;">
-                                <strong>SPA Authentication</strong>: your SPA is in a trusted domain and can send requests in order to authenticate individual users. Actually, Sanctum &plusmn; falls back to the <em>stateful</em> authentication (with session cookies) you already know.
-                                <br>
-                                &longrightarrow; we'll only talk about this type
-                            </li>
 
 
-
-                        </ul>
-                    </li>
-
-                </ul>
-            </section>
-
-            <section>
-                <h2>Installation Recipe</h2>
-
-                <ul style="font-size: 85%;width: 85%;">
-                    <li>
-                        As described in the <a href="https://laravel.com/docs/8.x/sanctum#spa-authentication">Sanctum docs</a>:
-                        <ul>
-                            <li><pre class="bigger"><code class="hljs bash">composer require laravel/sanctum</code></pre></li>
-                            <li><pre class="bigger"><code class="hljs bash">php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"</code></pre></li>
-                            <li>(migration is only required for API Token Authentication)</li>
-                            <li>add Sanctum's middleware to the <code>api</code> middleware group in <code>app/Http/Kernel.php</code>
-
-
-                        <pre class="bigger"><code class="hljs php">'api' =&gt; [
-    \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-    'throttle:api',
-    \Illuminate\Routing\Middleware\SubstituteBindings::class,
-],</code></pre>
-                            </li>
-                            <li>open <code>config/sanctum.php</code> and make sure that your <code>domain:port</code> combination is in <code>SANCTUM_STATEFUL_DOMAINS</code>. This setting determines for which domains authentication cookies are set.
-                                <br><strong>Attention:</strong> <code>localhost:8080</code> is not the same as <code>127.0.0.1:8080</code>
-                            </li>
-
-                        </ul>
-
-                    </li>
-                </ul>
-
-            </section>
-
-            <section>
-                <h2>Routes Recipe (1)</h2>
-
-                <ul style="font-size: 85%;width: 90%;">
-                    <li>
-                        The route <code>GET /sanctum/csrf-cookie</code> hands out CSRF tokens as it sets an <code>XSRF-TOKEN</code> cookie
-                        <ul>
-                            <li>You must pass this cookie in an <code>X-XSRF-TOKEN</code> header(!) of subsequent requests</li>
-                            <li>Some JavaScript libraries do this automatically for you</li>
-                        </ul>
-                    </li>
-                    <li style="margin-top: 1em;">
-                        You should implement your login route yourself in <code>routes/web.php</code> (!!!)
-                        <ul>
-                            <li>
-                                For example, <code>POST /sanctum/login</code>
-                                <pre class="bigger"><code class="hljs php">Route::post('/sanctum/login', function (Request $request) {
-    $credentials = $request-&gt;only('email', 'password');
-    if (Auth::attempt($credentials)) {
-        return response(['message' =&gt; 'The user has been authenticated successfully'], 200);
-    }
-    return response(['message' =&gt; 'The provided credentials do not match our records.'], 401);
-
-});</code></pre>
-                            </li>
-                            <li>Unfortunately, Breeze's login route is not compatible as it redirects after login even if the request only accepts JSON</li>
-                            <li>As the <em>normal</em> <code>web</code> mechanisms apply here, after successful login the user receives a session cookie <code>myapplicationname_session</code>, of which the server remembers there is successful authentication and by whom</li>
-                        </ul>
-                    </li>
-
-                </ul>
-
-            </section>
-
-            <section>
-                <h2>Routes Recipe (2)</h2>
-
-                <ul style="font-size: 85%;width: 90%;">
-                    <li>
-                        Protect the Web API routes in <code>routes/api.php</code> by plugging the <code>auth:sanctum</code> middleware:
-                        <pre class="bigger"><code class="hljs php">Route::middleware('auth:sanctum')-&gt;get('/secret1', function (Request $request) {
-    return $request-&gt;user();
-});</code></pre>
-                        <ul>
-                            <li>Actually, Sanctum is just applying the <em>normal</em> <code>web</code> and <code>auth</code> middlewares here</li>
-                            <li>So, if the user includes the right session cookie <code>myapplicationname_session</code>, the user is authenticated in the route</li>
-                            <li>Some JavaScript libraries do this automatically for you</li>
-                            <li>Needs a <code>Referer</code> header (!!!)</li>
-                        </ul>
-                    </li>
-                    <li style="margin-top: 1em;">
-                        You could implement your logout route yourself in <code>routes/web.php</code> (!!!)
-                        <ul>
-                            <li>
-                                For example, <code>POST /sanctum/logout</code>
-                                <pre class="bigger"><code class="hljs php">Route::post('/sanctum/logout', function (Request $request) {
-    Auth::guard('web')-&gt;logout();
-    $request-&gt;session()-&gt;invalidate();
-    return response(['message' =&gt; 'The user has been logged out successfully'], 200);
-});</code></pre>
-                            </li>
-
-                        </ul>
-                    </li>
-
-                </ul>
-
-            </section>
-            <section>
-                <h2>Demo with Insomnia</h2>
-                <figure class="zoomable-20">
-                    <img src="assets/05/sanctum1.png" alt="Sanctum example 1" height="140">
-                </figure>
-                <figure class="zoomable-20">
-                    <img src="assets/05/sanctum2.png" alt="Sanctum example 2" height="140">
-                </figure>
-                <figure class="zoomable-20">
-                    <img src="assets/05/sanctum3.png" alt="Sanctum example 3" height="140">
-                </figure>
-                <footer><small>demo with Postman on <a
-                    href="https://blog.codecourse.com/laravel-sanctum-airlock-with-postman/">codecourse</a></small></footer>
-            </section>
-
-
-            <section>
-                <h2>Example</h2>
-
-                <ul style="font-size: 85%;width: 90%;">
-                    <li>
-                        Use authentication and authorization as you were used to:
-                        <pre class="bigger"><code class="hljs php">Route::post('/products', function (Request $request) {
-
-    Gate::authorize('add-product');
-
-    $request-&gt;validate([
-        'name' =&gt; 'required|unique:products|max:125',
-        'price' =&gt; 'required|numeric|min:0.10',
-        'description' =&gt; 'required',
-        'brand_id' =&gt; 'required|exists:brands,id'
-    ]);
-
-    $product = new Product($request-&gt;all());
-    $product-&gt;user()-&gt;associate(Auth::user());
-    $product-&gt;save();
-
-    return ['message' =&gt; 'The product has been created'];
-
-})-&gt;middleware('auth:sanctum');</code></pre>
-
-                    </li>
-
-
-                </ul>
-
-            </section>
-
-
-        </section>
 
 
 
