@@ -729,21 +729,32 @@ The [public/storage] directory has been linked.</code></pre>
             <section>
                 <h2>Filtering in Laravel</h2>
                 <ul style="font-size: 75%; width: 100%;">
+                    <li>
+                        In Blade: persistence
+                        <ul>
+                            <li>
+                                Your form is also shown when the input is <strong>valid</strong>
+                            </li>
+                            <li>
+                                So you cannot rely on <code>old()</code> for persistence
+                            </li>
+                            <li>
+                                Just use <code>request('brand_id')</code> or <code>session()-&gt;get('brand_id')</code> in Blade directly
+                            </li>
+                        </ul>
+
+                    </li>
 
                     <li>
-                        In the controller
-                        <ul>
-                            <li>Validate your input data e.g. <code>'brand_id' =&gt; 'exists:brands'</code></li>
-                            <li>Eloquent: points of attention
+                        In the controller: Eloquent points of attention
                                 <pre class="bigger"><code class="hljs php">$products = Product::query(); // returning a neutral Builder object
 
-if ($request-&gt;has('brand_id')) { // might be some other condition
+if ($request-&gt;filled('brand_id')) { // might be some other condition e.g. has(), == 0
     $products-&gt;where('brand_id', $request-&gt;brand_id); // chaining changes the state of the Builder object anyway !
 }
 
 // syntactic sugar using when()
-// assume $request-&gt;category_id is false-ish when the user didn't select a category
-$products-&gt;when($request-&gt;category_id, function ($query, $categoryId)  {
+$products-&gt;when($request-&gt;filled('category_id'), function ($query, $categoryId)  {
     return $query-&gt;where('category_id', $categoryId);
 });
 
@@ -762,9 +773,7 @@ $products-&gt;where(function ($query) {
 // or more simple: whereIn
 $products-&gt;whereIn('color', ['red', 'blue']);
 </code></pre>
-                            </li>
 
-                        </ul>
                     </li>
                 </ul>
 
