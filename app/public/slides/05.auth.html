@@ -549,7 +549,8 @@ class CheckRole
         <section>
             <section>
                 <h2>05.4<br>Authentication</h2>
-
+                <p>= verifying who a user is</p>
+                <p><small>For now, we'll focus on<br></small>  <strong>session</strong>-based authentication, <br><small>typically used in server-side rendered applications</small> </p>
             </section>
 
 
@@ -564,35 +565,36 @@ class CheckRole
                                 API containing basic authentication methods such as <code>Auth::login()</code>
                             </li>
                             <li>
-                                Starter Kits: packages <em>scaffolding</em> the entire authentication layer (controllers, views, routes, &hellip;)
+                                To be configured in <code>config/auth.php</code>
                                 <ul>
-                                    <li>
-                                        <a href="https://github.com/laravel/ui">Laravel UI</a> 3.x (considered as <em>obsolete</em>)
+                                    <li><strong>Guards:</strong> how are users authenticated technically? e.g. session, token
                                     </li>
-                                    <li>
-                                        <a href="https://laravel.com/docs/8.x/starter-kits#laravel-breeze">Laravel Breeze</a> &longrightarrow; we'll use Breeze in the next slides
-                                    </li>
-                                    <li>
-                                        <a href="https://laravel.com/docs/8.x/fortify">Laravel Fortify</a>
-                                    </li>
-                                    <li>
-                                        <a href="https://jetstream.laravel.com/2.x/introduction.html">Laravel Jetstream</a>
-                                    </li>
+                                    <li><strong>Providers:</strong> where is the user information stored and how can it be retrieved? e.g. in the <code>users</code> table with Eloquent</li>
+                                    <li>Resetting passwords</li>
                                 </ul>
                             </li>
+
                         </ul>
                     </li>
-                    <li style="margin-top: 1em;">
-                        Configuration
-                        <ul style="font-size: 85%;">
-                            <li><strong>Guards:</strong> how are users authenticated technically? e.g. session, token
+                    <li style="margin-top: 1em;font-size: 85%;">
+                        You <strong>could</strong> write your own authentication logic (controllers, views, routes) but might not be secure
+                    </li>
+                    <li style="margin-top: 1em;font-size: 85%;">
+                        Starter Kits: packages <em>scaffolding</em> the entire authentication layer (controllers, views, routes)
+                        <ul>
+                            <li>
+                                <a href="https://github.com/laravel/ui">Laravel UI</a> 3.x (considered as <em>obsolete</em>)
                             </li>
-                            <li><strong>Providers:</strong> where is the user information stored and how can it be retrieved? e.g. in the <code>users</code> table with Eloquent</li>
-                            <li>Resetting passwords</li>
+                            <li>
+                                <a href="https://laravel.com/docs/8.x/starter-kits#laravel-breeze">Laravel Breeze</a> &longrightarrow; we'll use Breeze in the next slides
+                            </li>
+                            <li>
+                                <a href="https://laravel.com/docs/8.x/fortify">Laravel Fortify</a> (front-end agnostic and encapsulated in a library)
+                            </li>
+                            <li>
+                                <a href="https://jetstream.laravel.com/2.x/introduction.html">Laravel Jetstream</a>
+                            </li>
                         </ul>
-                    </li>
-                    <li style="margin-top: 1em;">
-                        These components can be configured in <code>config/auth.php</code>
                     </li>
                 </ul>
             </section>
@@ -705,6 +707,29 @@ $ npm run dev
             </section>
 
             <section>
+                <h2>Correction</h2>
+                <h4>step 3 with Docker/WSL2 from Ubuntu for Windows</h4>
+                <ul>
+                    <li>
+                        Unfortunately, npm has some bug when not executed as root user
+                    </li>
+                </ul>
+                <pre class="bigger"><code class="hljs bash">$ docker compose exec -u 1000:1000 php-web bash
+   # composer require laravel/breeze --dev
+   # php artisan breeze:install
+   # exit
+$ docker compose exec php-web bash
+   # mkdir /.npm
+   # chown -R 1000:1000 "/.npm"
+   # exit
+$ docker compose exec -u 1000:1000 php-web bash
+   # npm install
+   # npm run dev
+								</code></pre>
+
+            </section>
+
+            <section>
                 <h2>Step 4: Redirect Paths</h2>
 
                 <ul>
@@ -712,8 +737,8 @@ $ npm run dev
                         <strong>Step 4:</strong> set your redirect path (= destination after successful authentication)
                         <ul>
                             <li style="margin-top: 1em;">
-                                In <code>app/Http/Providers/RouteServiceProvider.php</code>:
-                                <pre class="bigger"><code class="hljs php">public const HOME = '/tasks'; // '/home' by default</code></pre>
+                                In <code>app/Providers/RouteServiceProvider.php</code>:
+                                <pre class="bigger"><code class="hljs php">public const HOME = '/tasks'; // '/dashboard' by default</code></pre>
                             </li>
                             <li  style="margin-top: 1em;">
                                 and set your redirect path if unauthenticated in <code>app/Http/Middleware/Authenticate.php</code>
@@ -728,7 +753,7 @@ $ npm run dev
                     </li>
 
                 </ul>
-                <footer><small>Note: these classes have nothing to do with Breeze - they're part of the Authentication API</small></footer>
+                <footer><small>Note: these classes have nothing to do with Breeze - they're part of the Laravel core</small></footer>
             </section>
 
             <section>
@@ -864,6 +889,7 @@ Auth::logout();</code></pre>
         <section>
             <section>
                 <h2>05.5<br>Authorization</h2>
+                <p>= verifying what a user has access to</p>
             </section>
 
 
@@ -1113,10 +1139,30 @@ Route::post('/product', function () {
 
         <section>
             <section>
-                <h2>05.6<br>Web API Authentication</h2>
+                <h2>05.6<br>Demo</h2>
+            </section>
+            <section data-background="#fdfdfd">
+                <h2>Demo outline</h2>
+                <ul style="font-size: 85%;">
+                    <li>Remember the webshop demo pages <code>/products</code>, <code>/products/{id}</code> and <code>/products/create</code> ?</li>
+
+                    <li>&longrightarrow; Let's integrate the users table into the model and extend the users with roles (customer or admin)</li>
+                </ul>
+                <img src="assets/05/demo-auth-model.png" alt="" width="750">
+                <ul style="font-size: 85%;width: 100%;">
+                    <li>&longrightarrow; Let's protect <code>/products/create</code> from unauthenticated &amp; unauthorized (= customer) users</li>
+                    <li>&longrightarrow; Let's have a look at the code &hellip;</li>
+                </ul>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h2>05.7<br>Web API Authentication</h2>
+                <p><em>that's for next week &hellip;</em></p>
             </section>
 
-            <section>
+            <!--section>
                 <h2>Laravel Passport and Laravel Sanctum</h2>
 
                 <ul>
@@ -1290,7 +1336,7 @@ Route::post('/product', function () {
 
                 </ul>
 
-            </section>
+            </section-->
 
 
         </section>
