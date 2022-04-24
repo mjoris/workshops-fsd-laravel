@@ -7,8 +7,6 @@ use App\Models\Product;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 
 // Eloquent model for concluding demo 'webshop' of 02.lets.mvc
 class ProductController extends Controller
