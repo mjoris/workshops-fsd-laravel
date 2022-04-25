@@ -12,7 +12,7 @@
 
                 @include('simple-admin.errors')
 
-                <form action="{{ route('login')}}" method="POST" class="form-horizontal">
+                <form action="{{ url('login') }}" method="post" class="form-horizontal">
                     @csrf
 
                     <div class="form-group">

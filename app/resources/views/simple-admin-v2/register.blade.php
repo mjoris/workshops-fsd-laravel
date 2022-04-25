@@ -12,7 +12,7 @@
 
                 @include('simple-admin.errors')
 
-                <form action="{{ route('register')}}" method="POST" class="form-horizontal">
+                <form action="{{ url('register')}}" method="post" class="form-horizontal">
                     @csrf
 
                     <div class="form-group">
@@ -50,7 +50,7 @@
                     <div class="form-group">
                         <div class="col-sm-offset-3 col-sm-6">
                             <button type="submit" class="btn btn-default">
-                                Log in
+                                Registreer
                             </button>
                         </div>
                     </div>
