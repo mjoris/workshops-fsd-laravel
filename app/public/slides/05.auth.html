@@ -1159,10 +1159,10 @@ Route::post('/product', function () {
         <section>
             <section>
                 <h2>05.7<br>Web API Authentication</h2>
-                <p><em>that's for next week &hellip;</em></p>
+                <p><strong>Token</strong>-based authentication</p>
             </section>
 
-            <!--section>
+            <section>
                 <h2>Laravel Passport and Laravel Sanctum</h2>
 
                 <ul>
@@ -1237,8 +1237,8 @@ Route::post('/product', function () {
                         You should implement your login route yourself in <code>routes/web.php</code> (!!!)
                         <ul>
                             <li>
-                                For example, <code>POST /sanctum/login</code>
-                                <pre class="bigger"><code class="hljs php">Route::post('/sanctum/login', function (Request $request) {
+                                For example, <code>POST /api/login</code>
+                                <pre class="bigger"><code class="hljs php">Route::post('/api/login', function (Request $request) {
     $credentials = $request-&gt;only('email', 'password');
     if (Auth::attempt($credentials)) {
         return response(['message' =&gt; 'The user has been authenticated successfully'], 200);
@@ -1276,8 +1276,8 @@ Route::post('/product', function () {
                         You could implement your logout route yourself in <code>routes/web.php</code> (!!!)
                         <ul>
                             <li>
-                                For example, <code>POST /sanctum/logout</code>
-                                <pre class="bigger"><code class="hljs php">Route::post('/sanctum/logout', function (Request $request) {
+                                For example, <code>POST /api/logout</code>
+                                <pre class="bigger"><code class="hljs php">Route::post('/api/logout', function (Request $request) {
     Auth::guard('web')-&gt;logout();
     $request-&gt;session()-&gt;invalidate();
     return response(['message' =&gt; 'The user has been logged out successfully'], 200);
@@ -1290,8 +1290,8 @@ Route::post('/product', function () {
                 </ul>
 
             </section>
-            <section>
-                <h2>Demo with Insomnia</h2>
+            <section data-background="#fdfdfd">
+                <h2>Demo with Insomnia or Postman</h2>
                 <figure class="zoomable-20">
                     <img src="assets/05/sanctum1.png" alt="Sanctum example 1" height="140">
                 </figure>
@@ -1312,7 +1312,7 @@ Route::post('/product', function () {
                 <ul style="font-size: 85%;width: 90%;">
                     <li>
                         Use authentication and authorization as you were used to:
-                        <pre class="bigger"><code class="hljs php">Route::post('/products', function (Request $request) {
+                        <pre class="bigger"><code class="hljs php">Route::post('/v4/products', function (Request $request) {
 
     Gate::authorize('add-product');
 
@@ -1333,10 +1333,14 @@ Route::post('/product', function () {
 
                     </li>
 
-
                 </ul>
 
-            </section-->
+            </section>
+
+            <section>
+                <h2>Full example: laravel-tasks-api</h2>
+                <p><a href="https://gitlab.com/ikdoeict/joris.maervoet/laravel-tasks-api">https://gitlab.com/ikdoeict/joris.maervoet/laravel-tasks-api</a></p>
+            </section>
 
 
         </section>

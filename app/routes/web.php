@@ -57,7 +57,9 @@ Route::post('/products/create', [ProductControllerWithAuth::class, 'create'])->m
 require __DIR__.'/auth.php';
 
 
-Route::post('/sanctum/login', function (Request $request) {
+// Routes for Web API authentication with Sanctum
+
+Route::post('/api/login', function (Request $request) {
     $credentials = $request->only('email', 'password');
 
     if (Auth::attempt($credentials)) {
@@ -68,7 +70,7 @@ Route::post('/sanctum/login', function (Request $request) {
 
 });
 
-Route::post('/sanctum/logout', function (Request $request) {
+Route::post('/api/logout', function (Request $request) {
     Auth::guard('web')->logout();
     $request->session()->invalidate();
     return response(['message' => 'The user has been logged out successfully'], 200);

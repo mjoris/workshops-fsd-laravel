@@ -74,9 +74,9 @@ Route::get('/v3/products', function () {
 
 
 
-// Under construction ...
+// Version 4: adding products with authentication & authorization
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/secret1', function (Request $request) {
     return $request->user();
 });
 
@@ -98,7 +98,4 @@ Route::post('/v4/products', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::middleware('auth:sanctum')->get('/secret1', function (Request $request) {
-    return $request->user();
-});
 
