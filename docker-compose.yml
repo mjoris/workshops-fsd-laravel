@@ -11,24 +11,25 @@ services:
     links:
       - mysqldb
   mysqldb:
-    image: mysql:5.7
+    image: mysql:8.0
     restart: always
     ports:
-     - "3307:3306"
+      - "3307:3306"
     volumes:
-     - "./docker/mysql-data:/var/lib/mysql"
-     - "./docker/demo.sql:/docker-entrypoint-initdb.d/dump.sql"
+      - "./docker/mysql-data:/var/lib/mysql"
+      - "./docker/labo.sql:/docker-entrypoint-initdb.d/dump.sql"
     environment:
-     - MYSQL_ROOT_PASSWORD=Azerty123
+      - MYSQL_ROOT_PASSWORD=Azerty123
+      - LANG=C.UTF-8
   myadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     ports:
-        - "8000:80"
+      - "8000:80"
     environment:
-        - PMA_ARBITRARY=0
-        - PMA_HOST=mysqldb
-        - UPLOAD_LIMIT=50M
+      - PMA_ARBITRARY=0
+      - PMA_HOST=mysqldb
+      - UPLOAD_LIMIT=50M
     restart: always
     depends_on:
-        - mysqldb
+      - mysqldb
