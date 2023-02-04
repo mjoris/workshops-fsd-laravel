@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 // Migration for concluding demo 'webshop' of 02.lets.mvc
-class CreateCategoryProductTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -34,4 +34,4 @@ class CreateCategoryProductTable extends Migration
     {
         Schema::dropIfExists('category_product');
     }
-}
+};
