@@ -35,6 +35,7 @@ From the Bash terminal in the php-web container, run the following commands:
 ```shell
 composer install
 cp .env.example .env
+chmod -R 777 storage bootstrap/cache
 php artisan key:generate
 php artisan migrate
 php artisan db:seed --class DemoSeeder
