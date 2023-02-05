@@ -208,12 +208,48 @@
             </section>
 
             <section>
-                <h2>Docker environments</h2>
+                <h2>Laravel on Docker (1)</h2>
+                <p>Important remark</p>
+                <ul style="font-size: 90%;">
+                    <li>Laravel is <strong>too slow</strong> on Docker Desktop for Windows (WSL2)
+                        <ul>
+                            <li>
+                                when bind-mounting your Laravel project in a Docker Container
+                            </li>
+                            <li>
+                                because WSL2 has <a href="https://github.com/microsoft/WSL/issues/4197">poor filesystem performance</a>
+                                <br> &longrightarrow; each PHP file access introducing some serious time delay (e.g. 100ms)
+                                <br> &longrightarrow; an HTTP request to a Laravel project results into <strong>many</strong> PHP file accesses
+                                <br> &longrightarrow; HTTP response delayed for seconds
+                            </li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">You cannot test/learn Laravel efficiently that way. <strong>No you can't!</strong></li>
+                    <li style="margin-top: 1em;">
+                        <strong>Solution:</strong>
+                        enable Docker integration with WSL2 distro &amp; store your project in the Linux filesystem of WSL2
+                        <ul>
+                            <li>
+                                access through <code>\\wsl$</code> in Explorer and CLI through your distro
+                            </li>
+                            <li>
+                                IDEs know &plusmn; how to handle this
+                            </li>
+                            <li>
+                                see <u>Handleiding Docker-WSL2-Ubuntu.pdf</u> on Toledo
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Laravel on Docker (2)</h2>
                 <ul style="font-size: 90%;">
                     <li>Developers who want to use Docker as their virtual development environment with Laravel, have several options, depending on their preferences and requirements
                     <ul>
                         <li><a href="https://laradock.io/">Laradock</a>
-                            <ul style="font-size: 70%;">
+                            <ul style="font-size: 50%;">
                                 <li>A <em>swiss knife</em> Docker environment (consisting of &gt; 60 Docker images of high quality), to be cloned once for all your web projects</li>
                                 <li>Running is as easy as <code>docker-compose up -d nginx mysql phpmyadmin workspace</code>, where the <code>workspace</code> is a separate container to run all your CLI commands</li>
                                 <li>
@@ -224,10 +260,10 @@
                         </li>
                         <li>
                             <a href="https://laravel.com/docs/9.x/sail">Laravel Sail</a>
-                            <ul style="font-size: 70%;">
+                            <ul style="font-size: 50%;">
                                 <li>The official dev env of Laravel (since 8.0)</li>
                                 <li>Internally, you run a (temporary) Sail container for the installation of a fresh Laravel project. Next, running is as easy as <code>sail up</code> and from your own terminal you can launch any of your CLI commands on a container e.g. <code>sail composer</code>.
-                                Comes with <a href="https://github.com/mailhog/MailHog">MailHog</a>.</li>
+                                Comes with <a href="https://github.com/axllent/mailpit">MailPit</a>.</li>
                                 <li>Cons: rather complex Docker approach in a <strong>black box</strong>, Windows support is not (yet) 100%, <code>docker-compose.yml</code> not (yet) intended for docker-without-sail, webserver image takes long to build</li>
                             </ul>
                         </li>
@@ -323,6 +359,9 @@
                         <code>database/</code> &mdash; Database migration and seeds
                     </li>
                     <li>
+                        <code>lang/</code> &mdash; Language files
+                    </li>
+                    <li>
                         <code>resources/</code> &mdash; Raw assets (to be compiled) such as templates and localization files
                     </li>
                     <li>
@@ -366,7 +405,6 @@
 
                     </li>
                 </ul>
-                <footer><em>Read more on <a href="https://laravel.com/docs/9.x/providers">Laravel Service Providers</a></em></footer>
             </section>
 
             <section>
@@ -569,37 +607,50 @@ DB_CONNECTION=sqlite</code></pre>
             </section>
 
             <section>
-                <h2>Our Installation and Config Manual</h2>
-                <ul style="font-size: 80%;">
+                <h2>Installation Manual</h2>
+                <p style="font-size: 75%;"></p>
+                <ul style="font-size: 75%;">
+                    <p><code><span style="background-color: darkgreen;color: yellow;">colored text</span></code> = with Docker on Windows</p>
                     <li>
                         Installing a fresh Laravel project
                         <ol>
-                            <li>Start a new git repo and <code>git clone</code></li>
-                            <li>Add your Docker environment (<code>docker-compose.yml</code>, <code>/docker</code>, &hellip; )
-                                <br>
-                                <span style="font-size:70%;">providing some <em>empty</em> project folder, of which a future subfolder <code>public</code> is set as the document root of the web container</span></li>
-                            <li>
-                                Run <code>docker-compose up</code>, <code>docker-compose exec &hellip; bash</code> into the web container and run <br>
-                                <code>composer create-project laravel/laravel . ^8.0</code>
+                            <li>Create a new empty repo on <a href="https://gitlab.com/">gitlab</a></li>
+                            <li><code>git clone &lt;repo-url&gt;</code> <code><span style="background-color: darkgreen;color: yellow;">inside the WSL2-Linux filesystem</span></code></li>
+                            <li>Add <code>/docker-compose.yml</code> <code>/.gitignore</code>
+                                <code>/docker/Dockerfile</code> <code>/docker/php.ini</code> (<code>/docker/dump.sql</code>)
+                                <code>/app</code>
+                                <br><small>Keep <code>/app</code> empty. <code>/app/public</code> will become the document root of the web container later on</small>
                             </li>
-                            <li>Craft <code>.env</code> and <code>config/*.php</code> until your project is working</li>
+                            <li style="line-height: 1;">
+                                <code>docker-compose up</code>
+                                <br><code>docker-compose exec <span style="background-color: darkgreen;color: yellow;">-u 1000:1000</span> php-web bash</code>
+                                <br><code>$ composer create-project laravel/laravel . ^9.0</code>
+                                <br><code>$ chmod -R 777 storage bootstrap/cache</code>
+                            </li>
+                            <li>Craft <code>.env</code> and <code>config/*.php</code></li>
                             <li>If necessary: copy the non-sensitive parts of <code>.env</code> to <code>.env.example</code></li>
-                            <li>Commit and push</li>
+                            <li><code>git add .</code> &nbsp;
+                                <code>git commit -m "Adding initial Laravel project"</code> &nbsp;
+                                <code>git push</code></li>
                         </ol>
                     </li>
                     <li style="margin-top: 1em;">
                         Installing an already existing Laravel project
                         <ol>
-                            <li><code>git clone</code> the repo</li>
-                            <li>
-                                Run <code>docker-compose up</code>, <code>docker-compose exec &hellip; bash</code> into the web container and run <br>
-                                <code>composer install<br>
-                                    cp .env.example .env<br>
-                                    php artisan key:generate</code>
+                            <li><code>git clone &lt;repo-url&gt;</code> <code><span style="background-color: darkgreen;color: yellow;">inside the WSL2-Linux filesystem</span></code></li>
+
+                            <li style="line-height: 1;">
+                                <code>docker-compose up</code>
+                                <br><code>docker-compose exec <span style="background-color: darkgreen;color: yellow;">-u 1000:1000</span> php-web bash</code>
+                                <br><code>$ composer install</code>
+                                <br><code>$ cp .env.example .env</code>
+                                <br><code>$ php artisan key:generate</code>
+                                <br><code>$ chmod -R 777 storage bootstrap/cache</code>
                             </li>
                         </ol>
                     </li>
                 </ul>
+
             </section>
 
         </section>
