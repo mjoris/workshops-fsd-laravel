@@ -45,6 +45,9 @@
                         The routes of your web app are defined in <code>routes/web.php</code>
                     </li>
                     <li>
+                        The routes of your web API are defined in <code>routes/api.php</code> (URLs with prefix <code>api/</code>)
+                    </li>
+                    <li>
                         What's a route?
                         <ul>
                             <li>A route is a combination of a <strong>pattern</strong> and an <strong>HTTP method</strong></li>
@@ -125,8 +128,13 @@ Route::any('foo', function () { &hellip;</code></pre>
                         Constrain parameters using the <code>where</code> method
                         <pre class="bigger"><code class="hljs php">Route::get('user/{id}/{name}', function ($id, $name) {
     //
-})
-->where(['id' => '[0-9]+', 'name' => '[a-zA-Z]+']);</code></pre>
+})->where(['id' => '[0-9]+', 'name' => '[a-zA-Z]+']);</code></pre>
+                    </li>
+                    <li>
+                        Same, with helper methods:
+                        <pre class="bigger"><code class="hljs php">Route::get('user/{id}/{name}', function ($id, $name) {
+    //
+})->whereNumber('id')->whereAlpha('name');</code></pre>
                     </li>
                     <li>You can add <a href="https://laravel.com/docs/9.x/routing#parameters-regular-expression-constraints">global constraints</a> too
                         <ul>
@@ -151,17 +159,21 @@ Route::any('foo', function () { &hellip;</code></pre>
                                 <pre class="bigger"><code class="hljs php">use Illuminate\Http\Request;
 
 Route::post('register', function(Request $request) {
-	$email = $request-&gt;input('email', 'not provided');
-	$name = $request-&gt;cookie('name');
-	$iKnowItsTrue = $request-&gt;isMethod('post');
-	if ($request-&gt;has('name')) {
-    &hellip;
+    $email = $request-&gt;input('email', 'not provided');
+    $name = $request-&gt;cookie('name');
+    $value = $request-&gt;header('X-Header-Name');
+    $iKnowItsTrue = $request-&gt;isMethod('post');
+    $iKnowItsFalse = $request-&gt;is('register/*');
+    if ($request-&gt;has('name')) {
+        $name = $request-&gt;name;
+        &hellip;
 });</code></pre>
                             </li>
-                            <li>the input method handles any type of input parameter: POST parameters, GET parameters, ... and even JSON input (if the Content-Type is set properly)</li>
+                            <li>the input() method handles any type of input parameter: POST parameters, GET parameters, ... and even JSON input (if the Content-Type is set properly)</li>
                         </ul>
                     </li>
                 </ul>
+                <footer><small>From now on, let's call POST parameters <em>payload parameters</em> and GET parameters <em>query string parameters</em></small></footer>
             </section>
 
             <section>
@@ -176,7 +188,7 @@ Route::post('register', function(Request $request) {
 $names = $request-&gt;input('products.*.name');	</code></pre>
                             </li>
                             <li>dynamic properties
-                                <pre class="bigger"><code class="hljs php">$name = $request-&gt;name; // same as: $request&gt;input('name');</code></pre>
+                                <pre class="bigger"><code class="hljs php">$name = $request-&gt;name; // same as: $request-&gt;input('name');</code></pre>
                             </li>
                             <li>handling file uploads
                                 <pre class="bigger"><code class="hljs php">if ($request->hasFile('additional_documents')) {
@@ -187,6 +199,34 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
     }
 }</code></pre>
                             </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>The HTTP Request (3)</h2>
+
+                <ul style="width: 100%;">
+                    <li>
+                        The <a href="https://laravel.com/docs/9.x/requests">HTTP Request</a>
+                        <ul>
+                            <li>more on input parameters</li>
+                        </ul>
+                            <pre class="bigger"><code class="hljs php" style="font-size: 83%;">if ($request-&gt;has(['name', 'email'])) { ...        // if all of the specified parameters are present
+if ($request-&gt;hasAny(['name', 'email'])) { ...     // if any of the specified parameters are present
+if ($request-&gt;filled('name')) { ...                // if the parameter is present and not empty
+$input = $request-&gt;all();                          // array with all parameters
+$input = $request-&gt;only(['username', 'password']); // same, but only with specified paramters (if present)
+$input = $request-&gt;except(['credit_card']);        // same, without specified paramters
+$request-&gt;merge(['votes' =&gt; 0]);            // merge parameters with the request object (will overwrite if present)
+$input = $request-&gt;collect();               // collection with all parameters
+$name = $request-&gt;query('name');            // get the name parameter from the query string, not from the payload
+
+$archived = $request-&gt;boolean('archived');  // convert to boolean cf. "on" "yes"
+$birthday = $request-&gt;date('birthday');     // convert to a Carbon date
+$name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and trim</code></pre>
+                        <ul>
                             <li>Want more? <a href="https://laravel.com/api/9.x/Illuminate/Http/Request.html">Request API</a></li>
                         </ul>
                     </li>
@@ -229,9 +269,9 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
                             <li>is an instance of <code>Illuminate\Http\Response</code></li>
                             <li>can be returned in your code
                                 <ul>
-                                    <li>as a view: <pre class="bigger"><code class="hljs php">return view('greeting', ['name' => 'James']);</code></pre> &mdash; it involves rendering the <code>resources/views/greeting.blade.php</code> template</li>
+                                    <li>as a view (automatic conversion): <pre class="bigger"><code class="hljs php">return view('greeting', ['name' => 'James']);</code></pre> &mdash; it involves rendering the <code>resources/views/greeting.blade.php</code> template</li>
                                     <li>idem, with chained HTTP response methods: <pre class="bigger"><code class="hljs php">return response()->view('greeting', $data)->&hellip;;</code></pre></li>
-                                    <li>JSON, with chained HTTP response methods: <pre class="bigger"><code class="hljs php">return response()->json(['name' => 'Abigail', 'state' => 'CA'])->&hellip;;</code></pre></li>
+                                    <li>JSON, with chained HTTP response methods: <pre class="bigger"><code class="hljs php">return response()->json(['name' => 'Abigail', 'state' => 'CA'])->&hellip;;</code></pre>json() also sets the HTTP Content-Type header</li>
                                 </ul>
                             </li>
                         </ul>
@@ -272,7 +312,7 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
                             <li>these <a href="https://laravel.com/docs/9.x/errors#http-exceptions">exceptions</a> are rendered by the <a href="https://laravel.com/docs/9.x/errors#the-exception-handler">exception handler</a> which by default
                                 <ul>
                                     <li>renders a <a href="https://laravel.com/docs/9.x/errors#custom-http-error-pages"><em>custom</em></a> error page if you define: <code>resources/views/errors/404.blade.php</code> for error code <code>404</code> and so on </li>
-                                    <li>PHP errors are rendered by <a href="https://laravel-news.com/ignition">Ignition</a> (if your app is in debug mode)</li>
+                                    <li>PHP errors are rendered by <a href="https://github.com/spatie/laravel-ignition">Ignition</a> (if your app is in debug mode)</li>
                                 </ul>
                             </li>
                         </ul>
@@ -442,13 +482,13 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
                     <li>
                         Render an array as JSON
                         <pre class="bigger"><code>&lt;script&gt;
-    var app = @json($array);
+    var app = {{ Illuminate\Support\Js::from($array) }};
 &lt;/script&gt;</code></pre>
                     </li>
                     <li>
-                        Generate curly braces for client-side templating
+                        Generate @ and curly braces for client-side templating
                         <pre class="bigger"><code>&lt;h1&gt;Laravel&lt;/h1&gt;
-
+@@if( condition )
 Hello, @{{ name }}.</code></pre>
                     </li>
                 </ul>
@@ -550,8 +590,7 @@ Hello, @{{ name }}.</code></pre>
                             <li>Avoid complex (plain PHP) loops</li>
                             <li>Method chaining &mdash; example <pre class="bigger"><code class="hljs php">$collection = collect(['taylor', 'abigail', null])->map(function ($name) {
     return strtoupper($name);
-})
-->reject(function ($name) {
+})->reject(function ($name) {
     return empty($name);
 });</code></pre></li>
                             <li><a href="https://www.youtube.com/watch?v=crSUWtRYw-M">&#128250; Watch Adam Wathan on Laracon EU 2016</a></li>
@@ -617,7 +656,7 @@ echo Carbon::now()->addYear()->diffForHumans();    // in 1 Jahr
                         </ul>
                     </li>
                     <li>
-                        DB configuration: see <a href="#/3">previous slides on configuration</a>
+                        DB configuration: see <a href="/slides/01.laravel.intro.html#/3">previous slides on configuration</a>
                         <ul>
                             <li>Note: you can have <a href="https://laravel.com/docs/9.x/database#introduction">separate configs</a> for reading/writing</li>
                         </ul>
