@@ -829,194 +829,12 @@ foreach ($user-&gt;tasks as $task) {
             </section>
         </section>
 
-        <section>
-            <section>
-                <h2>02.5<br>Intermezzo: Migrations</h2>
-            </section>
 
-            <section>
-                <h2>Migrations (1)</h2>
-
-                <ul>
-                    <li>
-                        Typical dev team situation
-                        <ul>
-                            <li>All team members have a local (test) instance of the database </li>
-                            <li>From time to time the DB schema is modified</li>
-                            <li>How can we easily share these changes?
-                                <ul>
-                                    <li>By changing the global SQL-dump and put it to version control? Maybe, but it doesn't scale </li>
-                                    <li>By adding an SQL-update file and put it to version control? Maybe, but it is difficult to produce and it is not structured</li>
-                                </ul></li>
-                        </ul>
-                    </li>
-                    <li>
-                        Solution: Database Migrations
-                        <ul>
-                            <li>Easily modify and share the application's database schema. </li>
-                            <li>It's like version control for your DB</li>
-
-                        </ul>
-                    </li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>Migrations (2)</h2>
-
-                <ul>
-                    <li>
-                        How does it work?
-                        <ul>
-                            <li>A modification to the DB schema is described in a migration class file, named with a timestamp, located in <code>database/migrations</code> </li>
-                            <li>A migration class contains two methods: <code>up</code> (perform migration) and <code>down</code> (reverse).</li>
-                            <li>These modification are programmed with Laravel schema builder </li>
-                            <li style="margin-top: 1em">Artisan helps you to create blueprints of migration classes </li>
-                            <li>Put successful migrations to version control </li>
-                            <li>In one Artisan command, you can execute all migrations that have not been executed before (logged in the DB table <code>migrations</code>)</li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        Read more about it in the <a href="https://laravel.com/docs/8.x/migrations">Laravel docs on Migrations</a>
-                    </li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>Migrations (3)</h2>
-
-                <ul style="font-size: 85%; width: 100%;">
-                    <li>
-                        Example: table creation
-                        <pre class="bigger"><code class="hljs bash">$ php artisan make:migration create_events_table --create=events</code></pre>
-                        <ul>
-                            <li>generates <code>database/migrations/&lt;timestamp&gt;_create_events_table.php</code>
-                                <pre class="bigger"><code class="hljs php">class CreateEventsTable extends Migration
-{
-    public function up()
-    {
-        Schema::create('events', function (Blueprint $table) {
-            $table-&gt;id(); // your table has a PK auto-inc unsigned bigint column id
-            $table-&gt;timestamps(); // your table has created_at and updated_at columns
-        });
-    }
-
-    public function down()
-    {
-        Schema::drop('events');
-    }
-}</code></pre>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-                <footer><small>Note: if you create the classes without Artisan you need to call <code>composer dump-autoload</code></small></footer>
-            </section>
-
-            <section>
-                <h2>Migrations (4)</h2>
-
-                <ul style="width: 100%;">
-                    <li>
-                        Example: table creation
-                        <ul>
-                            <li>complete the schema creation
-                                <pre class="bigger"><code class="hljs php">public function up()
-{
-	Schema::create('events', function (Blueprint $table) {
-		$table-&gt;id(); // LEAVE IT HERE
-		$table-&gt;string('title');
-		$table-&gt;text('description');
-		$table-&gt;date('event_date');
-
-		// foreign key: column types need to be EXACTLY the same
-		$table-&gt;unsignedBigInteger('location_id');
-		$table-&gt;foreign('location_id')-&gt;references('id')-&gt;on('locations');
-		// all at once: $table->foreignId('location_id')->constrained();
-
-		$table-&gt;timestamps(); // LEAVE IT HERE
-	});
-}</code></pre>
-                            </li>
-                            <li>run all migrations
-                                <pre class="bigger"><code class="hljs bash">$ php artisan migrate</code></pre>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>Migrations (5)</h2>
-
-                <ul>
-                    <li>
-                        Let's get practical
-                        <ul>
-                            <li>
-                                Consult the tables in the <a href="https://laravel.com/docs/8.x/migrations#creating-columns">migrations docs</a> on available column types, column modifiers and index modifiers
-                            </li>
-                            <li>After all, there exists a <em>mapping</em> for each command, data type, &hellip; to each of the supported DBMS systems</li>
-                            <li>More flavours of <code>php artisan migrate</code>
-                                <pre class="bigger"><code class="hljs bash">  migrate:fresh     Drop all tables and re-run all migrations
-  migrate:install   Create the migration repository
-  migrate:refresh   Reset and re-run all migrations
-  migrate:reset     Rollback all database migrations
-  migrate:rollback  Rollback the last database migration
-  migrate:status    Show the status of each migration
-</code></pre>
-                            </li>
-                            <li>Still stuck? Delete the <code>migrations</code> table
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </section>
-
-            <!--section>
-                <h2>Migrations bug with MySQL utf8mb4</h2>
-
-                <ul>
-                    <li style="font-size: 80%">
-                        The <a href="http://aoverton.com/web-development/using-mysql-utf8mb4-with-laravel-5/">problem</a>
-                        <ul>
-                            <li>Definition of string columns with Migrations<pre class="bigger"><code class="hljs php">$table-&gt;string('name');
-$table-&gt;string('email')-&gt;unique();
-</code></pre></li>
-                            <li>Default string length in Laravel's Schema Builder: 255 chars</li>
-                            <li>With utf8mb4: 255 * 4 = 1020 bytes</li>
-                            <li>Max length: 1000 bytes for MyISAM, 767 bytes for InnoDB<pre><code class="hljs bash">[Illuminate\Database\QueryException] SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key
-was too long; max key length is 767 bytes (SQL: alter table `users` add unique users_email_unique(`email`))
-</code></pre></li>
-
-                        </ul>
-                    </li>
-                    <li style="font-size: 80%">
-                        Solutions
-                        <ul>
-                            <li>Best: correct string lengths<pre class="bigger"><code class="hljs php">$table-&gt;string('name', 191);
-$table-&gt;string('email', 191)-&gt;unique();
-</code></pre></li>
-                            <li>Good: just use <em>utf8</em> (= 3-byte-encoding) for your DB</li>
-                            <li>
-                                Bad: replace <em>utf8mb4</em> by <em>utf8</em> in <code>config/database.php</code>
-                                &rarr; you're fooling the system
-                            </li>
-                        </ul>
-                    </li>
-
-                </ul>
-            </section-->
-
-
-
-        </section>
 
 
         <section>
             <section>
-                <h2>02.6<br>MVC recap</h2>
+                <h2>02.5<br>MVC recap</h2>
             </section>
 
             <section>
@@ -1039,7 +857,7 @@ $table-&gt;string('email', 191)-&gt;unique();
 
         <section>
             <section data-background="https://i.makeagif.com/media/3-11-2016/SU3i02.gif">
-                <h2>02.7<br>HTTP Controllers</h2>
+                <h2>02.6<br>HTTP Controllers</h2>
                 <p>This is the sound of C &hellip;</p>
             </section>
 
@@ -1210,7 +1028,7 @@ class TaskController extends Controller
 
         <section>
             <section>
-                <h2>02.8<br>Concluding demo</h2>
+                <h2>02.7<br>Concluding demo</h2>
             </section>
             <section>
                 <h2>Concluding demo</h2>
@@ -1321,7 +1139,7 @@ class TaskController extends Controller
                 <ul>
                     <li><a href="https://laravel.com/docs/8.x/queries">Laravel docs: Database: Query Builder</a></li>
                     <li><a href="https://laravel.com/docs/8.x/eloquent">Laravel docs: Eloquent: Getting Started</a></li>
-                    <li><a href="https://laravel.com/docs/8.x/migrations">Laravel docs: Migrations</a></li>
+
 
 
                     <li><a href="https://laravel.com/docs/8.x/controllers">Laravel docs: Controllers</a></li>
