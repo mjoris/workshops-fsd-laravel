@@ -711,7 +711,46 @@ foreach ($users as $user) {
 
         <section>
             <section>
-                <h2>02.5<br>Migrations</h2>
+                <h2>02.5<br>Controllers (Intro)</h2>
+            </section>
+
+            <section>
+                <h2>Controllers</h2>
+
+                <ul style="font-size: 80%; width: 70%;">
+                    <li>Create a <code>*Controller</code> in the folder <code>app/Http/Controllers</code>
+                        <pre class="bigger"><code class="hljs bash">php artisan make:controller TaskController</code></pre>
+                    </li>
+                    <li>
+                        Point to its <strong>methods</strong> in <code>/routes/web.php</code> (or in <code>/routes/api.php</code>)
+                        <pre class="bigger"><code class="hljs php">use App\Http\Controllers\TaskController;
+
+Route::get('/tasks', [TaskController::class, 'index']);
+Route::post('/tasks/create', [TaskController::class, 'store']);
+Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code></pre>
+                    </li>
+                    <li>
+                        Write the appropriate method(s) in <code>*Controller</code>
+                        <pre class="bigger"><code class="hljs php">class TaskController extends Controller
+{
+    public function index(Request $request)
+    {
+        $tasks = DB::select('select * from tasks where user_id = ?',
+                            [$request-&gt;user_id]);
+        return view('tasks.index', ['tasks' =&gt; $tasks]);
+    }
+
+    public function destroy(Request $request, $id) </code></pre>
+                    </li>
+                </ul>
+            </section>
+
+
+        </section>
+
+        <section>
+            <section>
+                <h2>02.6<br>Migrations</h2>
             </section>
 
             <section>
@@ -772,7 +811,7 @@ foreach ($users as $user) {
                         <pre class="bigger"><code class="hljs bash">$ php artisan make:migration create_events_table --create=events</code></pre>
                         <ul>
                             <li>generates <code>database/migrations/&lt;timestamp&gt;_create_events_table.php</code>
-                                <pre class="bigger"><code class="hljs php">class CreateEventsTable extends Migration
+                                <pre class="bigger"><code class="hljs php">return new class extends Migration
 {
     public function up()
     {
@@ -784,7 +823,7 @@ foreach ($users as $user) {
 
     public function down()
     {
-        Schema::drop('events');
+        Schema::dropIfExists('events');
     }
 }</code></pre>
                             </li>
@@ -845,6 +884,7 @@ foreach ($users as $user) {
   migrate:reset     Rollback all database migrations
   migrate:rollback  Rollback the last database migration
   migrate:status    Show the status of each migration
+  migrate --pretend Show SQL queries to be executed without running them
 </code></pre>
                             </li>
                             <li>Still stuck? Delete the <code>migrations</code> table
@@ -910,6 +950,7 @@ $table-&gt;string('email', 191)-&gt;unique();
                     <li><a href="https://laravel.com/docs/9.x/views">Laravel docs: Views</a></li>
                     <li><a href="https://laravel.com/docs/9.x/blade">Laravel docs: Blade Templates</a></li>
                     <li><a href="https://laravel.com/docs/9.x/database">Laravel docs: Databases: Getting Started</a></li>
+                    <li><a href="https://laravel.com/docs/9.x/migrations">Laravel docs: Migrations</a></li>
                 </ul>
             </section>
         </section>
