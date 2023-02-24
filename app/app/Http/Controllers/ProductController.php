@@ -56,6 +56,9 @@ class ProductController extends Controller
             $query->where('id', $id);
         })->get();
         dump($productsOfCategoryTwo);
+
+        // v4: shorter, with whereRelation
+        dump(Product::whereRelation('categories', 'id', $id)->get());
     }
 
     public function demo3()

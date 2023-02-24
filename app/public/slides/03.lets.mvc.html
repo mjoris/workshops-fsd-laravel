@@ -28,7 +28,7 @@
     <div class="slides">
         <section data-background="#b5533c">
             <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
-            <h1>03. Let's MVC</h1>
+            <h1>03. Let's MVC<br>with Eloquent</h1>
         </section>
 
 
@@ -322,7 +322,8 @@ print_r(Todo::all());</code></pre>
                             <li>Automatic prevention against <strong>SQL injection</strong></li>
 
                             <li style="margin-top: 0.5em">At the end of the chain: <code>get()</code> returning a <a href="https://laravel.com/docs/9.x/collections">Collection</a> of results
-                                <pre class="bigger"><code class="hljs php">$users = DB::table('users')-&gt;get();</code></pre>
+                                <pre class="bigger"><code class="hljs php" data-overlay-example="/types-demo?qb-1">$users = DB::table('users')-&gt;get();
+dump($users);</code></pre>
                                 <ul>
                                     <li>which you can still loop with <code>foreach</code></li>
                                     <li>where a result is an instance of PHP's base class having its columns accessible through properties</li>
@@ -350,7 +351,12 @@ print_r(Todo::all());</code></pre>
                      -&gt;groupBy('status')
                      -&gt;get();</code></pre>
                                 <ul>
-                                    <li><code>select()</code>, <code>where()</code>, <code>groupBy()</code> return a <a href="https://github.com/laravel/framework/blob/9.x/src/Illuminate/Database/Query/Builder.php">Builder</a> object</li>
+                                    <li><code>select()</code>, <code>where()</code>, <code>groupBy()</code> return a <a href="https://github.com/laravel/framework/blob/9.x/src/Illuminate/Database/Query/Builder.php">Builder</a> object
+                                    <pre class="bigger"><code class="hljs php" data-overlay-example="/types-demo?qb-2">$where = DB::table('users')
+    -&gt;select('name', 'email as user_email')
+    -&gt;where('status', '<>', 1);
+dump($where);</code></pre>
+                                    </li>
                                     <li><code>get()</code> is the only method actually performing a query here !</li>
                                 </ul>
 
@@ -566,6 +572,33 @@ $activeEvent = Event::where('active', 1)->firstOrFail();</code></pre>
             </section>
 
             <section>
+                <h2>What does Eloquent return?</h2>
+                    <ul>
+                        <li>Actually, Eloquent methods like <code>all()</code> and <code>get()</code> return an <a href="https://laravel.com/docs/9.x/eloquent-collections">Eloquent Collection</a>
+                            <pre class="bigger"><code class="hljs php" data-overlay-example="/types-demo?elo-1">use App\Models\Product;
+
+$products = Product::all();
+dump($products);</code></pre>
+                            <ul style="font-size: 85%;">
+                                <li><a href="https://laravel.com/docs/9.x/eloquent-collections">Eloquent Collections</a> inherit all capabilities from
+                                    <a href="https://laravel.com/docs/9.x/collections">Collections</a>
+                                    <br>e.g. <code>$products->count()</code>, <code>$products->pluck('name')</code>, <code>$products->where('name', 'Oneplus')</code>
+                                    <br>but still <em>remember</em> their DB retrieval context (primary key, columns, etc.)
+                                    <br>e.g. <code>$products->find(1)</code>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li style="margin-top: 1em;">Individual "row" results are <em>model instances</em>: objects of the model class (e.g. <code>class Product extends Model</code>) you generated with Artisan
+                            <pre class="bigger"><code class="hljs php" data-overlay-example="/types-demo?elo-2">$product = Product::find(1);
+dump($product);</code></pre>
+                        </li>
+                    </ul>
+            </section>
+
+
+
+            <section>
                 <h2>Builder object or DB query result?</h2>
                         <ul style="font-size: 80%;width: 100%;">
                             <li style="margin-top: 0.5em;">
@@ -775,13 +808,13 @@ foreach ($user-&gt;tasks as $task) {
 
                             <li style="margin-top: 0.5em;">
                                 <code>$user-&gt;tasks</code>
-                                returns a collection of task objects (data)
-                                <br>&rarr; actually special sort of collection: an <a
-                                href="https://laravel.com/docs/9.x/eloquent-collections">Eloquent Collection</a> <br>&rarr; <em>keep on chaining</em>
+                                returns an <a
+                                href="https://laravel.com/docs/9.x/eloquent-collections">Eloquent Collection</a> of Task objects (data)
+                                <br>&rarr; <em>keep on chaining</em>
                             </li>
                             <li style="margin-top: 0.5em;">
                                 <code>$user-&gt;tasks()</code>
-                                returns a query builder object <br> &rarr; <em>keep on chaining</em> <br> &rarr; master relations with <a href="https://laravel.com/docs/9.x/eloquent-relationships#inserting-and-updating-related-models">create(), save() and associate()</a>
+                                returns a (Query) Builder object <br> &rarr; <em>keep on chaining</em> <br> &rarr; master relations with <a href="https://laravel.com/docs/9.x/eloquent-relationships#inserting-and-updating-related-models">create(), save() and associate()</a>
                             </li>
 
                         </ul>
@@ -1070,7 +1103,7 @@ class TaskController extends Controller
             </section>
             <section>
                 <h2>Eloquent demo (2)</h2>
-                <pre class="bigger"><code class="hljs php" style="font-size: 80%" data-overlay-example="/eloquent-demo-2">    // retrieve all products of brand 1
+                <pre class="bigger"><code class="hljs php" style="font-size: 78%" data-overlay-example="/eloquent-demo-2">    // retrieve all products of brand 1
     $productsOfBrandOne = Product::where('brand_id', 1)->orderBy('price', 'desc')->get();
     dump('all products of brand 1 ---');
     dump($productsOfBrandOne->pluck('name', 'id')); // pluck of collection
@@ -1088,7 +1121,10 @@ class TaskController extends Controller
     $productsOfCategoryTwo = Product::whereHas('categories', function (Builder $query) use ($id) {
         $query->where('id', $id);
     })->get();
-    dump($productsOfCategoryTwo);</code></pre>
+    dump($productsOfCategoryTwo);
+
+    // v4: shorter, with whereRelation
+    dump(Product::whereRelation('categories', 'id', $id)->get());</code></pre>
             </section>
             <section>
                 <h2>Eloquent demo (3)</h2>

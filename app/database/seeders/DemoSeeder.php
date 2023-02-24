@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 // Migration for concluding demo 'webshop' of 02.lets.mvc
@@ -22,6 +23,14 @@ class DemoSeeder extends Seeder
             'name' => Str::random(10),
             'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
             'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+        ]);
+
+        // just for demo purposes ... not really part of the DB model
+        DB::table('users')->insert([
+            'name' => Str::random(10),
+            'email' => 'theboss@gmail.com',
+            'password' => Hash::make('Azerty123'),
+            'role' => 'admin'
         ]);
 
         DB::table('products')->insert([
