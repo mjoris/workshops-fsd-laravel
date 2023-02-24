@@ -29,7 +29,7 @@
         <section data-background="#b5533c">
             <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
             <h1>04. Forms</h1>
-            <footer>More precisely: server-side rendered forms</footer>
+            <footer>More precisely: server-side rendered forms <br> and how to implement them with <br> <strong>Sessions</strong>, <strong>Validation</strong> and <strong>File Storage</strong></footer>
         </section>
 
 
@@ -75,7 +75,7 @@ return redirect()-&gt;route('profile');</code></pre>
             <section>
                 <h2>Route groups</h2>
 
-                <ul style="width: 100%;">
+                <ul style="width: 100%;font-size: 85%;">
                     <li>
                         Specify a route (URI) prefix
                         <pre class="bigger"><code class="hljs php">Route::prefix('admin')-&gt;group(function () {
@@ -85,6 +85,13 @@ return redirect()-&gt;route('profile');</code></pre>
     Route::get('dashboard', function () {
         // Matches the "/admin/dashboard" URL
     });
+});</code></pre>
+                    </li>
+                    <li>
+                        Controller groups
+                        <pre class="bigger"><code class="hljs php">Route::controller(OrderController::class)-&gt;group(function () {
+    Route::get('/orders/{id}', 'show');
+    Route::post('/orders', 'store');
 });</code></pre>
                     </li>
                     <li>
@@ -185,7 +192,7 @@ Route::post('blogposts/create', 'PostController@store');</code></pre>
                                 stores the blog post
                             </li>
                             <li>
-                                redirects the user
+                                <u>always</u> redirects the user
                             </li>
                         </ul>
                     </li>
@@ -413,12 +420,14 @@ public function store(Request $request)
                         </ul>
                         <pre class="bigger"><code class="hljs php" style="font-size: 85%;">'start_date' =&gt; 'required|date|after:tomorrow',
 'finish_date' =&gt; 'required|date|after:start_date',
+'finish_date' =&gt; ['required', 'date', 'after:start_date'], // same, alternative notation
 
 'photo' =&gt; 'image|mimes:jpeg,png', // is an image of any type and its content is jpeg or png
 'avatar' =&gt; 'dimensions:min_width=100,min_height=200', // image with specified dimensions
 
 'state' =&gt; 'exists:states,abbreviation', // exists in column abbreviation of table states
-'email' =&gt; 'email:rfc,dns' // has email format and valid domain (requires extra package)
+'email' =&gt; 'email:rfc,dns', // has email format and valid domain (requires extra package)
+'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->uncompromised()],
 
 // for optional fields !!!!!!
 // since we have TrimStrings and ConvertEmptyStringsToNull middleware running
@@ -489,7 +498,8 @@ public function store(Request $request)
 
                 <ul style="font-size: 85%;width: 85%;">
                     <li>
-                        Change <code>common/errors.blade.php</code> such that it visualizes an <em>$errors</em> <strong>MessageBag</strong>
+                        Change <code>common/errors.blade.php</code> such that it visualizes an <em>$errors</em> <a
+                        href="https://laravel.com/docs/9.x/validation#working-with-error-messages"><strong>MessageBag</strong></a>
                         <pre class="bigger"><code class="hljs">@if ($errors-&gt;any())
     &lt;!-- Form Error List --&gt;
     &lt;div class="alert alert-danger"&gt;
@@ -646,7 +656,7 @@ The [public/storage] directory has been linked.</code></pre>
                             <li style="margin-top: 0.3em;">Create a symbolic link to <code>storage/app/public</code> or configure Filesystem</li>
                             <li style="margin-top: 0.3em;">In your form (Views): check your <code>enctype</code> attribute (see
                                 <a href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/06.forms.html#/6/2">this course</a>)  </li>
-                            <li style="margin-top: 0.3em;">Access the uploaded file through the HTTP request object (<a href="01.laravel.intro.html/4/7">code example</a>)</li>
+                            <li style="margin-top: 0.3em;">Access the uploaded file through the HTTP request object (<a href="02.my.first.laravel.app.html#/1/7">code example</a>)</li>
                             <li style="margin-top: 0.3em;">Validation: check on file (MIME) type and eventually file size, dimension, &hellip;
                                 <ul>
                                     <li>
