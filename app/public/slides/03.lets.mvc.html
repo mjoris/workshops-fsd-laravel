@@ -28,14 +28,14 @@
     <div class="slides">
         <section data-background="#b5533c">
             <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
-            <h1>02. Let's MVC</h1>
+            <h1>03. Let's MVC</h1>
         </section>
 
 
         <!-- Laravel: what to expect -->
         <section>
             <section>
-                <h2>02.1<br>Introducing MVC</h2>
+                <h2>03.1<br>Introducing MVC</h2>
             </section>
 
 
@@ -74,7 +74,7 @@
 
         <section>
             <section>
-                <h2>02.2<br>Introducing ORM</h2>
+                <h2>03.2<br>Introducing ORM</h2>
             </section>
 
             <section>
@@ -307,7 +307,7 @@ print_r(Todo::all());</code></pre>
 
         <section>
             <section>
-                <h2>02.3<br>Query Builder</h2>
+                <h2>03.3<br>Query Builder</h2>
             </section>
 
             <section>
@@ -315,13 +315,13 @@ print_r(Todo::all());</code></pre>
 
                 <ul>
                     <li>
-                        Fluent interface for building SQL queries (<a href="https://laravel.com/docs/8.x/queries">docs</a>)
+                        Fluent interface for building SQL queries (<a href="https://laravel.com/docs/9.x/queries">docs</a>)
                         <ul>
                             <li>Always start with <code>DB::table()</code></li>
                             <li>and use chained methods to filter/select/aggregate data</li>
                             <li>Automatic prevention against <strong>SQL injection</strong></li>
 
-                            <li style="margin-top: 0.5em">At the end of the chain: <code>get()</code> returning a <a href="https://laravel.com/docs/8.x/collections">Collection</a> of results
+                            <li style="margin-top: 0.5em">At the end of the chain: <code>get()</code> returning a <a href="https://laravel.com/docs/9.x/collections">Collection</a> of results
                                 <pre class="bigger"><code class="hljs php">$users = DB::table('users')-&gt;get();</code></pre>
                                 <ul>
                                     <li>which you can still loop with <code>foreach</code></li>
@@ -341,7 +341,7 @@ print_r(Todo::all());</code></pre>
 
                 <ul>
                     <li>
-                        Fluent interface for building SQL queries (<a href="https://laravel.com/docs/8.x/queries">docs</a>)
+                        Fluent interface for building SQL queries (<a href="https://laravel.com/docs/9.x/queries">docs</a>)
                         <ul>
                             <li>example with <code>select()</code>, <code>where()</code> and <code>groupBy()</code>
                                 <pre class="bigger"><code class="hljs php">$users = DB::table('users')
@@ -350,7 +350,7 @@ print_r(Todo::all());</code></pre>
                      -&gt;groupBy('status')
                      -&gt;get();</code></pre>
                                 <ul>
-                                    <li><code>select()</code>, <code>where()</code>, <code>groupBy()</code> return a <a href="https://github.com/laravel/framework/blob/8.x/src/Illuminate/Database/Query/Builder.php">Builder</a> object</li>
+                                    <li><code>select()</code>, <code>where()</code>, <code>groupBy()</code> return a <a href="https://github.com/laravel/framework/blob/9.x/src/Illuminate/Database/Query/Builder.php">Builder</a> object</li>
                                     <li><code>get()</code> is the only method actually performing a query here !</li>
                                 </ul>
 
@@ -395,7 +395,7 @@ foreach ($events as $id =&gt; $name) {
 
                 <ul style="width: 100%;">
                     <li>
-                        Chain a multitude of QB methods (<a href="https://laravel.com/docs/8.x/queries">docs</a>)
+                        Chain a multitude of QB methods (<a href="https://laravel.com/docs/9.x/queries">docs</a>)
                         <ul>
                             <li>aggregate methods e.g. <code>count()</code>, <code>max()</code></li>
                             <li>much more e.g. <code>whereIn()</code>, <code>orWhere()</code>, joins e.g. <code>leftJoin()</code>, <code>on()</code> </li>
@@ -426,7 +426,7 @@ DB::table('flights')-&gt;upsert([
 
         <section>
             <section>
-                <h2>02.4<br>Eloquent ORM</h2>
+                <h2>03.4<br>Eloquent ORM</h2>
             </section>
 
             <section>
@@ -435,7 +435,7 @@ DB::table('flights')-&gt;upsert([
                 <ul>
                     <li>
                         ORM: &plusmn; each database table has a corresponding "Model" which is used to interact with (<a
-                        href="https://laravel.com/docs/8.x/eloquent">Eloquent docs</a>)
+                        href="https://laravel.com/docs/9.x/eloquent">Eloquent docs</a>)
                     </li>
                     <li>
                         First step: generate the models with Artisan <span class="warning">(! uppercase &amp; eng. singular)</span>
@@ -757,7 +757,7 @@ foreach ($user-&gt;tasks as $task) {
 </code></pre>
                             </li>
 
-                            <li>Read the <a href="https://laravel.com/docs/8.x/eloquent-relationships">docs on Eloquent relationships</a> to learn about other types of relationships
+                            <li>Read the <a href="https://laravel.com/docs/9.x/eloquent-relationships">docs on Eloquent relationships</a> to learn about other types of relationships
                             </li>
                         </ul>
                     </li>
@@ -777,19 +777,19 @@ foreach ($user-&gt;tasks as $task) {
                                 <code>$user-&gt;tasks</code>
                                 returns a collection of task objects (data)
                                 <br>&rarr; actually special sort of collection: an <a
-                                href="https://laravel.com/docs/8.x/eloquent-collections">Eloquent Collection</a> <br>&rarr; <em>keep on chaining</em>
+                                href="https://laravel.com/docs/9.x/eloquent-collections">Eloquent Collection</a> <br>&rarr; <em>keep on chaining</em>
                             </li>
                             <li style="margin-top: 0.5em;">
                                 <code>$user-&gt;tasks()</code>
-                                returns a query builder object <br> &rarr; <em>keep on chaining</em> <br> &rarr; master relations with <a href="https://laravel.com/docs/8.x/eloquent-relationships#inserting-and-updating-related-models">create(), save() and associate()</a>
+                                returns a query builder object <br> &rarr; <em>keep on chaining</em> <br> &rarr; master relations with <a href="https://laravel.com/docs/9.x/eloquent-relationships#inserting-and-updating-related-models">create(), save() and associate()</a>
                             </li>
 
                         </ul>
                     </li>
                     <li style="margin-top: 1em;">
                         &longrightarrow; Let's have a look at
-                        <a href="https://laravel.com/docs/8.x/eloquent-relationships#many-to-many">many-to-many relationships</a> and
-                        <a href="https://laravel.com/docs/8.x/eloquent-relationships#updating-many-to-many-relationships">how to update them</a>
+                        <a href="https://laravel.com/docs/9.x/eloquent-relationships#many-to-many">many-to-many relationships</a> and
+                        <a href="https://laravel.com/docs/9.x/eloquent-relationships#updating-many-to-many-relationships">how to update them</a>
                         <br>
                         remember: <span class="warning">never</span> make a separate model for the intermediate (= pivot) table
 
@@ -822,7 +822,7 @@ foreach ($user-&gt;tasks as $task) {
 </code></pre>
                             </li>
                             <li>Now you can do things like <code>$event-&gt;event_date = Carbon::now();</code></li>
-                            <li>Actually, with <code>$casts</code> you can define <a href="https://laravel.com/docs/8.x/eloquent-mutators#attribute-casting">many cast types</a> in order to have your attributes auto-converted</li>
+                            <li>Actually, with <code>$casts</code> you can define <a href="https://laravel.com/docs/9.x/eloquent-mutators#attribute-casting">many cast types</a> in order to have your attributes auto-converted</li>
                         </ul>
                     </li>
                 </ul>
@@ -834,7 +834,7 @@ foreach ($user-&gt;tasks as $task) {
 
         <section>
             <section>
-                <h2>02.5<br>MVC recap</h2>
+                <h2>03.5<br>MVC recap</h2>
             </section>
 
             <section>
@@ -857,7 +857,7 @@ foreach ($user-&gt;tasks as $task) {
 
         <section>
             <section data-background="https://i.makeagif.com/media/3-11-2016/SU3i02.gif">
-                <h2>02.6<br>HTTP Controllers</h2>
+                <h2>03.6<br>HTTP Controllers</h2>
                 <p>This is the sound of C &hellip;</p>
             </section>
 
@@ -907,7 +907,7 @@ Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code><
     }</code></pre>
                     </li>
                     <li>
-                        <a href="https://laravel.com/docs/8.x/routing#route-model-binding">Implicit model binding:</a> Eloquent will use the <code>id</code> column
+                        <a href="https://laravel.com/docs/9.x/routing#route-model-binding">Implicit model binding:</a> Eloquent will use the <code>id</code> column
                         <pre class="bigger"><code class="hljs php">Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code></pre>
                         <pre class="bigger"><code class="hljs php">class TaskController extends Controller
 {
@@ -1028,7 +1028,7 @@ class TaskController extends Controller
 
         <section>
             <section>
-                <h2>02.7<br>Concluding demo</h2>
+                <h2>03.7<br>Concluding demo</h2>
             </section>
             <section>
                 <h2>Concluding demo</h2>
@@ -1137,13 +1137,11 @@ class TaskController extends Controller
 
 
                 <ul>
-                    <li><a href="https://laravel.com/docs/8.x/queries">Laravel docs: Database: Query Builder</a></li>
-                    <li><a href="https://laravel.com/docs/8.x/eloquent">Laravel docs: Eloquent: Getting Started</a></li>
+                    <li><a href="https://laravel.com/docs/9.x/queries">Laravel docs: Database: Query Builder</a></li>
+                    <li><a href="https://laravel.com/docs/9.x/eloquent">Laravel docs: Eloquent: Getting Started</a></li>
 
-
-
-                    <li><a href="https://laravel.com/docs/8.x/controllers">Laravel docs: Controllers</a></li>
-                    <li><a href="https://laravel.com/docs/8.x/routing#route-model-binding">Laravel docs: Route Model Binding</a></li>
+                    <li><a href="https://laravel.com/docs/9.x/controllers">Laravel docs: Controllers</a></li>
+                    <li><a href="https://laravel.com/docs/9.x/routing#route-model-binding">Laravel docs: Route Model Binding</a></li>
 
                 </ul>
             </section>
