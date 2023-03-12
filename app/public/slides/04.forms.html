@@ -699,7 +699,17 @@ The [public/storage] directory has been linked.</code></pre>
                         Allow a visitor to refine a set of results
                         <ul>
                             <li>A form with checkboxes, dropdowns, etc. per defining property of the result set</li>
-                            <li>Typically placed on the left hand side, next to the results</li>
+                            <li>Typically placed
+                                <ul>
+                                    <li>
+                                        on the left hand side, next to the results (desktop)
+                                    </li>
+                                    <li>
+                                        above the results, collapsible or linking to menu (mobile)
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>SQL example: <code>WHERE (brand_id = 5 OR brand_id = 6) AND (price BETWEEN 100 AND 200) AND &hellip;</code></li>
                             <li>It is necessary to persist the form values (!)</li>
                         </ul>
                     </li>
@@ -711,7 +721,10 @@ The [public/storage] directory has been linked.</code></pre>
                         </ul>
                     </li>
                 </ul>
-                <p><img src="assets/03/filter.png" alt="" title="" width="300" class="noborder zoomable-20" /></p>
+                <p>
+                    <img src="assets/03/filters-sb-d.png" alt="" title="" height="200" class="noborder zoomable-20" />
+                    <img src="assets/03/filters-sb-m.png" alt="" title="" height="200" class="noborder zoomable-20" />
+                </p>
             </section>
 
             <section>
@@ -737,55 +750,72 @@ The [public/storage] directory has been linked.</code></pre>
             </section>
 
             <section>
-                <h2>Filtering in Laravel</h2>
-                <ul style="font-size: 75%; width: 100%;">
+                <h2>Filtering (GET) in Laravel (1)</h2>
+                <ol style="font-size: 85%; width: 100%;">
                     <li>
-                        In Blade: persistence
-                        <ul>
-                            <li>
-                                Your form is also shown when the input is <strong>valid</strong>
-                            </li>
-                            <li>
-                                So you cannot rely on <code>old()</code> for persistence
-                            </li>
-                            <li>
-                                Just use <code>request('brand_id')</code> or <code>session()-&gt;get('brand_id')</code> in Blade directly
-                            </li>
-                        </ul>
+                        Routing: just stick to 1 (GET) route
+                        <pre class="bigger"><code class="hljs php">Route::get('/products', [ProductController::class, 'filter']);</code></pre>
+                        parameter example: <code>products?brand_id=64&amp;category_id=3&amp;size=L,XL</code><br>&longrightarrow; no <em>redirect on failing validation</em> and no <em>session flashing</em> (and no <code>old()</code>)
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Blade persistence by <code>request()</code> (or <code>session()-&gt;get()</code>)
+                        <pre class="bigger"><code class="hljs">&lt;select name="brand_id" id="brand_id" class="form-control"&gt;
+    @foreach ($brands as $brand)
+        &lt;option value="{{ $brand-&gt;id }}" @if (request('brand_id', '') == $brand-&gt;id) selected="selected" @endif&gt;{{ $brand->name }}&lt;/option&gt;
+    @endforeach
+&lt;/select&gt;</code>
+                        </pre>
+
 
                     </li>
 
-                    <li>
-                        In the controller: Eloquent points of attention
-                                <pre class="bigger"><code class="hljs php">$products = Product::query(); // returning a neutral Builder object
 
-if ($request-&gt;filled('brand_id')) { // might be some other condition e.g. has(), == 0
-    $products-&gt;where('brand_id', $request-&gt;brand_id); // chaining changes the state of the Builder object anyway !
+                </ol>
+
+            </section>
+
+            <section>
+                <h2>Filtering (GET) in Laravel (2)</h2>
+                <ol style="font-size: 85%; width: 100%;"  start="3">
+
+
+                    <li>
+                        Some example controller code
+                        <pre class="bigger"><code class="hljs php">$validator = Validator::make($request-&gt;all(), [ // Manually Creating Validators
+    'brand_id' =&gt; 'nullable|exists:brands,id',
+    &hellip;
+]);
+
+if ($validator-&gt;passes()) {
+    $products = Product::query(); // returning a neutral Builder object
+
+    if ($request-&gt;filled('brand_id')) { // might be some other condition e.g. has(), == 0
+        $products-&gt;where('brand_id', $request-&gt;brand_id); // chaining changes the state of the Builder object anyway !
+    }
+
+    $products-&gt;when($request-&gt;filled('category_id'), function ($query, $categoryId)  { // syntactic sugar using when()
+        return $query-&gt;where('category_id', $categoryId);
+    });
+
+    // Never do: $products->where('size', 'L')->orWhere('size', 'XL')
+    // use logical grouping in stead
+    $products-&gt;where(function ($query) {
+        $query-&gt;where('size', 'L')
+              -&gt;orWhere('size', 'XL')
+    });
+
+    // or more simple: whereIn
+    $products-&gt;whereIn('color', ['red', 'blue']);
 }
 
-// syntactic sugar using when()
-$products-&gt;when($request-&gt;filled('category_id'), function ($query, $categoryId)  {
-    return $query-&gt;where('category_id', $categoryId);
-});
-
-// NEVER DO THIS:
-// $products-&gt;where('size', 'L')-&gt;orWhere('size', 'XL')
-// WHY?
-// In SQL, AND has precedence over OR, so:
-// ... WHERE ((brand_id = 4) AND (category_id = 7) AND (size = 'L')) OR (size = 'XL')
-
-// use logical grouping in stead
-$products-&gt;where(function ($query) {
-    $query-&gt;where('size', 'L')
-          -&gt;orWhere('size', 'XL')
-});
-
-// or more simple: whereIn
-$products-&gt;whereIn('color', ['red', 'blue']);
 </code></pre>
-
+                        Never do <code>$products->where('size', 'L')->orWhere('size', 'XL')</code>
+                        <br>because in SQL
+                        <u>AND has precedence over OR</u>. So your SQL-query becomes:
+                        <br>
+                        <code>... WHERE ((brand_id = 64) AND (category_id = 3) AND (size = 'L')) OR (size = 'XL')</code>
                     </li>
-                </ul>
+                </ol>
 
             </section>
 
@@ -906,7 +936,7 @@ $products-&gt;whereIn('color', ['red', 'blue']);
                 <h2>Pagination in Laravel (2)</h2>
                 <ul>
                     <li>
-                        Simple (Tailwind CSS compatible) display in Blade
+                        Simple (Tailwind CSS or <a href="https://laravel.com/docs/9.x/pagination#using-bootstrap">bootstrap</a> compatible) display in Blade
                         <pre class="bigger"><code class="hljs">&lt;div class="container"&gt;
 @foreach ($users as $user)
     {{ $user->name }}
