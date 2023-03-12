@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>W&amp;M Full-stack – Laravel course materials</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section data-background="#b5533c">
+            <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
+            <h1>05. Eloquent: the Next Level</h1>
+        </section>
+
+
+        <!-- Eloquent: the next level -->
+        <section>
+            <section>
+                <h2>05.1<br>Eloquent: the Next Level</h2>
+            </section>
+
+            <section>
+                <h2>What you already know (1)</h2>
+
+                <ul>
+                    <li>
+                        In <code>app/Models</code> you define &plusmn; 1 model (e.g. <code>Smurf</code>) per table (e.g. <code>smurfs</code>)
+                        <ul>
+                            <li style="margin-top: 1em;">
+                                Having an empty model class means a set of assumptions apply on the table name, the PK, the timestamps, &hellip;
+                                <br>
+                                &longrightarrow; exceptions? override class fields, functions, &hellip;
+                            </li>
+                            <li style="margin-top: 1em;">
+                                1 to 1 relationship: define by <code>hasOne()</code> and <code>belongsTo()</code>
+                            </li>
+                            <li>
+                                1 to many relationship: define by <code>hasMany()</code> and <code>belongsTo()</code>
+                            </li>
+                            <li>
+                                many to many relationship: define by <code>belongsToMany()</code> at both sides
+                            </li>
+                            <li>
+                                &longrightarrow; exceptional FK column names? add parameters!
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </section>
+            <section>
+                <h2>What you already know (2)</h2>
+
+                <ul style="font-size: 80%">
+                    <li>
+                        Best Eloquent practices always start from the Eloquent model class!
+                        <ul>
+                            <li style="margin-top: 0.5em;">
+                                Only few static methods directly cause a DB query yielding a result
+                                <pre class="bigger"><code class="hljs php">Smurf::all()     // returns an Eloquent collection of Smurf objects
+Smurf::find(666) // returns a Smurf object
+Smurf::count()   // returns an integer</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                Most static methods return a Builder object (you are just building a query!)
+                                <pre class="bigger"><code class="hljs php">Smurf::where('age', '>', 315)
+Smurf::select('id', 'age')</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                On a builder object you can chain another Builder method, returning the <strong>very same</strong> Builder object
+                                <pre class="bigger"><code class="hljs php">$smurfs = Smurf::where('age', '>', 315)->where('color', 'blue')->select('id', 'age')->orderBy('age', 'desc');</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                Following methods transform a Builder object into a result (executing a DB query)
+                                <pre class="bigger"><code class="hljs php">$smurfs->get()        // returns an Eloquent collection of Smurf objects
+$smurfs->count()      // returns an integer
+$smurfs->first()      // returns a Smurf object
+$smurfs->find(666)    // returns a Smurf object
+$smurfs->value('age') // returns a value
+$smurfs->pluck('age') // returns a plain old array</code></pre>
+                            </li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>What you already know (3)</h2>
+
+                <ul style="font-size: 80%;">
+                    <li>
+                        Don't get confused !
+                        <ul>
+                            <li style="margin-top: 0.5em;">
+                                On Eloquent collections you can chain a big number of collection methods (yes! some of them have the same name as &hellip;)
+                                <pre class="bigger"><code class="hljs php">$smurfs->get()->count()                 // Better: $smurfs->count()
+$smurfs->get()->where('age', '>', 320)  // Better: fix this in the Builder part</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                An Eloquent collection extends a collection in the sense that it has captured which field was the PK
+                                <pre class="bigger"><code class="hljs php">Smurf::all()->find(666)        // Better: Smurf::find(666)
+$smurfs->get()->contains(88);  // Better: $smurfs->where('id', 88)->exists();</code></pre>
+                            </li>
+                            <li style="margin-top: 0.5em;">
+                                A relation can be plugged on an Eloquent <strong>object</strong> in 2 ways:
+                                <pre class="bigger"><code class="hljs php">Smurf::find(666)->friends   // executes a query and returns an Eloquent collection
+Smurf::find(666)->friends() // only returns a Builder object ...</code></pre>
+                            </li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Eager Loading</h2>
+                <ul style="font-size: 85%;">
+                    <li>By default, related models are <em>lazy</em> loaded</li>
+                    <li>
+                        When looping over a set objects and accessing their relationships as
+                        properties might generate a high number of DB queries:
+                        <pre class="bigger"><code class="hljs php">$books = Book::all(); // collection of 25 books
+
+foreach ($books as $book) {
+    echo $book-&gt;author-&gt;name; // generating a DB query each time
+}</code></pre>
+                    </li>
+                    <li>
+                        The method <code>with()</code> supports <a href="https://laravel.com/docs/9.x/eloquent-relationships#eager-loading"><strong>eager loading</strong></a> and <em>adds a question to</em> prefetch the related model objects in the Builder object:
+                        <pre class="bigger"><code class="hljs php">$books = Book::with('author')-&gt;get(); // generates 2 queries
+
+foreach ($books as $book) {
+    echo $book-&gt;author-&gt;name; // no DB query
+}</code></pre>
+                    </li>
+                    <li>
+                        Multiple relationships: <code>Book::with(['author', 'publisher'])-&gt;get();</code>
+                    </li>
+                    <li>
+                        Nested relationships: <code>Book::with('author.contacts')-&gt;get();</code>
+                    </li>
+                    <li>
+                        Constraining columns: <code>Book::with('author:id,name')-&gt;get();</code>
+                    </li>
+                </ul>
+
+            </section>
+
+            <section>
+                <h2>(Local) Query Scopes</h2>
+                <ul style="width: 100%; font-size: 85%;">
+                    <li><a href="https://laravel.com/docs/9.x/eloquent#local-scopes">Local scopes</a> enable the reuse of frequently used query <strong>Builder</strong> parts</li>
+
+
+                </ul>
+                <pre class="bigger"><code class="hljs php">class User extends Model
+{
+    public function scopeActive($query)
+    {
+        return $query-&gt;where('active', 1);
+    }
+
+    public function scopeOfType($query, $type)
+    {
+        return $query-&gt;where('type', $type);
+    }
+}</code></pre>
+                <pre class="bigger"><code class="hljs php">use App\Models\User;
+
+$users = User::ofType('admin')-&gt;active()-&gt;orderBy('created_at')-&gt;get();
+
+$users = User::ofType('admin')-&gt;orWhere-&gt;active()-&gt;get(); // orWhere specifically for scopes </code></pre>
+            </section>
+
+            <section>
+                <h2>Accessors &amp; Mutators</h2>
+                <ul style="width: 100%; font-size: 80%;">
+                    <li>2 applications (<a
+                        href="https://laravel.com/docs/9.x/eloquent-mutators#accessors-and-mutators">docs</a>)
+                        <ul>
+                            <li>Override default attribute behaviour (such as <code>$user-&gt;first_name</code>), typically for data transformation  </li>
+                            <li>Define custom attributes (such as <code>$user-&gt;full_name</code>) while there is no such column or relation</li>
+                        </ul>
+                    </li>
+                    <li>How? Define a <code>get{Attribute}Attribute()</code> and <code>set{Attribute}Attribute()</code></li>
+                    <li>Attention: attribute name in <code>snake_case</code> vs. method name part in <code>PascalCase</code></li>
+                </ul>
+                <pre class="bigger"><code class="hljs php">class User extends Model
+{
+    public function getFirstNameAttribute($value) {
+        return ucfirst($value);
+    }
+
+    public function setFirstNameAttribute($value) {
+        $this-&gt;attributes['first_name'] = strtolower($value);
+    }
+
+    public function getFullNameAttribute() {
+        return $this-&gt;first_name . ' ' . $this-&gt;last_name;
+    }
+}</code></pre>
+                <pre class="bigger"><code class="hljs php">$user = User::find(1);
+$firstName = $user-&gt;first_name;
+$user-&gt;first_name = 'Bart';
+echo($user-&gt;full_name);</code></pre>
+
+            </section>
+
+            <section>
+                <h2>Accessors &amp; Mutators: nice example</h2>
+                <ul style="width: 100%; font-size: 80%;">
+                    <li>Suppose you have a DB model for a multi-language web shop
+                        <ul>
+                            <li>products(id, price)</li>
+                            <li>languages(id, code)</li>
+                            <li>product_descriptions(id, product_id, language_id, name, description)</li>
+                        </ul>
+                    </li>
+                    <li>Design a <code>$product-&gt;name</code> attribute, encapsulating the (app or session) locale </li>
+
+                </ul>
+                <pre class="bigger"><code class="hljs php">class Product extends Model
+{
+    public function getNameAttribute()
+    {
+        $currentLanguage = Language::where('code', '=', App::currentLocale())-&gt;first();
+
+        $description = $this-&gt;descriptions()
+                            -&gt;where('language_id', '=', $currentLanguage-&gt;language_id)
+                            -&gt;first();
+
+        return $description ? $description-&gt;name : '';
+    }
+}</code></pre>
+
+            </section>
+
+            <section>
+                <h2>Casting</h2>
+                <ul style="width: 100%; font-size: 80%;">
+                    <li>You don't need accessors &amp; mutators to implement <a href="https://laravel.com/docs/9.x/eloquent-mutators#attribute-casting">auto-casting of attributes</a>
+                    </li>
+                    <li>Check the documentation for the supported cast types</li>
+
+                </ul>
+                <pre class="bigger"><code class="hljs php">class User extends Model
+{
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_admin' =&gt; 'boolean',
+        'options' =&gt; 'array', // handy when the column options constains JSON
+        'date_of_birth' =&gt; 'datetime:Y-m-d',
+        // created_at and updated_at are already known as datetime
+    ];
+
+}</code></pre>
+
+            </section>
+
+        </section>
+
+
+        <!-- The END -->
+        <section>
+            <section>
+                <h2>Questions?</h2>
+                <footer>
+                    <em><a href="http://www.ikdoeict.be/">ikdoeict.be</a> &mdash; <a href="mailto:joris.maervoet@odisee.be">joris.maervoet@odisee.be</a></em>
+                </footer>
+            </section>
+            <section>
+                <h2>Sources</h2>
+                <ul>
+                    <li><a href="https://laravel.com/docs/9.x/eloquent-mutators">Laravel docs: Eloquent Mutators and Casting</a></li>
+
+                </ul>
+            </section>
+        </section>
+
+
+    </div>
+
+</div>
+
+<script src="dist/reveal.js"></script>
+<script src="plugin/zoom/zoom.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/search/search.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script>
+
+    // Also available as an ES module, see:
+    // https://revealjs.com/initialization/
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        center: true,
+        hash: true,
+        slideNumber: true,
+
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [ RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight ]
+    });
+
+
+</script>
+<script src="toc.js"></script>
+<script src="overlay.js"></script>
+
+</body>
+</html>
