@@ -28,14 +28,14 @@
     <div class="slides">
         <section data-background="#b5533c">
             <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
-            <h1>04. Web APIs</h1>
+            <h1>05. Web APIs</h1>
         </section>
 
 
         <!-- Eloquent: the next level -->
         <section>
             <section>
-                <h2>04.1<br>Eloquent: the Next Level</h2>
+                <h2>05.1<br>Eloquent: the Next Level</h2>
             </section>
 
             <section>
@@ -146,7 +146,7 @@ foreach ($books as $book) {
 }</code></pre>
                     </li>
                     <li>
-                        The method <code>with()</code> supports <a href="https://laravel.com/docs/8.x/eloquent-relationships#eager-loading"><strong>eager loading</strong></a> and <em>adds a question to</em> prefetch the related model objects in the Builder object:
+                        The method <code>with()</code> supports <a href="https://laravel.com/docs/9.x/eloquent-relationships#eager-loading"><strong>eager loading</strong></a> and <em>adds a question to</em> prefetch the related model objects in the Builder object:
                         <pre class="bigger"><code class="hljs php">$books = Book::with('author')-&gt;get(); // generates 2 queries
 
 foreach ($books as $book) {
@@ -169,7 +169,7 @@ foreach ($books as $book) {
             <section>
                 <h2>(Local) Query Scopes</h2>
                 <ul style="width: 100%; font-size: 85%;">
-                    <li><a href="https://laravel.com/docs/8.x/eloquent#local-scopes">Local scopes</a> enable the reuse of frequently used query <strong>Builder</strong> parts</li>
+                    <li><a href="https://laravel.com/docs/9.x/eloquent#local-scopes">Local scopes</a> enable the reuse of frequently used query <strong>Builder</strong> parts</li>
 
 
                 </ul>
@@ -196,7 +196,7 @@ $users = User::ofType('admin')-&gt;orWhere-&gt;active()-&gt;get(); // orWhere sp
                 <h2>Accessors &amp; Mutators</h2>
                 <ul style="width: 100%; font-size: 80%;">
                     <li>2 applications (<a
-                        href="https://laravel.com/docs/8.x/eloquent-mutators#accessors-and-mutators">docs</a>)
+                        href="https://laravel.com/docs/9.x/eloquent-mutators#accessors-and-mutators">docs</a>)
                         <ul>
                             <li>Override default attribute behaviour (such as <code>$user-&gt;first_name</code>), typically for data transformation  </li>
                             <li>Define custom attributes (such as <code>$user-&gt;full_name</code>) while there is no such column or relation</li>
@@ -258,7 +258,7 @@ echo($user-&gt;full_name);</code></pre>
             <section>
                 <h2>Casting</h2>
                 <ul style="width: 100%; font-size: 80%;">
-                    <li>You don't need accessors &amp; mutators to implement <a href="https://laravel.com/docs/8.x/eloquent-mutators#attribute-casting">auto-casting of attributes</a>
+                    <li>You don't need accessors &amp; mutators to implement <a href="https://laravel.com/docs/9.x/eloquent-mutators#attribute-casting">auto-casting of attributes</a>
                     </li>
                     <li>Check the documentation for the supported cast types</li>
 
@@ -288,7 +288,7 @@ echo($user-&gt;full_name);</code></pre>
         <!-- Web API Conventions -->
         <section>
             <section>
-                <h2>04.2<br>Web API Conventions</h2>
+                <h2>05.2<br>Web API Conventions</h2>
             </section>
 
             <section>
@@ -316,7 +316,7 @@ echo($user-&gt;full_name);</code></pre>
         <!-- Web API Basics with Laravel -->
         <section>
             <section>
-                <h2>04.3<br>Web API Basics with Laravel</h2>
+                <h2>05.3<br>Web API Basics with Laravel</h2>
             </section>
 
             <section>
@@ -379,7 +379,7 @@ echo($user-&gt;full_name);</code></pre>
                 <h2>Eloquent Serialization (1)</h2>
 
                 <ul style="width: 100%; font-size: 90%;">
-                    <li><a href="https://laravel.com/docs/8.x/eloquent-serialization">Eloquent Serialization</a> determines how exactly the eloquent model is converted into JSON</li>
+                    <li><a href="https://laravel.com/docs/9.x/eloquent-serialization">Eloquent Serialization</a> determines how exactly the eloquent model is converted into JSON</li>
                     <li>Use <code>$hidden</code> in the Eloquent model class to exclude properties:</li>
                 </ul>
                 <pre class="bigger"><code class="hljs php">class Product extends Model
@@ -496,7 +496,7 @@ Route::post('/products', function (Request $request) {
                 <ul style="font-size: 90%;width: 80%;">
                     <li>Again: you'd better put your code in controllers, having 1 controller per resource</li>
                     <li style="margin-top: 1em;">The methods and structure of these controllers and corresponding routes will be very similar</li>
-                    <li style="margin-top: 1em;">Streamline your controllers with <a href="https://laravel.com/docs/8.x/controllers#resource-controllers">Resource Controllers</a></li>
+                    <li style="margin-top: 1em;">Streamline your controllers with <a href="https://laravel.com/docs/9.x/controllers#resource-controllers">Resource Controllers</a></li>
                 </ul>
             </section>
 
@@ -630,7 +630,7 @@ Route::post('/products', function (Request $request) {
                                     </tbody>
                                 </table>
                             </li>
-                            <li>Extend with <a href="https://laravel.com/docs/8.x/controllers#restful-nested-resources">Nested Resources</a></li>
+                            <li>Extend with <a href="https://laravel.com/docs/9.x/controllers#restful-nested-resources">Nested Resources</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -644,14 +644,14 @@ Route::post('/products', function (Request $request) {
         <!-- Eloquent API Resources -->
         <section>
             <section>
-                <h2>04.4<br>Eloquent API Resources</h2>
+                <h2>05.4<br>Eloquent API Resources</h2>
             </section>
 
             <section>
                 <h2>Introduction</h2>
                 <ul>
                     <li>In certain situations, defining one single JSON response per Eloquent model is not satisfactory</li>
-                    <li style="margin-top: 1em;"><a href="https://laravel.com/docs/8.x/eloquent-resources">Eloquent API Resources</a> forms a transformation layer between your Eloquent models and JSON responses</li>
+                    <li style="margin-top: 1em;"><a href="https://laravel.com/docs/9.x/eloquent-resources">Eloquent API Resources</a> forms a transformation layer between your Eloquent models and JSON responses</li>
                     <li style="margin-top: 1em;">You will define <code>Resource</code> classes, defining a transformation between an Eloquent model and a JSON response</li>
                 </ul>
             </section>
@@ -748,8 +748,8 @@ Route::get('/products', function () {
                     </li>
                     <li>By default, all data is <strong>wrapped</strong> in a <code>data</code> key (configurable)</li>
                     <li>When passing a <strong>paginated</strong> result, the response contains <code>meta</code> and <code>links</code> keys describing the paginator's state</li>
-                    <li>Read more about <a href="https://laravel.com/docs/8.x/eloquent-resources#conditional-attributes">conditional attributes</a> and
-                        <a href="https://laravel.com/docs/8.x/eloquent-resources#conditional-relationships">conditional relationships</a></li>
+                    <li>Read more about <a href="https://laravel.com/docs/9.x/eloquent-resources#conditional-attributes">conditional attributes</a> and
+                        <a href="https://laravel.com/docs/9.x/eloquent-resources#conditional-relationships">conditional relationships</a></li>
                 </ul>
             </section>
 
@@ -772,9 +772,9 @@ Route::get('/products', function () {
             <section>
                 <h2>Sources</h2>
                 <ul>
-                    <li><a href="https://laravel.com/docs/8.x/eloquent-mutators">Laravel docs: Eloquent Mutators and Casting</a></li>
-                    <li><a href="https://laravel.com/docs/8.x/eloquent-serialization">Laravel docs: Eloquent Serialization</a></li>
-                    <li><a href="https://laravel.com/docs/8.x/eloquent-resources">Laravel docs: Eloquent API Resources</a></li>
+                    <li><a href="https://laravel.com/docs/9.x/eloquent-mutators">Laravel docs: Eloquent Mutators and Casting</a></li>
+                    <li><a href="https://laravel.com/docs/9.x/eloquent-serialization">Laravel docs: Eloquent Serialization</a></li>
+                    <li><a href="https://laravel.com/docs/9.x/eloquent-resources">Laravel docs: Eloquent API Resources</a></li>
 
                 </ul>
             </section>
