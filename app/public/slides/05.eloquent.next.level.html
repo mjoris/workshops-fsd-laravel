@@ -35,11 +35,11 @@
         <!-- Eloquent: the next level -->
         <section>
             <section>
-                <h2>05.1<br>Eloquent: the Next Level</h2>
+                <h2>05.1<br>What you already know</h2>
             </section>
 
             <section>
-                <h2>What you already know (1)</h2>
+                <h2>Recap: the Models</h2>
 
                 <ul>
                     <li>
@@ -68,7 +68,7 @@
                 </ul>
             </section>
             <section>
-                <h2>What you already know (2)</h2>
+                <h2>Recap: from Builder Object to results</h2>
 
                 <ul style="font-size: 80%">
                     <li>
@@ -105,7 +105,7 @@ $smurfs->pluck('age') // returns a plain old array</code></pre>
             </section>
 
             <section>
-                <h2>What you already know (3)</h2>
+                <h2>Recap: Eloquent Collections</h2>
 
                 <ul style="font-size: 80%;">
                     <li>
@@ -131,10 +131,15 @@ Smurf::find(666)->friends() // only returns a Builder object ...</code></pre>
                     </li>
                 </ul>
             </section>
+        </section>
+        <section>
+            <section>
+                <h2>05.2<br>Eager loading</h2>
+            </section>
 
             <section>
                 <h2>Eager Loading</h2>
-                <ul style="font-size: 85%;">
+                <ul style="font-size: 90%;">
                     <li>By default, related models are <em>lazy</em> loaded</li>
                     <li>
                         When looping over a set objects and accessing their relationships as
@@ -153,21 +158,113 @@ foreach ($books as $book) {
     echo $book-&gt;author-&gt;name; // no DB query
 }</code></pre>
                     </li>
+                </ul>
+            </section>
+            <section>
+                <h2>Let's have a look &hellip;</h2>
+                <pre class="bigger"><code class="hljs php" data-overlay-example="/eloquent-demo-5">$lazyProduct = Product::find(1);
+$eagerProduct = Product::with('brand')-&gt;find(1);
+dump($lazyProduct);  // internal relations field empty
+dump($eagerProduct); // internal relations field with 'brand'
+
+// no difference
+dump($lazyProduct-&gt;brand->name);
+dump($eagerProduct-&gt;brand->name);
+                 </code></pre>
+            </section>
+            <section>
+                <h2>Specifying Relationships and Columns</h2>
+                <ul style="font-size: 85%;width: 75%;">
                     <li>
-                        Multiple relationships: <code>Book::with(['author', 'publisher'])-&gt;get();</code>
+                        Multiple relationships: <pre><code class="hljs php">Book::with(['author', 'publisher'])-&gt;get();</code></pre>
                     </li>
                     <li>
-                        Nested relationships: <code>Book::with('author.contacts')-&gt;get();</code>
+                        Nested relationships: <pre><code class="hljs php">Book::with('author.contacts')-&gt;get();</code></pre>
                     </li>
                     <li>
-                        Constraining columns: <code>Book::with('author:id,name')-&gt;get();</code>
+                        Constraining columns: <pre><code class="hljs php">Book::with('author:id,name')-&gt;get(); // include internally required PK/FK columns </code></pre>
+                    </li>
+                    <li>
+                        Constraining eager loads:
+                        <pre><code class="hljs php">// you do not need to to this when the gain is insignificant
+$books = Book::with(['reviews' => function ($query) {
+    $query->where('rating', '>', 4.0);
+}])->get();</code></pre>
                     </li>
                 </ul>
+            </section>
+            <section>
+                <h2>Exercise with Blade</h2>
 
+                    <ul style="font-size: 90%;">
+                        <li>
+                            In <code>ProductController</code>,<br>
+                            <code>Product::all()</code> is passed to a product overview Blade template
+                        </li>
+                        <li style="margin-top: 1em;">
+                            This template loops over these products and,<br> for each <code>$product</code>, it shows
+                            <br>
+                            <code>{{ $product-&gt;id }}</code>
+                            <code>{{ $product-&gt;name }}</code>
+                            <code>{{ $product-&gt;price }}</code><br>
+                            <code>{{ $product-&gt;brand-&gt;name }}</code> <br>
+                            <code>{{ $product-&gt;categories-&gt;pluck('name')-&gt;implode(' | ') }}</code>
+                        </li>
+                        <li style="margin-top: 1em;">
+                            How can we optimize <code>Product::all()</code>?
+                        </li>
+
+                    </ul>
+                <pre class="fragment"><code class="hljs php" style="font-size: 85%;">Product::select(['id', 'name', 'price', 'brand_id'])-&gt;with(['brand:id,name', 'categories:id,name'])-&gt;get()</code>
+                            </pre>
+            </section>
+            <section>
+                <h2>Eager Loading by Default</h2>
+                <ul style="width:80%;">
+                    <li>Add to your <code>protected $with</code> to the model class
+                <pre class="bigger"><code class="hljs php">class Book extends Model
+{
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['author'];
+
+    /**
+     * Get the author that wrote the book.
+     */
+    public function author()
+    {
+        return $this-&gt;belongsTo(Author::class);
+    }
+}</code></pre></li>
+                </ul>
+            </section>
+            <section>
+                <h2>Lazy Eager Loading</h2>
+                <ul style="width:80%;">
+                    <li>Perform an eager (re)load after the model has been retrieved
+                        <pre class="bigger"><code class="hljs php">$books = Book::all();
+
+if ($someCondition) {
+    $books-&gt;load('author', 'publisher');
+}
+
+if ($someOtherCondition) {
+    $books-&gt;loadMissing('author'); // only when not already loaded
+}</code></pre></li>
+                </ul>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h2>05.3<br>Query Scopes</h2>
             </section>
 
             <section>
-                <h2>(Local) Query Scopes</h2>
+                <h2>Local Query Scopes</h2>
                 <ul style="width: 100%; font-size: 85%;">
                     <li><a href="https://laravel.com/docs/9.x/eloquent#local-scopes">Local scopes</a> enable the reuse of frequently used query <strong>Builder</strong> parts</li>
 
@@ -192,8 +289,14 @@ $users = User::ofType('admin')-&gt;active()-&gt;orderBy('created_at')-&gt;get();
 $users = User::ofType('admin')-&gt;orWhere-&gt;active()-&gt;get(); // orWhere specifically for scopes </code></pre>
             </section>
 
+        </section>
+        <section>
             <section>
-                <h2>Accessors &amp; Mutators</h2>
+                <h2>05.4<br>Mutators &amp; Casting</h2>
+            </section>
+
+            <section>
+                <h2>Accessors &amp; Mutators (1)</h2>
                 <ul style="width: 100%; font-size: 80%;">
                     <li>2 applications (<a
                         href="https://laravel.com/docs/9.x/eloquent-mutators#accessors-and-mutators">docs</a>)
@@ -202,56 +305,80 @@ $users = User::ofType('admin')-&gt;orWhere-&gt;active()-&gt;get(); // orWhere sp
                             <li>Define custom attributes (such as <code>$user-&gt;full_name</code>) while there is no such column or relation</li>
                         </ul>
                     </li>
-                    <li>How? Define a <code>get{Attribute}Attribute()</code> and <code>set{Attribute}Attribute()</code></li>
-                    <li>Attention: attribute name in <code>snake_case</code> vs. method name part in <code>PascalCase</code></li>
-                </ul>
-                <pre class="bigger"><code class="hljs php">class User extends Model
+                    <li>How? Define in your model class a <code>protected function attributeName()</code> returning an instance of <code>Illuminate\Database\Eloquent\Casts\Attribute</code>
+                        <pre class="bigger"><code class="hljs php">class User extends Model
 {
-    public function getFirstNameAttribute($value) {
-        return ucfirst($value);
+    protected function firstName(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) =&gt; ucfirst($value),
+            set: fn ($value) =&gt; strtolower($value),
+        );
     }
 
-    public function setFirstNameAttribute($value) {
-        $this-&gt;attributes['first_name'] = strtolower($value);
-    }
-
-    public function getFullNameAttribute() {
-        return $this-&gt;first_name . ' ' . $this-&gt;last_name;
+    protected function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, $attributes) =&gt; ($attributes['first_name'] . ' ' . $attributes['last_name']),
+        );
     }
 }</code></pre>
-                <pre class="bigger"><code class="hljs php">$user = User::find(1);
+
+                    </li>
+                    <li>Attention: function <code>firstName()</code> in <strong>camel case</strong> but attribute call <code>first_name</code> in <strong>snake case</strong></li>
+                </ul>
+                <footer><small>
+                    <code>get:</code> and <code>set:</code> are just <a
+                    href="https://php.watch/versions/8.0/named-parameters">named parameters</a> of the function <code>make()</code>
+                    <br>
+                    <code>fn ($a) =&gt; $b</code> is the <a
+                    href="https://www.php.net/manual/en/functions.arrow.php">arrow function</a> equivalent of
+                    <code>function ($a) {return $b;}</code>
+                </small></footer>
+            </section>
+            <section>
+                <h2>Accessors &amp; Mutators (2)</h2>
+                <ul style="width: 100%; font-size: 80%;">
+                    <li>Usage</li>
+                </ul>
+
+                <pre class="bigger"><code class="hljs php" style="font-size: 80%;">$user = User::find(1);
 $firstName = $user-&gt;first_name;
 $user-&gt;first_name = 'Bart';
-echo($user-&gt;full_name);</code></pre>
+echo($user-&gt;full_name);
+$user-&gt;save();</code></pre>
 
             </section>
 
             <section>
-                <h2>Accessors &amp; Mutators: nice example</h2>
-                <ul style="width: 100%; font-size: 80%;">
-                    <li>Suppose you have a DB model for a multi-language web shop
+                <h2>Remark: Accessor Caching</h2>
+                <ul style="width: 85%; font-size: 85%;">
+                    <li>When an <strong><u>accessor</u></strong> returns an <strong>object</strong> (<a
+                        href="https://laravel.com/docs/9.x/eloquent-mutators#accessor-caching">example</a>)
                         <ul>
-                            <li>products(id, price)</li>
-                            <li>languages(id, code)</li>
-                            <li>product_descriptions(id, product_id, language_id, name, description)</li>
+                            <li>any changes to the object are synced back to the model
+                                <pre class="bigger"><code class="hljs php">$user = User::find(1);
+$address = $user->address_object;
+$address->zip = 9000; // changes the zip of address inside $user
+$user->save(); // updates zip</code></pre>
+                            </li>
+                            <li>undo this behaviour by <code>Attribute::make()-&gt;withoutObjectCaching();</code></li>
                         </ul>
                     </li>
-                    <li>Design a <code>$product-&gt;name</code> attribute, encapsulating the (app or session) locale </li>
+                    <li style="margin-top: 1em;">When an <strong><u>accessor</u></strong> returns <strong>primitive value</strong> (string, int, &hellip;)
+                        <ul>
+                            <li>any changes to the returned value are not synced back to the model
+                                <pre class="bigger"><code class="hljs php">$user = User::find(1);
+$firstName = $user->first_name;
+$firstName = 'Sven';
+$user->save(); // unchanged</code></pre>
+                            </li>
+                            <li>enable syncing by <code>Attribute::make()-&gt;shouldCache();</code></li>
+                        </ul>
+                    </li>
 
                 </ul>
-                <pre class="bigger"><code class="hljs php">class Product extends Model
-{
-    public function getNameAttribute()
-    {
-        $currentLanguage = Language::where('code', '=', App::currentLocale())-&gt;first();
 
-        $description = $this-&gt;descriptions()
-                            -&gt;where('language_id', '=', $currentLanguage-&gt;language_id)
-                            -&gt;first();
-
-        return $description ? $description-&gt;name : '';
-    }
-}</code></pre>
 
             </section>
 
@@ -272,12 +399,14 @@ echo($user-&gt;full_name);</code></pre>
      */
     protected $casts = [
         'is_admin' =&gt; 'boolean',
-        'options' =&gt; 'array', // handy when the column options constains JSON
+        'options' =&gt; 'array', // handy when the column options contains JSON
         'date_of_birth' =&gt; 'datetime:Y-m-d',
         // created_at and updated_at are already known as datetime
+        'directory' =&gt; AsStringable::class, // cast to fluent string
     ];
 
 }</code></pre>
+                <footer><small>Remark: when your database column is in JSON, the cast type <code>'array'</code> will not automatically sync array manipulation back to the model. It will return a PHP error. Use the cast type <code>AsArrayObject::class</code> or <code>AsCollection::class</code> in stead </small></footer>
 
             </section>
 

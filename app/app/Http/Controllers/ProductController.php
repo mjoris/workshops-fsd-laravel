@@ -94,6 +94,18 @@ class ProductController extends Controller
         Product::where('price', 0.85)->delete();
     }
 
+    public function demo5()
+    {
+        $lazyProduct = Product::find(1);
+        $eagerProduct = Product::with('brand')->find(1);
+        dump($lazyProduct);  // internal relations field empty
+        dump($eagerProduct); // internal relations field with 'brand'
+
+        // no difference
+        dump($lazyProduct->brand->name);
+        dump($eagerProduct->brand->name);
+    }
+
     public function overview()
     {
         return view('simple-admin.products', ['products' => Product::all()]);
