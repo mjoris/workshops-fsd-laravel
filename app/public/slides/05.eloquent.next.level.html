@@ -400,7 +400,7 @@ $user->save(); // unchanged</code></pre>
     protected $casts = [
         'is_admin' =&gt; 'boolean',
         'options' =&gt; 'array', // handy when the column options contains JSON
-        'date_of_birth' =&gt; 'datetime:Y-m-d',
+        'date_of_birth' =&gt; 'datetime:Y-m-d', // auto-convert to Carbon objects (date format is only for serialization)
         // created_at and updated_at are already known as datetime
         'directory' =&gt; AsStringable::class, // cast to fluent string
     ];

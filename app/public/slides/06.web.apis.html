@@ -44,14 +44,14 @@
                     <li>
                         You remember &hellip;
                         <ul style="font-size: 90%;">
-                            <li>how to design the Web API <strong>end points</strong> taking into account <a href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/12.webapis.html#/3/3">resource hierarchy and consistency</a>  </li>
-                            <li style="margin-top: 0.7em;">you should only use GET-parameters for <a href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/12.webapis.html#/3/4">filtering, sorting, pagination and passing a PK</a></li>
+                            <li>how to design the Web API <strong>end points</strong> taking into account <a href="https://jorismaervoet.ikdoeict.be/workshops-wmss/12.webapis.html#/3/3">resource hierarchy and consistency</a>  </li>
+                            <li style="margin-top: 0.7em;">you should only use GET-parameters for <a href="https://jorismaervoet.ikdoeict.be/workshops-wmss/12.webapis.html#/3/4">filtering, sorting, pagination and passing a PK</a></li>
                             <li style="margin-top: 0.7em;">when to accept  <a
-                                href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/12.webapis.html#/3/6">which HTTP verb</a></li>
+                                href="https://jorismaervoet.ikdoeict.be/workshops-wmss/12.webapis.html#/3/6">which HTTP verb</a></li>
                             <li style="margin-top: 0.7em;">when to return <a
-                                href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/12.webapis.html#/3/9">which HTTP status code</a></li>
+                                href="https://jorismaervoet.ikdoeict.be/workshops-wmss/12.webapis.html#/3/8">which HTTP status code</a></li>
                             <li style="margin-top: 0.7em;">we'll be using <a
-                                href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/12.webapis.html#/3/11">JSON</a>, both in the response and in the request body</li>
+                                href="https://jorismaervoet.ikdoeict.be/workshops-wmss/12.webapis.html#/3/11">JSON</a>, both in the response and in the request body</li>
 
                         </ul>
                     </li>
@@ -63,7 +63,7 @@
         <!-- Web API Basics with Laravel -->
         <section>
             <section>
-                <h2>06.2<br>Web API Basics with Laravel</h2>
+                <h2>06.2<br>Web APIs by Eloquent Serialization</h2>
             </section>
 
             <section>
@@ -114,12 +114,24 @@
 })-&gt;where('id', '[0-9]+');</code></pre>
 
                 <ul style="width: 100%; font-size: 90%;">
-                    <li style="margin-top: 0.5em;">When the product exists, the Eloquent model object <code>$product</code> will automatically be serialized into JSON and converted into a <code>Response</code> object</li>
+                    <li style="margin-top: 0.5em;">When the product exists, the Eloquent model object <code>$product</code> will automatically be serialized into JSON (<code>$product-&gt;toJson()</code>) and converted into a <code>Response</code> object</li>
 
                     <li style="margin-top: 0.5em;">When the product doesn't exist, <code>findOrFail()</code> launches a <code>NotFoundHttpException</code> resulting in a <code>404</code> response</li>
 
                 </ul>
                 <footer><small>Of course, you'd better use controllers</small></footer>
+            </section>
+
+            <section>
+                <h2>Demo v1 with Postman</h2>
+                <pre class="bigger"><code class="hljs php">Route::get('/v1/products/{id}', function ($id) {
+    $product = Product::findOrFail($id);
+    return $product;
+})-&gt;where('id', '[0-9]+');
+
+Route::get('/v1/products', function () {
+    return Product::all();
+});</code></pre>
             </section>
 
             <section>
@@ -169,7 +181,7 @@
                 </ul>
                 <pre class="bigger"><code class="hljs php">$product->makeVisible('user_id')
 $product->makeHidden('price')
-$product->append('description')</code></pre>
+$product->append('html_description')</code></pre>
             </section>
 
             <section>
@@ -209,19 +221,19 @@ $product->append('description')</code></pre>
 
             <section>
                 <h2>A CR<s>UD</s> Example</h2>
-                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function ($id) {
+                <pre class="bigger"><code class="hljs php">Route::get('/v2/products/{id}', function ($id) {
 
     $product = Product::with('brand')-&gt;findOrFail($id);
     return ['data' =&gt; $product];
 
 })-&gt;where('id', '[0-9]+');
 
-Route::get('/products', function () {
+Route::get('/v2/products', function () {
 
     return ['data' =&gt; Product::with('brand')-&gt;get()];
 });
 
-Route::post('/products', function (Request $request) {
+Route::post('/v2/products', function (Request $request) {
 
     $request-&gt;validate([
         'name' =&gt; 'required|unique:products|max:125',
@@ -236,6 +248,13 @@ Route::post('/products', function (Request $request) {
 });</code></pre>
                 <footer><small>Of course, you'd better use controllers</small></footer>
 
+            </section>
+        </section>
+
+        <!-- Resource Controllers -->
+        <section>
+            <section>
+                <h2>06.3<br>Resource Controllers</h2>
             </section>
 
             <section>
@@ -391,7 +410,7 @@ Route::post('/products', function (Request $request) {
         <!-- Eloquent API Resources -->
         <section>
             <section>
-                <h2>06.3<br>Eloquent API Resources</h2>
+                <h2>06.4<br>Eloquent API Resources</h2>
             </section>
 
             <section>
@@ -483,11 +502,11 @@ Route::post('/products', function (Request $request) {
                         <pre class="bigger"><code class="hljs php">use App\Http\Resources\ProductResource;
 use App\Models\Product;
 
-Route::get('/products/{id}', function ($id) {
+Route::get('/v3/products/{id}', function ($id) {
     return new ProductResource(Product::findOrFail($id));
 });
 
-Route::get('/products', function () {
+Route::get('/v3/products', function () {
     return new ProductCollection(Product::all());
     // if you don't have a ProductCollection:
     // return ProductResource::collection(Product::all());
