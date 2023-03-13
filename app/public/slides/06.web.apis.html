@@ -249,7 +249,23 @@ Route::post('/v2/products', function (Request $request) {
                 <footer><small>Of course, you'd better use controllers</small></footer>
 
             </section>
+
+            <section>
+                <h2>Exercise</h2>
+                <ul style="font-size: 90%;width: 80%;">
+                    <li>In almost any endpoint, when a book is returned as JSON, the book should contain
+                        <ul>
+                            <li>the fields <code>id</code>, <code>isbn</code> and <code>title</code> (these are columns in the DB)</li>
+                            <li>the field <code>internal_code</code> (which is a concatenation of the book's <code>id</code> and <code>location</code> columns)</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">Which 3 things should be added to the model class Book?</li>
+                    <li style="margin-top: 1em;">In 1 endpoint, the book should contain the <code>description</code> column in stead of <code>isbn</code>. How can this be overridden? </li>
+                </ul>
+            </section>
         </section>
+
+
 
         <!-- Resource Controllers -->
         <section>
