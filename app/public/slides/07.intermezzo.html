@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>W&amp;M Full-stack – Laravel course materials</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section data-background="#b5533c">
+            <h3>Web &amp; Mobile Full-Stack  [OGI03<span style="text-transform: none">r</span>]</h3>
+            <h1>07. Intermezzo</h1>
+        </section>
+
+
+        <!-- Form Requests -->
+        <section>
+            <section>
+                <h2>07.1<br>Form Requests</h2>
+            </section>
+
+            <section>
+                <h2>Form Request</h2>
+
+                <ul>
+                    <li>
+                        Definition: custom class encapsulating validation and authorization logic
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        Typically for 1 form
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        It's called a request because <code>FormRequest extends Request</code>
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        Objective: don't clutter your controller code with long and complex validation (example: fold-out form)
+                    </li>
+
+
+                </ul>
+                <footer><small>The use of form requests is not obligatory in the project</small></footer>
+            </section>
+            <section>
+                <h2>Creating a Form Request</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        How to create a <em>form request</em>?
+                        <pre class="bigger"><code class="hljs bash">php artisan make:request StorePostRequest</code></pre>
+                    </li>
+                    <li style="margin-top: 0.7em;">
+                        &longrightarrow; a <em>form request</em> class is created in <code>app/Http/Requests</code>
+                        <pre class="bigger"><code class="hljs php" style="height: 22em;">class StorePostRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return false;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            //
+        ];
+    }
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Specify rules()</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        Example
+                        <pre class="bigger"><code class="hljs php">/**
+ * Get the validation rules that apply to the request.
+ *
+ * @return array
+ */
+public function rules()
+{
+    return [
+        'title' =&gt; 'required|unique:posts|max:255',
+        'body' =&gt; 'required',
+    ];
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Specify authorize()</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        Example
+                        <pre class="bigger"><code class="hljs php">/**
+ * Determine if the user is authorized to make this request.
+ *
+ * @return bool
+ */
+public function authorize()
+{
+    // assuming my 'users' table has an enum column 'role'
+    return $this-&gt;user()-&gt;role == 'blogger';
+}</code></pre>
+                    </li>
+                    <li>Most likely, you wil interact with your authorization <strong>gates</strong> and <strong>policies</strong> here &longrightarrow; we'll see this later on in this workshop</li>
+                    <li>If you plan to put your authorization logic elsewhere, just write <code>return true;</code> </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Applying the Form Request</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        Just type-hint the <em>form request</em> on your controller. Yes, that's all.
+                        <pre class="bigger"><code class="hljs php">/**
+ * Store a new blog post.
+ *
+ * @param  \App\Http\Requests\StorePostRequest  $request
+ * @return Illuminate\Http\Response
+ */
+public function store(StorePostRequest $request)
+{
+    // The incoming request is valid and authorized ...
+    Blogpost::create($request->all());
+}</code></pre>
+                    </li>
+                    <li>You see? <code>FormRequest extends Request</code></li>
+                    <li>When the <code>rules()</code> fail, the errors and input values are flashed into the session and the user is redirected </li>
+                    <li>When the <code>authorize()</code> fails, a <code>403</code> page is shown </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Further Customization</h2>
+
+                <ul style="width: 85%;">
+                    <li>Customizing <a href="https://laravel.com/docs/8.x/validation#customizing-the-error-messages"> the error messages and attribute names (!)</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/validation#preparing-input-for-validation">Preparing</a> the input for validation</li>
+                </ul>
+            </section>
+
+
+        </section>
+
+        <!-- Blade components -->
+        <section>
+            <section>
+                <h2>07.2<br>Blade Components</h2>
+            </section>
+
+            <section>
+                <h2>Blade Components</h2>
+
+                <ul>
+                    <li>
+                        System similar to Blade sections, layouts and includes
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        2 types of components: class based and anonymous
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        A component is like a Blade subtemplate, and a class based component is also backed by a class
+                    </li>
+                </ul>
+                <footer><small>The use of Blade components is not obligatory in the project</small></footer>
+            </section>
+            <section>
+                <h2>Creating a Class Based Component</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        How to create a <em>class based component</em>?
+                        <pre class="bigger"><code class="hljs bash">php artisan make:component Alert</code></pre>
+
+                        &longrightarrow; creates a view template in <code>resources/views/components</code>
+                        <br>
+                        &longrightarrow; creates a component class in <code>app/View/Components</code>
+                        <pre class="bigger"><code class="hljs php">class Alert extends Component
+{
+    public function __construct()
+    {
+        //
+    }
+
+    public function render()
+    {
+        return view('components.alert');
+    }
+}</code></pre>
+                    </li>
+                    <li>
+                        Example with subdirectories:
+                        <pre class="bigger"><code class="hljs bash">php artisan make:component Forms/Input</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Rendering components</h2>
+
+                <ul style="width: 85%;font-size: 80%;">
+                    <li>
+                        Example
+                        <pre class="bigger"><code class="hljs html">&lt;x-alert/&gt;
+&lt;x-forms.input/&gt;</code></pre>
+                    </li>
+                    <li>
+                        Passing data by HTML attributes (variable attributes start with <code>:</code>) &hellip;
+                        <pre class="bigger"><code class="hljs html">&lt;x-alert type="error" :message="$message"/&gt;</code></pre>
+                    </li>
+                    <li>
+                        &hellip; to be passed to the component's constructor:
+                        <pre class="bigger"><code class="hljs php">class Alert extends Component
+{
+    public $type;
+    public $message;
+
+    public function __construct($type, $message)
+    {
+        $this-&gt;type = $type;
+        $this-&gt;message = $message;
+    }</code></pre>
+                    </li>
+                    <li>Public fields (/methods) are available in the component's view: <pre class="bigger"><code class="hljs html">&lt;div class="alert alert-{{ $type }}"&gt;
+    {{ $message }}
+&lt;/div&gt;</code></pre></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Slots</h2>
+
+                <ul style="width: 85%;">
+                    <li>
+                        Slots are the <em>sections</em> of a component
+                    </li>
+                    <li>
+                        Let's say we have in <code>/resources/views/components/alert.blade.php</code>
+                        <pre class="bigger"><code class="hljs html">&lt;span class="alert-title"&gt;{{ $title }}&lt;/span&gt;
+
+&lt;div class="alert alert-danger"&gt;
+    {{ $slot }}
+&lt;/div&gt;</code></pre>
+                    </li>
+                    <li>
+                        Injecting content into the component:
+                        <pre class="bigger"><code class="hljs html">&lt;x-alert&gt;
+    &lt;x-slot name="title"&gt;
+        Server Error
+    &lt;/x-slot&gt;
+
+    &lt;strong&gt;Whoops!&lt;/strong&gt; Something went wrong!
+&lt;/x-alert&gt;</code></pre></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Blade Components: Interested?</h2>
+                <ul>
+                    <li>This was just a simple introduction. Read more in the <a
+                        href="https://laravel.com/docs/8.x/blade#components">docs</a></li>
+                </ul>
+            </section>
+
+
+        </section>
+
+        <!-- Middleware -->
+        <section>
+            <section>
+                <h2>07.3<br>Middleware</h2>
+
+            </section>
+
+            <section>
+                <h2>Middleware Introduction</h2>
+
+                <ul>
+                    <li>
+                        Middleware<small><a href="https://laravel.com/docs/8.x/middleware">&#9873;</a></small> = code executed before or after a request is handled by the application
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Middlewares can be global, or only for a specific route or controller
+                        <ul>
+                            <li>Application middleware</li>
+                            <li>Route/controller specific middleware</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Laravel offers pre-built middlewares located in the <code>app/Http/Middleware</code> directory e.g.
+                        <ul>
+                            <li>authentication</li>
+                            <li>CSRF protection</li>
+                            <li>&hellip;</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Defining your own Middleware</h2>
+
+                <ul>
+                    <li>
+                        First step: generate the middleware with Artisan (location: <code>app/Http/Middleware</code>)
+                        <pre class="bigger"><code class="hljs bash">$ php artisan make:middleware CheckAge</code></pre>
+                    </li>
+                    <li>
+                        Example of <em>Before Middleware</em>
+                        <pre class="bigger"><code class="hljs php">namespace App\Http\Middleware;
+use Closure;
+
+class CheckAge
+{
+    public function handle($request, Closure $next)
+    {
+        if ($request-&gt;age &lt;= 200) {
+            return redirect('home');
+        }
+        return $next($request);
+    }
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Before vs. After Middleware</h2>
+                <pre class="bigger"><code class="hljs php">class BeforeMiddleware
+{
+    public function handle($request, Closure $next)
+    {
+        // Perform action
+
+        return $next($request);
+    }
+}</code></pre>
+                <pre class="bigger"><code class="hljs php">class AfterMiddleware
+{
+    public function handle($request, Closure $next)
+    {
+        $response = $next($request);
+
+        // Perform action
+
+        return $response;
+    }
+}</code></pre>
+            </section>
+
+
+            <section>
+                <h2>Registering Global Middleware</h2>
+
+                <ul style="width: 100%;">
+                    <li>
+                        Add it to the <code>$middleware</code> property of your <code>app/Http/Kernel.php</code> class
+                    </li>
+                    <li style="margin-top: 1em;">
+                        What's already in there?
+                        <pre class="bigger"><code class="hljs php">    protected $middleware = [
+        \App\Http\Middleware\TrustProxies::class,
+        \Fruitcake\Cors\HandleCors::class,
+        \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
+        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        \App\Http\Middleware\TrimStrings::class,
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+    ];</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Registering specific middleware (1)</h2>
+
+                <ul>
+                    <li>
+                        <strong>Step 1:</strong> assign a short-hand key to the <code>$middleware</code> property of your <code>app/Http/Kernel.php</code> class
+                    </li>
+                    <li style="margin-top: 1em;">
+                        What's already in there?
+                        <pre class="bigger"><code class="hljs php">    protected $routeMiddleware = [
+        'auth' =&gt; \App\Http\Middleware\Authenticate::class,
+        'auth.basic' =&gt; \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'cache.headers' =&gt; \Illuminate\Http\Middleware\SetCacheHeaders::class,
+        'can' =&gt; \Illuminate\Auth\Middleware\Authorize::class,
+        'guest' =&gt; \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'password.confirm' =&gt; \Illuminate\Auth\Middleware\RequirePassword::class,
+        'signed' =&gt; \Illuminate\Routing\Middleware\ValidateSignature::class,
+        'throttle' =&gt; \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'verified' =&gt; \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+    ];</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Registering specific middleware (2)</h2>
+
+                <ul style="width: 100%;">
+                    <li>
+                        <strong>Step 2 option 1:</strong> plug the middleware to a specific route
+                        <pre class="bigger"><code class="hljs php">Route::get('admin/profile', 'UserController@showProfile')-&gt;middleware('auth');</code></pre>
+                        <pre class="bigger"><code class="hljs php">Route::get('/', function () {
+    //
+})-&gt;middleware(['first', 'second']);</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Registering specific middleware (3)</h2>
+
+                <ul>
+                    <li>
+                        <strong>Step 2 option 2:</strong> plug the middleware <a href="https://laravel.com/docs/8.x/controllers#controller-middleware">to a specific controller</a>
+                        <ul>
+                            <li>Call the middleware from the controller's constructor</li>
+                            <li>It is assigned to all actions in the controller</li>
+                        </ul>
+                        <pre class="bigger"><code class="hljs php">class TaskController extends Controller
+{
+    public function __construct()
+    {
+        $this-&gt;middleware('auth');
+
+        $this-&gt;middleware('log')-&gt;only('index');
+
+        $this-&gt;middleware('subscribed')-&gt;except('store');
+    }
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Registering specific middleware (4)</h2>
+
+                <ul>
+                    <li>
+                        <strong>Step 2 option 3:</strong> plug the middleware to a route group
+                        <pre class="bigger"><code class="hljs php">Route::middleware(['first', 'second'])-&gt;group(function () {
+    Route::get('/', function ()    {
+        // Uses first and second Middleware
+    });
+
+    Route::get('user/profile', function () {
+        // Uses first and second Middleware
+    });
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Middleware Groups</h2>
+
+                <ul>
+                    <li>
+                        Build groups of middleware in the <code>$middlewareGroups</code> property of your <code>app/Http/Kernel.php</code> class
+                    </li>
+                    <li style="margin-top: 1em;">
+                        What's already in there?
+                        <pre class="bigger"><code class="hljs php">protected $middlewareGroups = [
+    'web' =&gt; [ // can be assigned to a route, a route group or a controller
+        \App\Http\Middleware\EncryptCookies::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \App\Http\Middleware\VerifyCsrfToken::class,
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    ],</code></pre>
+                    </li>
+                    <li>The web middleware group is automatically applied to your <code>routes/web.php</code> file by the <code>RouteServiceProvider</code> !</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Middleware Parameters</h2>
+
+                <ul>
+
+                    <li>
+                        Check this interesting example (simple authorization)
+                        <pre class="bigger"><code class="hljs php">namespace App\Http\Middleware;
+use Closure;
+
+class CheckRole
+{
+    public function handle($request, Closure $next, $role)
+    {
+        if (! $request->user()-&gt;hasRole($role)) {
+            // Redirect...
+        }
+        return $next($request);
+    }
+}</code></pre>
+                    </li>
+                    <li>
+                        Pass your parameters (separated by <code>,</code>) by adding a <code>:</code> after the middleware name
+                        <pre class="bigger"><code class="hljs php">Route::post('blogposts/create', 'PostController@store')->middleware('role:editor');</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+
+        </section>
+
+
+
+
+        <!-- The END -->
+        <section>
+            <section>
+                <h2>Questions?</h2>
+                <footer>
+                    <em><a href="http://www.ikdoeict.be/">ikdoeict.be</a> &mdash; <a href="mailto:joris.maervoet@odisee.be">joris.maervoet@odisee.be</a></em>
+                </footer>
+            </section>
+            <section>
+                <h2>Sources</h2>
+                <ul>
+                    <li><a href="https://laravel.com/docs/8.x/validation#form-request-validation">Laravel docs: Form Request Validation</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/blade#components">Laravel docs: Blade Components</a></li>
+                    <li><a href="https://laravel.com/docs/8.x/middleware">Laravel docs: Middleware</a></li>
+                </ul>
+            </section>
+        </section>
+
+
+    </div>
+
+</div>
+
+<script src="dist/reveal.js"></script>
+<script src="plugin/zoom/zoom.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/search/search.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script>
+
+    // Also available as an ES module, see:
+    // https://revealjs.com/initialization/
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        center: true,
+        hash: true,
+        slideNumber: true,
+
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [ RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight ]
+    });
+
+
+</script>
+<script src="toc.js"></script>
+<script src="overlay.js"></script>
+
+</body>
+</html>
