@@ -84,7 +84,7 @@
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     * @return array&lt;string, mixed&gt;
      */
     public function rules()
     {
@@ -280,7 +280,7 @@ public function store(StorePostRequest $request)
                     <li>
                         Injecting content into the component:
                         <pre class="bigger"><code class="hljs html">&lt;x-alert&gt;
-    &lt;x-slot name="title"&gt;
+    &lt;x-slot:title&gt;
         Server Error
     &lt;/x-slot&gt;
 
@@ -338,14 +338,14 @@ public function store(StorePostRequest $request)
                 <ul>
                     <li>
                         First step: generate the middleware with Artisan (location: <code>app/Http/Middleware</code>)
-                        <pre class="bigger"><code class="hljs bash">$ php artisan make:middleware CheckAge</code></pre>
+                        <pre class="bigger"><code class="hljs bash">$ php artisan make:middleware EnsureRequestHasMinimalAge</code></pre>
                     </li>
                     <li>
                         Example of <em>Before Middleware</em>
                         <pre class="bigger"><code class="hljs php">namespace App\Http\Middleware;
 use Closure;
 
-class CheckAge
+class EnsureRequestHasMinimalAge
 {
     public function handle($request, Closure $next)
     {
@@ -395,7 +395,7 @@ class CheckAge
                         What's already in there?
                         <pre class="bigger"><code class="hljs php">    protected $middleware = [
         \App\Http\Middleware\TrustProxies::class,
-        \Fruitcake\Cors\HandleCors::class,
+        \Illuminate\Http\Middleware\HandleCors::class,
         \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
@@ -417,10 +417,10 @@ class CheckAge
                         <pre class="bigger"><code class="hljs php">    protected $routeMiddleware = [
         'auth' =&gt; \App\Http\Middleware\Authenticate::class,
         'auth.basic' =&gt; \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'bindings' =&gt; \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' =&gt; \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' =&gt; \Illuminate\Auth\Middleware\Authorize::class,
         'guest' =&gt; \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'password.confirm' =&gt; \Illuminate\Auth\Middleware\RequirePassword::class,
         'signed' =&gt; \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' =&gt; \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' =&gt; \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
@@ -520,7 +520,7 @@ class CheckAge
                         <pre class="bigger"><code class="hljs php">namespace App\Http\Middleware;
 use Closure;
 
-class CheckRole
+class EnsureUserHasRole
 {
     public function handle($request, Closure $next, $role)
     {
