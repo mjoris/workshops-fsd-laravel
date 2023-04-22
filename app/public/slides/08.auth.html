@@ -40,17 +40,16 @@
             <section>
                 <h2>08.1<br>Authentication</h2>
                 <p>= verifying who a user is</p>
-                <p><small>For now, we'll focus on<br></small>  <strong>session</strong>-based authentication, <br><small>typically used in server-side rendered applications</small> </p>
             </section>
 
 
             <section>
-                <h2>Authentication Introduction</h2>
+                <h2>Authentication</h2>
 
                 <ul>
-                    <li>
+                    <li style="font-size: 85%;">
                         Laravel's <a href="https://laravel.com/docs/9.x/authentication">Authentication</a>
-                        <ul style="font-size: 85%;">
+                        <ul >
                             <li>
                                 API containing basic authentication methods such as <code>Auth::login()</code>
                             </li>
@@ -60,27 +59,56 @@
                                     <li><strong>Guards:</strong> how are users authenticated technically? e.g. session, token
                                     </li>
                                     <li><strong>Providers:</strong> where is the user information stored and how can it be retrieved? e.g. in the <code>users</code> table with Eloquent</li>
-                                    <li>Resetting passwords</li>
+                                    <li>Resetting passwords: reset token table, timeouts, &hellip;</li>
                                 </ul>
                             </li>
+                            <li>Default config: <strong>session</strong> &longrightarrow; <em>stateful</em></li>
 
                         </ul>
                     </li>
                     <li style="margin-top: 1em;font-size: 85%;">
-                        You <strong>could</strong> write your own authentication logic (controllers, views, routes) but might not be secure
+                        You <strong>could</strong> write your own authentication logic (controllers, views, routes) but this might be cumbersome and insecure
                     </li>
+
                     <li style="margin-top: 1em;font-size: 85%;">
-                        Starter Kits: packages <em>scaffolding</em> the entire authentication layer (controllers, views, routes)
+                         What can be part of this authentication logic? Controllers, views, routes for
+                        <ul>
+                            <li>logging in/out</li>
+                            <li>registration</li>
+                            <li>password reset scenarios</li>
+                            <li>email verification</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Starter Kits</h2>
+
+                <ul>
+                    <li style="margin-top: 1em;font-size: 85%;">
+                        <strong>Dev</strong> packages <em>scaffolding</em> the entire authentication logic (controllers, views, routes)
                         <ul>
                             <li>
-                                <a href="https://github.com/laravel/ui">Laravel UI</a> 3.x (considered as <em>obsolete</em>)
+                                <a href="https://github.com/laravel/ui">Laravel UI</a> 4.x (bootstrap, vue or react; considered as <em>obsolete</em>)
                             </li>
                             <li>
-                                <a href="https://laravel.com/docs/9.x/starter-kits#laravel-breeze">Laravel Breeze</a> &longrightarrow; we'll use Breeze in the next slides
+                                <a href="https://laravel.com/docs/9.x/starter-kits#laravel-breeze">Laravel Breeze</a> (tailwind or inertia)
                             </li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;font-size: 85%;">
+                        A package/library containing the <u>controllers</u> &amp; <u>routes</u> of the authentication logic
+                        <ul>
                             <li>
-                                <a href="https://laravel.com/docs/9.x/fortify">Laravel Fortify</a> (front-end agnostic and encapsulated in a library)
+                                <a href="https://laravel.com/docs/9.x/fortify">Laravel Fortify</a> (front-end agnostic)
+                                <br> &longrightarrow; logic is inside the library &longrightarrow; black-box-like customization through ServiceProvider
                             </li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;font-size: 85%;">
+                        A package <em>scaffolding</em> an entire Laravel application, built on Fortify
+                        <ul>
                             <li>
                                 <a href="https://jetstream.laravel.com/2.x/introduction.html">Laravel Jetstream</a>
                             </li>
@@ -89,6 +117,12 @@
                 </ul>
             </section>
 
+            <section>
+                <h2>The Next Steps &hellip;</h2>
+                <p>
+                    &hellip; explain Laravel's authentication <strong>without</strong> starter kit
+                </p>
+            </section>
 
             <section>
                 <h2>Step 1: Migrations</h2>
@@ -171,52 +205,85 @@
             </section>
 
             <section>
-                <h2>Step 3: Install Laravel Breeze</h2>
-                <ul>
+                <h2>Step 3: Deploy the Authentication Logic</h2>
+                <ul style="width: 100%;font-size: 85%;">
                     <li>
-                        <strong>Step 3:</strong> install Breeze and make Artisan <em>scaffold</em> complete configuration for you
-                        <p><span class="warning">Caution:</span> <code>routes/web.php</code> will be overwritten! </p>
-                    </li>
-                </ul>
-                        <pre class="bigger"><code class="hljs bash">$ composer require laravel/breeze --dev
+                        Manual example loggin in/out
+                        <ul>
+                            <li>
+                                routes
+                                <pre class="bigger"><code class="hljs php">Route::get('/login', [AuthController::class, 'showLogin'])-&gt;middleware('guest')-&gt;name('login');
+Route::post('/login', [AuthController::class, 'login'])-&gt;middleware('guest');
+Route::post('/logout', [AuthController::class, 'logout'])-&gt;middleware('auth')-&gt;name('logout');</code></pre>
+                            </li>
+                            <li>
+                                AuthController
+                            </li>
+                            <pre class="bigger" ><code class="hljs php" style="height: 20em;">public function showLogin()
+{
+    return view('login');
+}
 
-$ php artisan breeze:install
-$ npm install
-$ npm run dev
-								</code></pre>
-                <ul style="width: 100%;">
-                    <li style="margin-top: 1em;">
-                        By default, Breeze styles the templates with <a href="https://tailwindcss.com/">Tailwind CSS</a>.
-                        <br>Want
-                        <a href="https://inertiajs.com/">Inertia.js</a>? <code>php artisan breeze:install --inertia</code>
-                    </li>
-                    <li style="margin-top: 1em;">
-                        What happened exactly? We'll cover this after the last step &hellip;
+public function login(Request $request)
+{
+    $credentials = $request-&gt;validate([
+        'email' =&gt; 'required|string|email',
+        'password' =&gt; 'required|string',
+    ]);
+
+    if (Auth::attempt($credentials, $request-&gt;filled('remember'))) { // attempt = Auth::hasValidCredentials + Auth::login
+        $request-&gt;session()-&gt;regenerate(); // regenerate session id; prevents a session fixation attack
+        return redirect()-&gt;intended(RouteServiceProvider::HOME); // intended = attempted URL before auth interception
+    }
+
+    return back()-&gt;withErrors(['email' =&gt; 'The provided credentials do not match our records.'])-&gt;onlyInput('email');
+}
+
+public function logout(Request $request)
+{
+    Auth::logout();
+    $request-&gt;session()-&gt;invalidate(); // remove session data and regenerate session id
+    $request-&gt;session()-&gt;regenerateToken(); // regenerate CSRF token
+    return redirect('/');
+}</code></pre>
+                        </ul>
                     </li>
                 </ul>
+
+                <footer><small>Warning: you don't need to write the authentication logic manually. Use a starter kit in stead.</small></footer>
+
+
             </section>
 
             <section>
-                <h2>Correction</h2>
-                <h4>step 3 with Docker/WSL2 from Ubuntu for Windows</h4>
-                <ul>
+                <h2>Step 3 continued</h2>
+                <ul style="width: 100%;font-size: 85%;">
                     <li>
-                        Unfortunately, npm has some bug when not executed as root user
+                        Manual example loggin in/out
+                        <ul>
+                            <li>
+                                login.blade.php (simplified)
+                            </li>
+                            <pre class="bigger" ><code class="hljs php">@include('show-errors')
+
+    &lt;form action="{{ url('login') }}" method="post"&gt;
+        @csrf
+
+        &lt;label for="email"&gt;Email&lt;/label&gt;
+        &lt;input type="text" name="email" id="email" value="{{ old('email') }}" required="required"&gt;
+
+        &lt;label for="password"&gt;Password&lt;/label&gt;
+        &lt;input type="password" name="password" id="password" value=""&gt;
+
+        &lt;label for="remember_me"&gt;Remember me&lt;/label&gt;
+        &lt;input type="checkbox" name="remember" id="remember_me"&gt;
+
+        &lt;button type="submit"&gt;Log in&lt;/button&gt;
+
+    &lt;/form&gt;</code></pre>
+                        </ul>
                     </li>
                 </ul>
-                <pre class="bigger"><code class="hljs bash">$ docker compose exec -u 1000:1000 php-web bash
-   # composer require laravel/breeze --dev
-   # php artisan breeze:install
-   # exit
-$ docker compose exec php-web bash
-   # mkdir /.npm
-   # chown -R 1000:1000 "/.npm"
-   # exit
-$ docker compose exec -u 1000:1000 php-web bash
-   # npm install
-   # npm run dev
-								</code></pre>
-
             </section>
 
             <section>
@@ -243,7 +310,6 @@ $ docker compose exec -u 1000:1000 php-web bash
                     </li>
 
                 </ul>
-                <footer><small>Note: these classes have nothing to do with Breeze - they're part of the Laravel core</small></footer>
             </section>
 
             <section>
@@ -251,10 +317,10 @@ $ docker compose exec -u 1000:1000 php-web bash
 
                 <ul>
                     <li>
-                        <strong>Step 5:</strong> plug the <code>auth</code> middleware to each action requiring authentication
+                        <strong>Step 5A:</strong> plug the <code>auth</code> middleware to each action requiring authentication
                         <ul>
                             <li style="margin-top: 1.5em;">
-                                How? See the <a href="#/3/6">slides about middleware</a>
+                                How? See the <a href="07.intermezzo.html#/3/6">slides about middleware</a>
                             </li>
                         </ul>
                     </li>
@@ -299,6 +365,95 @@ Auth::logout();</code></pre>
 
             </section>
 
+
+
+            <section>
+                <h2>Further reading</h2>
+
+                <ul>
+                    <li>
+                        Read the <a href="https://laravel.com/docs/9.x/authentication">Laravel docs on Authentication</a> on
+                        <ul>
+                            <li>
+                                Authentication Throttling
+                            </li>
+                            <li>
+                                Manually Authenticating Users
+                            </li>
+                            <li>
+                                Resetting Passwords
+                            </li>
+                            <li>
+                                Customizing guards and providers
+                            </li>
+                            <li>Social authentication with <a href="https://laravel.com/docs/9.x/socialite">Laravel Socialite</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </section>
+
+        </section>
+
+        <section>
+            <section>
+                <h2>08.2<br>Authentication with Breeze</h2>
+            </section>
+            <section>
+                <h2>Let's play around with Laravel Breeze</h2>
+                <ul>
+                    <li>
+                        As said before, you'd better use a starter kit instead of programming your <strong>application logic</strong> manually
+                    </li>
+                    <li><a href="https://laravel.com/docs/9.x/starter-kits#laravel-breeze">Laravel Breeze</a> is such a kit</li>
+                    <li>So Breeze replaces step 3 &hellip;</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Step 3: Install Laravel Breeze</h2>
+                <ul>
+                    <li>
+                        <strong>Step 3:</strong> install Breeze and make Artisan <em>scaffold</em> complete configuration for you
+                        <p><span class="warning">Caution:</span> <code>routes/web.php</code> will be overwritten! </p>
+                    </li>
+                </ul>
+                <pre class="bigger"><code class="hljs bash">$ composer require laravel/breeze --dev
+
+$ php artisan breeze:install blade
+$ npm install
+$ npm run build
+								</code></pre>
+                <ul style="width: 100%;">
+                    <li style="margin-top: 1em;">
+                        specify the stack you want to install after <code>breeze:install</code>
+                        <br><code>blade</code> - templates with <a href="https://tailwindcss.com/">Tailwind CSS</a>
+                        <br><code>react</code>/<code>vue</code> - <a href="https://inertiajs.com/">Inertia.js</a> with React/Vue
+                        <br><code>api</code> - only API, compatible with <a href="https://nextjs.org/">Next</a>/<a href="https://nuxtjs.org/">Nuxt</a>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Correction</h2>
+                <h4>step 3 with Docker/WSL2 from Ubuntu for Windows</h4>
+                <ul>
+                    <li>
+                        Unfortunately, npm has some bug when not executed as root user
+                    </li>
+                </ul>
+                <pre class="bigger"><code class="hljs bash">$ docker compose exec -u 1000:1000 php-web bash
+   # composer require laravel/breeze --dev
+   # exit
+$ docker compose exec php-web bash
+   # mkdir /.npm
+   # chown -R 1000:1000 "/.npm"
+   # exit
+$ docker compose exec -u 1000:1000 php-web bash
+   # php artisan breeze:install blade
+   # npm install
+   # npm run build</code></pre>
+
+            </section>
             <section>
                 <h2>What the Hell Happened?</h2>
 
@@ -306,13 +461,14 @@ Auth::logout();</code></pre>
                     <li>
                         Laravel Breeze generated in your project: &longrightarrow; let's have a look
                         <ul style="font-size: 80%;">
-                            <li>14 <a href="https://github.com/laravel/breeze/blob/1.x/stubs/default/routes/auth.php">routes</a> bundled into <code>routes/auth.php</code> included from a new(!) <code>routes/web.php</code></li>
-                            <li>8 <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/App/Http/Controllers/Auth">controllers</a> for any of the HTML Forms e.g. <code>AuthenticatedSessionController</code> for login  </li>
-                            <li>1 <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/App/Http/Requests/Auth">form request</a> </li>
-                            <li>2 trivial <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/App/View/Components">Blade component classes</a></li>
+                            <li>15 <a href="https://github.com/laravel/breeze/blob/1.x/stubs/default/routes/auth.php">routes</a> bundled into <code>routes/auth.php</code> included from a new(!) <code>routes/web.php</code></li>
+                            <li>9 <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/app/Http/Controllers/Auth">controllers</a> for any of the HTML Forms e.g. <code>AuthenticatedSessionController</code> for login  </li>
+                            <li>1 <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/app/Http/Controllers">example controller</a>: ProfileController</li>
+                            <li>1 <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/app/Http/Requests/Auth">form request</a> </li>
+                            <li>2 trivial <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/app/View/Components">Blade component classes</a></li>
                             <li>a large set of <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/resources/views">Blade templates</a></li>
                             <li>a <a href="https://laravel.com/docs/9.x/mix">Laravel Mix</a> (= a webpack wrapper) entrypoint <code>webpack.mix.js</code> for the compilation of js/css
-                                <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/resources">resources</a> into the <code>public</code> folder</li>
+                                <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/resources">resources</a> into the <code>public/build</code> folder</li>
                         </ul>
                     </li>
 
@@ -346,39 +502,12 @@ Auth::logout();</code></pre>
 
                 </ul>
             </section>
-
-            <section>
-                <h2>Further reading</h2>
-
-                <ul>
-                    <li>
-                        Read the <a href="https://laravel.com/docs/9.x/authentication">Laravel docs on Authentication</a> on
-                        <ul>
-                            <li>
-                                Authentication Throttling
-                            </li>
-                            <li>
-                                Manually Authenticating Users
-                            </li>
-                            <li>
-                                Resetting Passwords
-                            </li>
-                            <li>
-                                Customizing guards and providers
-                            </li>
-                            <li>Social authentication with <a href="https://laravel.com/docs/9.x/socialite">Laravel Socialite</a></li>
-                        </ul>
-                    </li>
-
-                </ul>
-            </section>
-
         </section>
 
         <!-- Authorization -->
         <section>
             <section>
-                <h2>08.2<br>Authorization</h2>
+                <h2>08.3<br>Authorization</h2>
                 <p>= verifying what a user has access to</p>
             </section>
 
@@ -629,7 +758,7 @@ Route::post('/product', function () {
 
         <section>
             <section>
-                <h2>08.3<br>Demo</h2>
+                <h2>08.4<br>Demo</h2>
             </section>
             <section data-background="#fdfdfd">
                 <h2>Demo outline</h2>
@@ -648,7 +777,7 @@ Route::post('/product', function () {
 
         <section>
             <section>
-                <h2>08.4<br>Web API Authentication</h2>
+                <h2>08.5<br>Web API Authentication</h2>
                 <p><strong>Token</strong>-based authentication</p>
             </section>
 
