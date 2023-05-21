@@ -31,11 +31,54 @@
             <h1>09. Document,<br> Test &amp; Deploy</h1>
         </section>
 
+        <!-- Digging deeper -->
+        <section>
+            <section>
+                <h2>09.1<br>Digging deeper</h2>
+            </section>
+
+            <section>
+                <h2>Laravel Subjects we didn't talk about</h2>
+                <ul style="font-size: 85%;">
+                    <li>
+                        Let's have a tiny introduction to &hellip;
+                        <ul>
+                            <li>
+                                <a href="https://laravel.com/docs/9.x/logging">Logging</a>
+                                <br>
+                                Hint: check 1 of the Laravel log readers, or try <a href="https://laravel.com/docs/9.x/telescope">Laravel Telescope</a>
+                            </li>
+                            <li>
+                                <a href="https://laravel.com/docs/9.x/artisan#writing-commands">Writing commands</a> for Artisan Console
+                            </li>
+                            <li>
+                                <a href="https://laravel.com/docs/9.x/mail">Mail</a> and Mailables
+                            </li>
+                            <li>
+                                <a href="https://laravel.com/docs/9.x/scheduling">Task Scheduling</a> (<a href="https://laravel.com/docs/9.x/scheduling#running-the-scheduler">how to run the scheduler</a>)
+                            </li>
+                            <li>
+                                <a href="https://laravel.com/docs/9.x/localization">Localization</a> and <a
+                                href="https://laravel-lang.com/">Laravel Lang</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        And there's much more:
+                        <a href="https://laravel.com/docs/9.x/cache">Cache</a>
+                        <a href="https://laravel.com/docs/9.x/events">Events</a>
+                        <a href="https://laravel.com/docs/9.x/socialite">Socialite</a>
+                        &hellip;
+                    </li>
+                </ul>
+            </section>
+        </section>
+
 
         <!-- Web API Documentation -->
         <section>
             <section>
-                <h2>09.1<br>Web API Documentation</h2>
+                <h2>09.2<br>Web API Documentation</h2>
             </section>
 
             <section>
@@ -93,7 +136,7 @@
         <!-- Testing -->
         <section>
             <section>
-                <h2>09.2<br>Testing</h2>
+                <h2>09.3<br>Testing</h2>
             </section>
 
             <section>
@@ -208,7 +251,7 @@ class ExampleTest extends TestCase
                         <pre class="bigger"><code class="hljs bash">php artisan test --testsuite=Feature --filter=UserTest --stop-on-failure</code></pre>
                     </li>
                     <li style="margin-top: 1.5em;">
-                        Speed up the process by <a href="https://laravel.com/docs/8.x/testing#running-tests-in-parallel">running tests in parallel</a>
+                        Speed up the process by <a href="https://laravel.com/docs/9.x/testing#running-tests-in-parallel">running tests in parallel</a>
                     </li>
 
 
@@ -277,7 +320,7 @@ $response
          -&gt;missing('password')
          -&gt;etc()
     );</code></pre>
-                        Read more on <a href="https://laravel.com/docs/8.x/http-tests#fluent-json-testing">Fluent JSON Testing</a>
+                        Read more on <a href="https://laravel.com/docs/9.x/http-tests#fluent-json-testing">Fluent JSON Testing</a>
                     </li>
 
                 </ul>
@@ -288,14 +331,14 @@ $response
                 <h2>More on HTTP Tests</h2>
 
                 <ul style="font-size: 90%;width: 80%;">
-                    <li>Testing <a href="https://laravel.com/docs/8.x/http-tests#testing-file-uploads">File Uploads</a>
+                    <li>Testing <a href="https://laravel.com/docs/9.x/http-tests#testing-file-uploads">File Uploads</a>
                     </li>
                     <li style="margin-top: 1.5em;">
-                        Testing <a href="https://laravel.com/docs/8.x/http-tests#testing-views">Views</a>
+                        Testing <a href="https://laravel.com/docs/9.x/http-tests#testing-views">Views</a>
                     </li>
 
                     <li style="margin-top: 1.5em;">
-                        <a href="https://laravel.com/docs/8.x/http-tests#available-assertions">List of all available assertions</a> on a <code>TestResponse</code> object
+                        <a href="https://laravel.com/docs/9.x/http-tests#available-assertions">List of all available assertions</a> on a <code>TestResponse</code> object
                     </li>
 
 
@@ -307,10 +350,10 @@ $response
                 <h2>More Laravel Testing</h2>
 
                 <ul style="font-size: 90%;width: 80%;">
-                    <li><a href="https://laravel.com/docs/8.x/console-tests">Console Tests</a>
+                    <li><a href="https://laravel.com/docs/9.x/console-tests">Console Tests</a>
                     </li>
-                    <li>Browser Tests with <a href="https://laravel.com/docs/8.x/dusk">Laravel Dusk</a></li>
-                    <li>Creating <a href="https://laravel.com/docs/8.x/database-testing">test database</a> records with model factories and seeders</li>
+                    <li>Browser Tests with <a href="https://laravel.com/docs/9.x/dusk">Laravel Dusk</a></li>
+                    <li>Creating <a href="https://laravel.com/docs/9.x/database-testing">test database</a> records with model factories and seeders</li>
                 </ul>
             </section>
 
@@ -319,7 +362,7 @@ $response
         <!-- (Manual) Deployment -->
         <section>
             <section>
-                <h2>09.3<br>(Manual) Deployment</h2>
+                <h2>09.4<br>(Manual) Deployment</h2>
             </section>
 
             <section>
@@ -412,7 +455,7 @@ SESSION_DOMAIN=.ikdoeict.be</code></pre>
             <section>
                 <h2>Further optimization</h2>
                 <ul style="font-size: 80%;width:80%;">
-                    <li>Read the <a href="https://laravel.com/docs/8.x/deployment#optimization">docs on Optimization</a> carefully and further optimize production with
+                    <li>Read the <a href="https://laravel.com/docs/9.x/deployment#optimization">docs on Optimization</a> carefully and further optimize production with
                         <pre class="bigger"><code class="hljs bash">composer install --optimize-autoloader --no-dev
 php artisan config:cache
 php artisan route:cache
@@ -428,7 +471,7 @@ php artisan view:cache</code></pre>
                 <h2>Maintenance mode</h2>
                 <ul style="font-size: 80%;width:80%;">
                     <li>Did you know you can put the whole application in <a
-                        href="https://laravel.com/docs/8.x/configuration#maintenance-mode">maintenance mode</a>?
+                        href="https://laravel.com/docs/9.x/configuration#maintenance-mode">maintenance mode</a>?
                         <pre class="bigger"><code class="hljs bash">php artisan down</code></pre>
 
                     </li>
@@ -466,7 +509,7 @@ php artisan up</code></pre>
 
         <section>
             <section>
-                <h2>09.4<br>Laravel Envoy</h2>
+                <h2>09.5<br>Laravel Envoy</h2>
             </section>
 
             <section>
@@ -496,7 +539,7 @@ php artisan up</code></pre>
                         Run a task by
                         <pre class="bigger"><code class="hljs bash">php vendor/bin/envoy run deploy --branch=master</code></pre>
                     </li>
-                    <li>Want more? <a href="https://laravel.com/docs/8.x/envoy">Envoy Docs</a> </li>
+                    <li>Want more? <a href="https://laravel.com/docs/9.x/envoy">Envoy Docs</a> </li>
                 </ul>
             </section>
 
@@ -504,7 +547,7 @@ php artisan up</code></pre>
 
         <section>
             <section>
-                <h2>09.5<br>CI/CD: an Introduction</h2>
+                <h2>09.6<br>CI/CD: an Introduction</h2>
             </section>
 
             <section>
