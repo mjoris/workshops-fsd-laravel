@@ -1,7 +1,7 @@
 pages:
   script:
     - mkdir public
-    - cp -r app/public/* public
+    - cp -r app/public/slides/* public
   artifacts:
     paths:
       - public
