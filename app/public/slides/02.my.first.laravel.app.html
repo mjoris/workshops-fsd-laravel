@@ -34,7 +34,7 @@
         <!-- Laravel Routing -->
         <section>
             <section>
-                <h2>02.1<br>Laravel Routing</h2>
+                <h2>02.1<br>Routing and Controllers</h2>
 
             </section>
 
@@ -68,7 +68,7 @@
             </section>
 
             <section>
-                <h2>Example</h2>
+                <h2>Routing: Example</h2>
                 <pre class="bigger"><code class="hljs php">Route::get('/', function () {
 	// show something (e.g. return a blob of HTML)
 });
@@ -86,7 +86,7 @@ Route::post('/', function () {
             </section>
 
             <section>
-                <h2>HTTP method combinations</h2>
+                <h2>Routing: HTTP Method Combinations</h2>
                 <ul style="width: 70%;">
                     <li style="margin-top: 1em">
                         HTTP verb combinations
@@ -122,7 +122,7 @@ Route::any('foo', function () { &hellip;</code></pre>
             </section>
 
             <section>
-                <h2>Regex constraints</h2>
+                <h2>Routing: Regex Constraints</h2>
                 <ul>
                     <li>
                         Constrain parameters using the <code>where</code> method
@@ -146,7 +146,36 @@ Route::any('foo', function () { &hellip;</code></pre>
 
             </section>
 
+            <section>
+                <h2>Controllers</h2>
 
+                <ul style="font-size: 80%; width: 70%;">
+                    <li>Create a <code>*Controller</code> in the folder <code>app/Http/Controllers</code>
+                        <pre class="bigger"><code class="hljs bash">php artisan make:controller TaskController</code></pre>
+                    </li>
+                    <li>
+                        Point to its <strong>methods</strong> in <code>/routes/web.php</code> (or in <code>/routes/api.php</code>)
+                        <pre class="bigger"><code class="hljs php">use App\Http\Controllers\TaskController;
+
+Route::get('/tasks', [TaskController::class, 'index']);
+Route::post('/tasks/create', [TaskController::class, 'store']);
+Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code></pre>
+                    </li>
+                    <li>
+                        Write the appropriate method(s) in <code>*Controller</code>
+                        <pre class="bigger"><code class="hljs php">class TaskController extends Controller
+{
+    public function index(Request $request)
+    {
+        $tasks = DB::select('select * from tasks where user_id = ?',
+                            [$request-&gt;user_id]);
+        return view('tasks.index', ['tasks' =&gt; $tasks]);
+    }
+
+    public function destroy(Request $request, $id) </code></pre>
+                    </li>
+                </ul>
+            </section>
 
             <section>
                 <h2>Route groups</h2>
@@ -742,51 +771,12 @@ foreach ($users as $user) {
                     </li>
                 </ul>
             </section>
-
         </section>
+
 
         <section>
             <section>
-                <h2>02.5<br>Controllers (Intro)</h2>
-            </section>
-
-            <section>
-                <h2>Controllers</h2>
-
-                <ul style="font-size: 80%; width: 70%;">
-                    <li>Create a <code>*Controller</code> in the folder <code>app/Http/Controllers</code>
-                        <pre class="bigger"><code class="hljs bash">php artisan make:controller TaskController</code></pre>
-                    </li>
-                    <li>
-                        Point to its <strong>methods</strong> in <code>/routes/web.php</code> (or in <code>/routes/api.php</code>)
-                        <pre class="bigger"><code class="hljs php">use App\Http\Controllers\TaskController;
-
-Route::get('/tasks', [TaskController::class, 'index']);
-Route::post('/tasks/create', [TaskController::class, 'store']);
-Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code></pre>
-                    </li>
-                    <li>
-                        Write the appropriate method(s) in <code>*Controller</code>
-                        <pre class="bigger"><code class="hljs php">class TaskController extends Controller
-{
-    public function index(Request $request)
-    {
-        $tasks = DB::select('select * from tasks where user_id = ?',
-                            [$request-&gt;user_id]);
-        return view('tasks.index', ['tasks' =&gt; $tasks]);
-    }
-
-    public function destroy(Request $request, $id) </code></pre>
-                    </li>
-                </ul>
-            </section>
-
-
-        </section>
-
-        <section>
-            <section>
-                <h2>02.6<br>Migrations</h2>
+                <h2>02.5<br>Migrations</h2>
             </section>
 
             <section>
@@ -964,8 +954,6 @@ $table-&gt;string('email', 191)-&gt;unique();
 
                 </ul>
             </section-->
-
-
 
         </section>
 
