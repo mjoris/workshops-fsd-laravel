@@ -147,6 +147,42 @@ Route::any('foo', function () { &hellip;</code></pre>
             </section>
 
 
+
+            <section>
+                <h2>Route groups</h2>
+
+                <ul style="width: 100%;font-size: 85%;">
+                    <li>
+                        Specify a route (URI) prefix
+                        <pre class="bigger"><code class="hljs php">Route::prefix('admin')-&gt;group(function () {
+    Route::get('users', function () {
+        // Matches the "/admin/users" URL
+    });
+    Route::get('dashboard', function () {
+        // Matches the "/admin/dashboard" URL
+    });
+});</code></pre>
+                    </li>
+                    <li>
+                        Controller groups
+                        <pre class="bigger"><code class="hljs php">Route::controller(OrderController::class)-&gt;group(function () {
+    Route::get('/orders/{id}', 'show');
+    Route::post('/orders', 'store');
+});</code></pre>
+                    </li>
+                    <li>
+                        Specify wildcard sub-domain for a route group
+                        <pre class="bigger"><code class="hljs php">Route::domain('{account}.myapp.com')-&gt;group(function () {
+    Route::get('user/{id}', function ($account, $id) {
+        //
+    });
+});</code></pre>
+                    </li>
+                </ul>
+                <footer><small>You should combine this with controllers</small></footer>
+            </section>
+
+
             <section>
                 <h2>The HTTP Request (1)</h2>
 
