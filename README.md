@@ -1,5 +1,5 @@
-# Web &amp; Mobile Full-Stack - workshop materials on Laravel
-Interactive workshop slides for the course Web &amp; Mobile Full-stack, part of the Professional Bachelor ICT study program @ Odisee, Belgium.
+# Full-stack Development - workshop materials on Laravel
+Interactive workshop slides for the course Full-stack Development, part of the Professional Bachelor ICT study program @ Odisee, Belgium.
 
 A web-based slideshow containing many PHP/Laravel code examples, which can be interactively executed in the provided Docker multi-container environment.
 
@@ -10,25 +10,25 @@ A web-based slideshow containing many PHP/Laravel code examples, which can be in
 ### Running the slides without working code examples
 * Install [git](https://git-scm.com/downloads) and run from your terminal/cmd
 ```shell
-git clone https://github.com/mjoris/workshops-wmfs-laravel.git
+git clone https://github.com/mjoris/workshops-fsd-laravel.git
 ```
-* Open the file <code>workshops-wmfs-laravel/app/public/slides/index.html</code> in a browser
+* Open the file <code>workshops-fsd-laravel/app/public/slides/index.html</code> in a browser
 
 ### Running the slides with working code examples
 * Install [git](https://git-scm.com/downloads) and [Docker Desktop](https://www.docker.com/products/docker-desktop).
 * Start the Docker Desktop application
 * Run from your terminal/cmd
 ```shell
-git clone https://github.com/mjoris/workshops-wmfs-laravel.git
+git clone https://github.com/mjoris/workshops-fsd-laravel.git
 ```
 * When Docker is up and running, run from your terminal/cmd
 ```shell
-cd workshops-wmfs-laravel
+cd workshops-fsd-laravel
 docker-compose up
 ```
 * When the containers are up and running, run from a new terminal/cmd
 ```shell
-cd workshops-wmfs-laravel
+cd workshops-fsd-laravel
 docker-compose exec php-web bash
 ```
 From the Bash terminal in the php-web container, run the following commands:
@@ -50,7 +50,7 @@ docker-compose down
 ## Recipes and troubleshooting
 
 ### Updating the course materials 
-* Run from your terminal/cmd, in your <code>workshops-wmfs-laravel</code> directory
+* Run from your terminal/cmd, in your <code>workshops-fsd-laravel</code> directory
 ```shell
 git reset --hard
 git pull origin master
