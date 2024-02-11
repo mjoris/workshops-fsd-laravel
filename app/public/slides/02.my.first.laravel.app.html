@@ -55,11 +55,11 @@
                         </ul>
                     </li>
                     <li style="margin-top: 1em">
-                        <a href="https://laravel.com/docs/9.x/routing#basic-routing">Router methods</a> very similar to bramus/router
+                        <a href="https://laravel.com/docs/10.x/routing#basic-routing">Router methods</a> very similar to bramus/router
                     </li>
                     <li>
                         Router method available for any HTTP verb (get, post, put, ...)
-                        <pre class="bigger"><code class="hljs php">Route::get('foo', function () {
+                        <pre class="bigger"><code class="hljs php">Route::get('/greeting', function () {
     return 'Hello World';
 });</code></pre>
                     </li>
@@ -82,7 +82,7 @@ Route::post('/', function () {
 });
 </code></pre>
                 <footer style="line-height: 1"><small>Note: POST requests are only accepted when a <a
-                    href="https://laravel.com/docs/9.x/csrf">CSRF</a> token is included in the request - we'll talk about that later on </small></footer>
+                    href="https://laravel.com/docs/10.x/csrf">CSRF</a> token is included in the request - we'll talk about that later on </small></footer>
             </section>
 
             <section>
@@ -92,7 +92,7 @@ Route::post('/', function () {
                         HTTP verb combinations
                         <pre class="bigger"><code class="hljs php">Route::match(['get', 'post'], '/', function () { &hellip;
 
-Route::any('foo', function () { &hellip;</code></pre>
+Route::any('/foo', function () { &hellip;</code></pre>
                     </li>
                 </ul>
             </section>
@@ -102,18 +102,18 @@ Route::any('foo', function () { &hellip;</code></pre>
                 <h2>Dynamic Routing</h2>
                 <ul style="width: 100%;">
                     <li>
-                        Working with <a href="https://laravel.com/docs/9.x/routing#route-parameters">Route
+                        Working with <a href="https://laravel.com/docs/10.x/routing#route-parameters">Route
                         parameters</a>
                         <ul>
                             <li>The parameters will be passed into your route's Closure</li>
                         </ul>
-                        <pre class="bigger"><code class="hljs php">Route::get('posts/{post}/comments/{comment}', function ($postId, $commentId) {
+                        <pre class="bigger"><code class="hljs php">Route::get('/posts/{post}/comments/{comment}', function (string $postId, string $commentId) {
     return 'Post ' . $postId;
 });</code></pre>
                     </li>
                     <li>
                         Optional parameters</a>
-                        <pre class="bigger"><code class="hljs php">Route::get('user/{name?}', function ($name = 'John') {
+                        <pre class="bigger"><code class="hljs php">Route::get('/user/{name?}', function (?string $name = 'John') {
     return $name;
 });</code></pre>
                     </li>
@@ -126,17 +126,17 @@ Route::any('foo', function () { &hellip;</code></pre>
                 <ul>
                     <li>
                         Constrain parameters using the <code>where</code> method
-                        <pre class="bigger"><code class="hljs php">Route::get('user/{id}/{name}', function ($id, $name) {
+                        <pre class="bigger"><code class="hljs php">Route::get('/user/{id}/{name}', function (string $id, string $name) {
     //
 })->where(['id' => '[0-9]+', 'name' => '[a-zA-Z]+']);</code></pre>
                     </li>
                     <li>
                         Same, with helper methods:
-                        <pre class="bigger"><code class="hljs php">Route::get('user/{id}/{name}', function ($id, $name) {
+                        <pre class="bigger"><code class="hljs php">Route::get('/user/{id}/{name}', function (string $id, string $name) {
     //
 })->whereNumber('id')->whereAlpha('name');</code></pre>
                     </li>
-                    <li>You can add <a href="https://laravel.com/docs/9.x/routing#parameters-regular-expression-constraints">global constraints</a> too
+                    <li>You can add <a href="https://laravel.com/docs/10.x/routing#parameters-global-constraints">global constraints</a> too
                         <ul>
                             <li>For example: for each <em>id</em> parameter in a dynamic route</li>
                             <li>Location: boot method of your RouteServiceProvider (typically <code>app/Providers/RouteServiceProvider.php</code>)</li>
@@ -149,7 +149,7 @@ Route::any('foo', function () { &hellip;</code></pre>
             <section>
                 <h2>Controllers</h2>
 
-                <ul style="font-size: 80%; width: 70%;">
+                <ul style="font-size: 80%; width: 85%;">
                     <li>Create a <code>*Controller</code> in the folder <code>app/Http/Controllers</code>
                         <pre class="bigger"><code class="hljs bash">php artisan make:controller TaskController</code></pre>
                     </li>
@@ -159,20 +159,21 @@ Route::any('foo', function () { &hellip;</code></pre>
 
 Route::get('/tasks', [TaskController::class, 'index']);
 Route::post('/tasks/create', [TaskController::class, 'store']);
-Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code></pre>
+Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy'])->whereNumber('task');</code></pre>
                     </li>
                     <li>
                         Write the appropriate method(s) in <code>*Controller</code>
-                        <pre class="bigger"><code class="hljs php">class TaskController extends Controller
+                        <pre class="bigger"><code class="hljs php">namespace App\Http\Controllers;
+
+class TaskController extends Controller
 {
-    public function index(Request $request)
-    {
+    public function index(Request $request) : View {
         $tasks = DB::select('select * from tasks where user_id = ?',
                             [$request-&gt;user_id]);
         return view('tasks.index', ['tasks' =&gt; $tasks]);
     }
 
-    public function destroy(Request $request, $id) </code></pre>
+    public function destroy(Request $request, string $id) : RedirectResponse</code></pre>
                     </li>
                 </ul>
             </section>
@@ -183,13 +184,9 @@ Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code><
                 <ul style="width: 100%;font-size: 85%;">
                     <li>
                         Specify a route (URI) prefix
-                        <pre class="bigger"><code class="hljs php">Route::prefix('admin')-&gt;group(function () {
-    Route::get('users', function () {
-        // Matches the "/admin/users" URL
-    });
-    Route::get('dashboard', function () {
-        // Matches the "/admin/dashboard" URL
-    });
+                        <pre class="bigger"><code class="hljs php">Route::prefix('/admin')-&gt;group(function () {
+    Route::get('/users', [AdminController::class, 'getUsers']);      // Matches the "/admin/users" URL
+    Route::get('/dashboard', [AdminController::class, 'dashboard']); // Matches the "/admin/dashboard" URL
 });</code></pre>
                     </li>
                     <li>
@@ -202,13 +199,12 @@ Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code><
                     <li>
                         Specify wildcard sub-domain for a route group
                         <pre class="bigger"><code class="hljs php">Route::domain('{account}.myapp.com')-&gt;group(function () {
-    Route::get('user/{id}', function ($account, $id) {
+    Route::get('/user/{id}', function (string $account, string $id) {
         //
     });
 });</code></pre>
                     </li>
                 </ul>
-                <footer><small>You should combine this with controllers</small></footer>
             </section>
 
 
@@ -217,18 +213,20 @@ Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code><
 
                 <ul style="font-size: 95%;">
                     <li>
-                        The <a href="https://laravel.com/docs/9.x/requests">HTTP Request</a>
+                        The <a href="https://laravel.com/docs/10.x/requests">HTTP Request</a>
                         <ul>
                             <li>is an instance of <code>Illuminate\Http\Request</code></li>
                             <li>is typically obtained in your code by <u>type hinting + dependency injection</u>:
                                 <pre class="bigger"><code class="hljs php">use Illuminate\Http\Request;
 
-Route::post('register', function(Request $request) {
+Route::post('/register', function(Request $request) {
     $email = $request-&gt;input('email', 'not provided');
     $name = $request-&gt;cookie('name');
     $value = $request-&gt;header('X-Header-Name');
     $iKnowItsTrue = $request-&gt;isMethod('post');
     $iKnowItsFalse = $request-&gt;is('register/*');
+    $urlWithQueryString = $request-&gt;fullUrl();
+    $ipAddress = $request-&gt;ip();
     if ($request-&gt;has('name')) {
         $name = $request-&gt;name;
         &hellip;
@@ -246,7 +244,7 @@ Route::post('register', function(Request $request) {
 
                 <ul style="width: 100%;">
                     <li>
-                        The <a href="https://laravel.com/docs/9.x/requests">HTTP Request</a>
+                        The <a href="https://laravel.com/docs/10.x/requests">HTTP Request</a>
                         <ul>
                             <li>use a <code>.</code> to dig into arrays (whether JSON or not)</li>
                             <pre class="bigger"><code class="hljs php">$name = $request-&gt;input('products.0.name');
@@ -274,7 +272,7 @@ $names = $request-&gt;input('products.*.name');	</code></pre>
 
                 <ul style="width: 100%;">
                     <li>
-                        The <a href="https://laravel.com/docs/9.x/requests">HTTP Request</a>
+                        The <a href="https://laravel.com/docs/10.x/requests">HTTP Request</a>
                         <ul>
                             <li>more on input parameters</li>
                         </ul>
@@ -292,7 +290,7 @@ $archived = $request-&gt;boolean('archived');  // convert to boolean cf. "on" "y
 $birthday = $request-&gt;date('birthday');     // convert to a Carbon date
 $name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and trim</code></pre>
                         <ul>
-                            <li>Want more? <a href="https://laravel.com/api/9.x/Illuminate/Http/Request.html">Request API</a></li>
+                            <li>Want more? <a href="https://laravel.com/api/10.x/Illuminate/Http/Request.html">Request API</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -303,7 +301,7 @@ $name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and
 
                 <ul style="width: 80%; font-size: 85%;">
                     <li>
-                        The <a href="https://laravel.com/docs/9.x/responses">HTTP Response</a>
+                        The <a href="https://laravel.com/docs/10.x/responses">HTTP Response</a>
                         <ul>
                             <li>is an instance of <code>Illuminate\Http\Response</code></li>
                             <li>can be returned in your code
@@ -329,7 +327,7 @@ $name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and
 
                 <ul style="font-size: 85%;">
                     <li>
-                        The <a href="https://laravel.com/docs/9.x/responses">HTTP Response</a>
+                        The <a href="https://laravel.com/docs/10.x/responses">HTTP Response</a>
                         <ul>
                             <li>is an instance of <code>Illuminate\Http\Response</code></li>
                             <li>can be returned in your code
@@ -349,7 +347,7 @@ $name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and
 
                 <ul style="width: 80%; font-size: 85%;">
                     <li>
-                        The <a href="https://laravel.com/docs/9.x/responses">HTTP Response</a>
+                        The <a href="https://laravel.com/docs/10.x/responses">HTTP Response</a>
                         <ul>
                             <li>is an instance of <code>Illuminate\Http\Response</code></li>
                             <li>can be returned in your code
@@ -373,11 +371,11 @@ $name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and
                         Some exceptions describe HTTP error codes from the server
                         <ul>
                             <li>e.g. page not found <code>404</code> (when there is no matching route), internal error (caused by developer) <code>500</code>, &hellip;</li>
-                            <li>raise them yourself by the <a href="https://laravel.com/docs/9.x/helpers#method-abort">abort()</a> helper</li>
-                            <li>these <a href="https://laravel.com/docs/9.x/errors#http-exceptions">exceptions</a> are rendered by the <a href="https://laravel.com/docs/9.x/errors#the-exception-handler">exception handler</a> which by default
+                            <li>raise them yourself by the <a href="https://laravel.com/docs/10.x/helpers#method-abort">abort()</a> helper</li>
+                            <li>these <a href="https://laravel.com/docs/10.x/errors#http-exceptions">exceptions</a> are rendered by the <a href="https://laravel.com/docs/10.x/errors#the-exception-handler">exception handler</a> which by default
                                 <ul>
-                                    <li>renders a <a href="https://laravel.com/docs/9.x/errors#custom-http-error-pages"><em>custom</em></a> error page if you define: <code>resources/views/errors/404.blade.php</code> for error code <code>404</code> and so on </li>
-                                    <li>PHP errors are rendered by <a href="https://github.com/spatie/laravel-ignition">Ignition</a> (if your app is in debug mode)</li>
+                                    <li>renders a <a href="https://laravel.com/docs/10.x/errors#custom-http-error-pages"><em>custom</em></a> error page if you define: <code>resources/views/errors/404.blade.php</code> for error code <code>404</code> and so on </li>
+                                    <li>PHP errors are rendered by <a href="https://github.com/spatie/laravel-ignition">Ignition</a> (if your app is in debug mode) <span style="text-decoration: underline;">and logged</span> (by default to <code>storage/logs/laravel.log</code>)</li>
                                 </ul>
                             </li>
                         </ul>
@@ -422,7 +420,7 @@ $name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and
 
                 <ul>
                     <li>
-                        <a href="https://laravel.com/docs/9.x/blade">Blade templates</a> are compiled by the Blade template engine
+                        <a href="https://laravel.com/docs/10.x/blade">Blade templates</a> are compiled by the Blade template engine
                         <ul>
                             <li>File extension: <code>.blade.php</code></li>
                             <li>File location, view instantiation (omit <code>.blade.php</code>!) and variable passing: see previous slide (Views).</li>
@@ -472,7 +470,7 @@ $name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and
 @endforeach</code></pre>
                         <ul>
                             <li>Structures don't work without <code>()</code></li>
-                            <li>Check the <a href="https://laravel.com/docs/9.x/blade#blade-directives">docs</a> for more syntax information</li>
+                            <li>Check the <a href="https://laravel.com/docs/10.x/blade#blade-directives">docs</a> for more syntax information</li>
                             <li>Associative array by index: just <code>$event['id']</code></li>
                             <li>Object fields: just <code>$event->id</code></li>
 
@@ -486,7 +484,7 @@ $name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and
 
                 <ul style="width: 100%;">
                     <li>
-                        <a href="https://laravel.com/docs/9.x/blade#layouts-using-template-inheritance">Template inheritance</a>: sections
+                        <a href="https://laravel.com/docs/10.x/blade#layouts-using-template-inheritance">Template inheritance</a>: sections
                         <pre class="bigger"><code class="hljs html">&lt;html&gt;
     &lt;head&gt;
         &lt;title&gt;App Name - @yield('title')&lt;/title&gt;
@@ -547,7 +545,7 @@ $name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and
                     <li>
                         Render an array as JSON
                         <pre class="bigger"><code>&lt;script&gt;
-    var app = {{ Illuminate\Support\Js::from($array) }};
+    var app = {{ Js::from($array) }};
 &lt;/script&gt;</code></pre>
                     </li>
                     <li>
@@ -565,9 +563,9 @@ Hello, @{{ name }}.</code></pre>
                     <li>
                         Linking from <code>route/1/</code> to <code>route/2/</code> would generate a browser link to <code>route/1/route/2</code> &rightarrow; helpers
                         <ul>
-                            <li><a href="https://laravel.com/docs/9.x/helpers#method-asset">asset()</a> - Use <code>{{ asset('css/common.css') }}</code> to generate a path in your template to an asset in your <code>public</code> folder</li>
-                            <li><a href="https://laravel.com/docs/9.x/helpers#method-url">url()</a> - Use <code>{{ url('artists/' . $id) }}</code> to generate a path to a route</li>
-                            <li><a href="https://laravel.com/docs/9.x/helpers#method-route">route()</a> - Use <code>{{ route('admin::dashboard') }}</code> to generate a path to a <a href="https://laravel.com/docs/9.x/routing#named-routes">named route</a></li>
+                            <li><a href="https://laravel.com/docs/10.x/helpers#method-asset">asset()</a> - Use <code>{{ asset('css/common.css') }}</code> to generate a path in your template to an asset in your <code>public</code> folder</li>
+                            <li><a href="https://laravel.com/docs/10.x/helpers#method-url">url()</a> - Use <code>{{ url('artists/' . $id) }}</code> to generate a path to a route</li>
+                            <li><a href="https://laravel.com/docs/10.x/helpers#method-route">route()</a> - Use <code>{{ route('admin::dashboard') }}</code> to generate a path to a <a href="https://laravel.com/docs/10.x/routing#named-routes">named route</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -608,36 +606,47 @@ Hello, @{{ name }}.</code></pre>
 
                 <ul>
                     <li>
-                        <a href="https://laravel.com/docs/9.x/facades">Facades</a>
+                        <a href="https://laravel.com/docs/10.x/facades">Facades</a>
                         <ul>
                             <li>Static interfaces to basic Laravel classes available e.g. <code>Route</code>, <code>View</code></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="https://laravel.com/docs/9.x/helpers">Helper functions</a>
+                        <a href="https://laravel.com/docs/10.x/helpers">Helper functions</a>
                         <ul>
                             <li><em>Historical</em> array helpers &mdash; complement PHP's array functions e.g.
-                                <a href="https://laravel.com/docs/9.x/helpers#method-array-pluck">Arr::pluck()</a>
-                                <a href="https://laravel.com/docs/9.x/helpers#method-array-flatten">Arr::flatten()</a>
-                                <a href="https://laravel.com/docs/9.x/helpers#method-array-set">Arr::set()</a>
-                                <a href="https://laravel.com/docs/9.x/helpers#method-array-sort">Arr::sort()</a>
+                                <a href="https://laravel.com/docs/10.x/helpers#method-array-pluck">Arr::pluck()</a>
+                                <a href="https://laravel.com/docs/10.x/helpers#method-array-flatten">Arr::flatten()</a>
+                                <a href="https://laravel.com/docs/10.x/helpers#method-array-set">Arr::set()</a>
+                                <a href="https://laravel.com/docs/10.x/helpers#method-array-sort">Arr::sort()</a>
                             </li>
-                            <li><em>Historical</em> string helpers &mdash; complement PHP's string functions
-                            </li>
-                            <li>Fluent string helpers &mdash; same but with chaining e.g.
-                                <a href="https://laravel.com/docs/9.x/helpers#method-fluent-str-is">is()</a>
-                                <a href="https://laravel.com/docs/9.x/helpers#method-fluent-str-contains">contains()</a>
-                                <a href="https://laravel.com/docs/9.x/helpers#method-fluent-str-plural">plural()</a>
+                            <li>Numbers &mdash; number formatting e.g.
+                                <a href="https://laravel.com/docs/10.x/helpers#method-number-format">Number::format</a>
+                                <a href="https://laravel.com/docs/10.x/helpers#method-number-currency">Number::currency</a>
                             </li>
                             <li>Paths &mdash; internal configuration file paths
                             </li>
                             <li>URLs &mdash; for generating URLs
                             </li>
-                            <li>Misc &mdash; Facade function shorthands (e.g. <a href="https://laravel.com/docs/9.x/helpers#method-today">today()</a>,
-                                <a href="https://laravel.com/docs/9.x/helpers#method-response">response()</a>) as well as other functions - check these:
-                                <a href="https://laravel.com/docs/9.x/helpers#method-dd">dd()</a>
-                                <a href="https://laravel.com/docs/9.x/helpers#method-optional">optional()</a>
+                            <li>Misc &mdash; Facade function shorthands (e.g. <a href="https://laravel.com/docs/10.x/helpers#method-today">today()</a>,
+                                <a href="https://laravel.com/docs/10.x/helpers#method-response">response()</a>) as well as other functions - check these:
+                                <a href="https://laravel.com/docs/10.x/helpers#method-dd">dd()</a>
+                                <a href="https://laravel.com/docs/10.x/helpers#method-dump">dump()</a>
                             </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="https://laravel.com/docs/10.x/strings">String functions</a>
+                        <ul>
+
+                            <li><em>Historical</em> string helpers &mdash; complement PHP's string functions
+                            </li>
+                            <li>Fluent string helpers &mdash; same but with chaining e.g.
+                                <a href="https://laravel.com/docs/10.x/strings#method-fluent-str-is">is()</a>
+                                <a href="https://laravel.com/docs/10.x/strings#method-fluent-str-contains">contains()</a>
+                                <a href="https://laravel.com/docs/10.x/strings#method-fluent-str-plural">plural()</a>
+                            </li>
+
                         </ul>
                     </li>
                 </ul>
@@ -649,7 +658,7 @@ Hello, @{{ name }}.</code></pre>
 
                 <ul>
                     <li>
-                        A <a href="https://laravel.com/docs/9.x/collections">collection</a> (<code>Illuminate\Support\Collection</code>) is a convenient wrapper for working with arrays of data
+                        A <a href="https://laravel.com/docs/10.x/collections">collection</a> (<code>Illuminate\Support\Collection</code>) is a convenient wrapper for working with arrays of data
 
                         <ul>
                             <li>Avoid complex (plain PHP) loops</li>
@@ -660,20 +669,20 @@ Hello, @{{ name }}.</code></pre>
 });</code></pre></li>
                             <li><a href="https://www.youtube.com/watch?v=crSUWtRYw-M">&#128250; Watch Adam Wathan on Laracon EU 2016</a></li>
                             <li>Check it out:
-                                <a href="https://laravel.com/docs/9.x/collections#method-map">map()</a>
-                                <a href="https://laravel.com/docs/9.x/collections#method-filter">filter()</a>
-                                <a href="https://laravel.com/docs/9.x/collections#method-reduce">reduce()</a>
-                                <a href="https://laravel.com/docs/9.x/collections#method-flatten">flatten()</a>
-                                <a href="https://laravel.com/docs/9.x/collections#method-flatmap">flatMap()</a>
-                                <a href="https://laravel.com/docs/9.x/collections#method-prepend">prepend()</a>
-                                <a href="https://laravel.com/docs/9.x/collections#method-pluck">pluck()</a>
-                                <a href="https://laravel.com/docs/9.x/collections#method-where">where()</a>
-                                <a href="https://laravel.com/docs/9.x/collections#method-all">all()</a>
+                                <a href="https://laravel.com/docs/10.x/collections#method-map">map()</a>
+                                <a href="https://laravel.com/docs/10.x/collections#method-filter">filter()</a>
+                                <a href="https://laravel.com/docs/10.x/collections#method-reduce">reduce()</a>
+                                <a href="https://laravel.com/docs/10.x/collections#method-flatten">flatten()</a>
+                                <a href="https://laravel.com/docs/10.x/collections#method-flatmap">flatMap()</a>
+                                <a href="https://laravel.com/docs/10.x/collections#method-prepend">prepend()</a>
+                                <a href="https://laravel.com/docs/10.x/collections#method-pluck">pluck()</a>
+                                <a href="https://laravel.com/docs/10.x/collections#method-where">where()</a>
+                                <a href="https://laravel.com/docs/10.x/collections#method-all">all()</a>
                             </li>
 
                         </ul>
                     </li>
-                    <li>Handling large datasets? <a href="https://laravel.com/docs/9.x/collections#lazy-collections">Lazy collections</a></li>
+                    <li>Handling large datasets? <a href="https://laravel.com/docs/10.x/collections#lazy-collections">Lazy collections</a></li>
                 </ul>
             </section>
 
@@ -714,6 +723,7 @@ echo Carbon::now()->addYear()->diffForHumans();    // in 1 Jahr
                     <li>
                         Supported DBMS systems by Laravel
                         <ul>
+                            <li>MariaDB</li>
                             <li>MySQL</li>
                             <li>Postgres</li>
                             <li>SQLite</li>
@@ -723,7 +733,7 @@ echo Carbon::now()->addYear()->diffForHumans();    // in 1 Jahr
                     <li>
                         DB configuration: see <a href="/slides/01.laravel.intro.html#/3">previous slides on configuration</a>
                         <ul>
-                            <li>Note: you can have <a href="https://laravel.com/docs/9.x/database#introduction">separate configs</a> for reading/writing</li>
+                            <li>Note: you can have <a href="https://laravel.com/docs/10.x/database#introduction">separate configs</a> for reading/writing</li>
                         </ul>
                     </li>
                 </ul>
@@ -734,7 +744,7 @@ echo Carbon::now()->addYear()->diffForHumans();    // in 1 Jahr
 
                 <ul>
                     <li>
-                        In Laravel you can run <a href="https://laravel.com/docs/9.x/database#running-queries">raw SQL queries</a>
+                        In Laravel you can run <a href="https://laravel.com/docs/10.x/database#running-queries">raw SQL queries</a>
                         <pre class="bigger"><code class="hljs php">$users = DB::select('select * from users where active = ?', [1]);
 
 foreach ($users as $user) {
@@ -757,9 +767,12 @@ foreach ($users as $user) {
 
                 <ul style="width: 100%;">
                     <li>
-                        In Laravel you can run <a href="https://laravel.com/docs/9.x/database#running-queries">raw SQL queries</a>
+                        In Laravel you can run <a href="https://laravel.com/docs/10.x/database#running-queries">raw SQL queries</a>
 
                         <ul>
+                            <li>Retrievel of scalar values
+                                <pre class="bigger"><code class="hljs php">$count = DB::scalar('select count(*) from users');</code></pre>
+                            </li>
 
                             <li>Similar functions for insert/update/delete
                                 <pre class="bigger"><code class="hljs php">$affected = DB::update('update users set votes = 100 where name = ?', ['John']);</code></pre>
@@ -823,7 +836,7 @@ foreach ($users as $user) {
                     </li>
 
                     <li>
-                        Read more about it in the <a href="https://laravel.com/docs/9.x/migrations">Laravel docs on Migrations</a>
+                        Read more about it in the <a href="https://laravel.com/docs/10.x/migrations">Laravel docs on Migrations</a>
                     </li>
                 </ul>
             </section>
@@ -834,12 +847,12 @@ foreach ($users as $user) {
                 <ul style="font-size: 85%; width: 100%;">
                     <li>
                         Example: table creation
-                        <pre class="bigger"><code class="hljs bash">$ php artisan make:migration create_events_table --create=events</code></pre>
+                        <pre class="bigger"><code class="hljs bash">$ php artisan make:migration create_events_table</code></pre>
                         <ul>
-                            <li>generates <code>database/migrations/&lt;timestamp&gt;_create_events_table.php</code>
+                            <li>generates <code>database/migrations/&lt;timestamp&gt;_create_events_table.php</code> (auto-guessing it's a table creation)
                                 <pre class="bigger"><code class="hljs php">return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('events', function (Blueprint $table) {
             $table-&gt;id(); // your table has a PK auto-inc unsigned bigint column id
@@ -847,7 +860,7 @@ foreach ($users as $user) {
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('events');
     }
@@ -867,21 +880,21 @@ foreach ($users as $user) {
                         Example: table creation
                         <ul>
                             <li>complete the schema creation
-                                <pre class="bigger"><code class="hljs php">public function up()
+                                <pre class="bigger"><code class="hljs php">public function up(): void
 {
-	Schema::create('events', function (Blueprint $table) {
-		$table-&gt;id(); // LEAVE IT HERE
-		$table-&gt;string('title');
-		$table-&gt;text('description');
-		$table-&gt;date('event_date');
+    Schema::create('events', function (Blueprint $table) {
+        $table-&gt;id(); // LEAVE IT HERE
+        $table-&gt;string('title');
+        $table-&gt;text('description');
+        $table-&gt;date('event_date');
 
-		// foreign key: column types need to be EXACTLY the same
-		$table-&gt;unsignedBigInteger('location_id');
-		$table-&gt;foreign('location_id')-&gt;references('id')-&gt;on('locations');
-		// all at once: $table->foreignId('location_id')->constrained();
+        // foreign key: column types need to be EXACTLY the same
+        $table-&gt;unsignedBigInteger('location_id');
+        $table-&gt;foreign('location_id')-&gt;references('id')-&gt;on('locations');
+        // all at once: $table->foreignId('location_id')->constrained();
 
-		$table-&gt;timestamps(); // LEAVE IT HERE
-	});
+        $table-&gt;timestamps(); // LEAVE IT HERE
+    });
 }</code></pre>
                             </li>
                             <li>run all migrations
@@ -900,7 +913,7 @@ foreach ($users as $user) {
                         Let's get practical
                         <ul>
                             <li>
-                                Consult the tables in the <a href="https://laravel.com/docs/9.x/migrations#creating-columns">migrations docs</a> on available column types, column modifiers and index modifiers
+                                Consult the tables in the <a href="https://laravel.com/docs/10.x/migrations#columns">migrations docs</a> on available column types, column modifiers and index modifiers
                             </li>
                             <li>After all, there exists a <em>mapping</em> for each command, data type, &hellip; to each of the supported DBMS systems</li>
                             <li>More flavours of <code>php artisan migrate</code>
@@ -915,6 +928,7 @@ foreach ($users as $user) {
                             </li>
                             <li>Still stuck? Delete the <code>migrations</code> table
                             </li>
+                            <li>Too many migrations? <a href="https://laravel.com/docs/10.x/migrations#squashing-migrations">Squash</a> them.</li>
                         </ul>
                     </li>
                 </ul>
@@ -969,12 +983,12 @@ $table-&gt;string('email', 191)-&gt;unique();
             <section>
                 <h2>Sources</h2>
                 <ul>
-                    <li><a href="https://laravel.com/docs/9.x/routing">Laravel docs: Routing</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/responses">Laravel docs: Responses</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/views">Laravel docs: Views</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/blade">Laravel docs: Blade Templates</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/database">Laravel docs: Databases: Getting Started</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/migrations">Laravel docs: Migrations</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/routing">Laravel docs: Routing</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/responses">Laravel docs: Responses</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/views">Laravel docs: Views</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/blade">Laravel docs: Blade Templates</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/database">Laravel docs: Databases: Getting Started</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/migrations">Laravel docs: Migrations</a></li>
                 </ul>
             </section>
         </section>

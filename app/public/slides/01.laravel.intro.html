@@ -228,7 +228,7 @@
                         </ul>
                     </li>
                     <li style="margin-top: 0.5em;">
-                        We'll be using <strong>PHP 8.2</strong>. Let's have a look <a href="https://stitcher.io/blog/new-in-php-82">what has changed &rarr;</a>
+                        We'll be using <strong>PHP 8.3</strong>. Let's have a look <a href="https://stitcher.io/blog/new-in-php-83">what has changed &rarr;</a>
                     </li>
                 </ul>
             </section>
@@ -261,9 +261,10 @@
                             </li>
                             <li>
                                 because WSL2 has <a href="https://github.com/microsoft/WSL/issues/4197">poor filesystem performance</a>
+                                <span style="font-size: 80%;">
                                 <br> &longrightarrow; each PHP file access introducing some serious time delay (e.g. 100ms)
                                 <br> &longrightarrow; an HTTP request to a Laravel project results into <strong>many</strong> PHP file accesses
-                                <br> &longrightarrow; HTTP response delayed for seconds
+                                <br> &longrightarrow; HTTP response delayed for seconds</span>
                             </li>
                         </ul>
                     </li>
@@ -302,7 +303,7 @@
                             </ul>
                         </li>
                         <li>
-                            <a href="https://laravel.com/docs/9.x/sail">Laravel Sail</a>
+                            <a href="https://laravel.com/docs/10.x/sail">Laravel Sail</a>
                             <ul style="font-size: 50%;">
                                 <li>The official dev env of Laravel (since 8.0)</li>
                                 <li>Internally, you run a (temporary) Sail container for the installation of a fresh Laravel project. Next, running is as easy as <code>sail up</code> and from your own terminal you can launch any of your CLI commands on a container e.g. <code>sail composer</code>.
@@ -331,10 +332,10 @@
                 <ul>
                     <li>
                         Installable via Composer
-                        <pre class="bigger"><code class="hljs bash">$ composer create-project laravel/laravel &lt;path&gt; ^9.0</code></pre>
+                        <pre class="bigger"><code class="hljs bash">$ composer create-project laravel/laravel &lt;path&gt; ^10.0</code></pre>
                         <ul style="margin-top: 0.5em;">
                             <li><code>&lt;path&gt;</code> is the actual directory where you want to install Laravel, e.g. <code>.</code></li>
-                            <li><code>^9.0</code> tag is optional - semantic versioning: everything within 9.*.* range is backward compatible</li>
+                            <li><code>^10.0</code> tag is optional - semantic versioning: everything within 10.*.* range is backward compatible</li>
                             <li><code>composer create-project</code> is the <a href="https://getcomposer.org/doc/03-cli.md#create-project">equivalent</a> of <code>git clone</code> + <code>composer install</code>.
                             So:
                                 <ul style="font-size: 80%;">
@@ -347,14 +348,14 @@
                     </li>
 
                     <li style="margin-top: 1em;">
-                        If you prefer <em>beautiful</em> commands such as <code>laravel new projectname</code>, you need to check <a href="https://laravel.com/docs/9.x#the-laravel-installer">Laravel Installer</a> (install via Composer)
+                        If you prefer <em>beautiful</em> commands such as <code>laravel new projectname</code>, you need to check <a href="https://laravel.com/docs/10.x#creating-a-laravel-project">Laravel Installer</a> (install via Composer)
                     </li>
                 </ul>
             </section>
 
             <section>
                 <h2>Project Structure (1)</h2>
-                <p><small>(<a href="https://laravel.com/docs/9.x/structure">Laravel docs</a>)</small></p>
+                <p><small>(<a href="https://laravel.com/docs/10.x/structure">Laravel docs</a>)</small></p>
                 <ul style="font-size: 75%">
                     <li>
                         <code>public/</code> &mdash; Public files
@@ -375,7 +376,7 @@
                         </ul>
                     </li>
                     <li>
-                        <code>app/</code> &mdash; <a href="http://www.php-fig.org/psr/psr-4/">PSR-4</a> classes of your application &mdash; 5&hellip;13 <a href="https://laravel.com/docs/9.x/structure#the-app-directory">subfolders</a> e.g.
+                        <code>app/</code> &mdash; <a href="http://www.php-fig.org/psr/psr-4/">PSR-4</a> classes of your application &mdash; 5&hellip;13 <a href="https://laravel.com/docs/10.x/structure#the-app-directory">subfolders</a> e.g.
                         <ul>
                             <li><code>Console/</code> &mdash; Your Artisan commands</li>
                             <li><code>Http/</code> &mdash; Your controllers and middleware</li>
@@ -433,15 +434,15 @@
 
             <section>
                 <h2>The Request Lifecycle</h2>
-                <p><em>How Laravel works</em><br><small>(<a href="https://laravel.com/docs/9.x/lifecycle">Laravel docs</a>)</small></p>
+                <p><em>How Laravel works</em><br><small>(<a href="https://laravel.com/docs/10.x/lifecycle">Laravel docs</a>)</small></p>
                 <ul>
                     <li>Webserver hands over the request to <code>public/index.php</code></li>
                     <li>It loads Composer's autoloader</li>
-                    <li>It retrieves an instance of the application <a href="https://laravel.com/docs/9.x/container">service container</a> from the <code>bootstrap/app.php</code> script</li>
+                    <li>It retrieves an instance of the application <a href="https://laravel.com/docs/10.x/container">service container</a> from the <code>bootstrap/app.php</code> script</li>
                     <li>Next, the request is handled by the <strong>HTTP Kernel</strong>
                         <ul>
                             <li>Bootstrapping includes calling <code>register</code> and <code>boot</code> on the
-                                <a href="https://laravel.com/docs/9.x/providers">service providers</a> defined in <code>config/app.php</code></li>
+                                <a href="https://laravel.com/docs/10.x/providers">service providers</a> defined in <code>config/app.php</code></li>
                             <li>Request passes the middleware e.g. session handling, CSRF token</li>
                             <li>Next, the request is dispatched to the router</li>
                         </ul>
@@ -465,7 +466,7 @@
                         <pre class="bigger"><code class="hljs bash">$ php artisan help serve</code></pre>
                     </li>
                     <li>
-                        You can <a href="https://laravel.com/docs/9.x/artisan">extend Artisan with your own commands</a>
+                        You can <a href="https://laravel.com/docs/10.x/artisan">extend Artisan with your own commands</a>
                     </li>
 
 
@@ -477,10 +478,10 @@
                 <h2>Need help?!</h2>
                 <ul>
                     <li>
-                        Docs: <a href="https://laravel.com/docs/9.x/">https://laravel.com/docs/9.x/</a>
+                        Docs: <a href="https://laravel.com/docs/10.x/">https://laravel.com/docs/10.x/</a>
                     </li>
                     <li>
-                        API: <a href="https://laravel.com/api/9.x/">https://laravel.com/api/9.x/</a>
+                        API: <a href="https://laravel.com/api/10.x/">https://laravel.com/api/10.x/</a>
                     </li>
 
                     <li>
@@ -554,7 +555,7 @@
                         Including environment variables in the <code>config/*.php</code> files
                         <ul>
                             <li>
-                                the <a href="https://laravel.com/docs/9.x/helpers#method-env">env()</a> function gets the value of an environment variable or returns a default value
+                                the <a href="https://laravel.com/docs/10.x/helpers#method-env">env()</a> function gets the value of an environment variable or returns a default value
                                 <ul>
                                     <li>
                                         Example without default value from <code>config/app.php</code>: <pre class="bigger"><code class="hljs php">'key' => env('APP_KEY'),</code></pre>
@@ -568,7 +569,7 @@
                                 Environment variables must/can be set in the <code>.env</code> file e.g. <pre class="bigger"><code>APP_KEY=base64:DBHbcyBbq0pBarhWVn0S8bYMqt9IV9EhXhthcyeioKw=
 DB_PASSWORD=secret</code></pre>
                             </li>
-                            <li>This is the mechanism behind the <a href="https://laravel.com/docs/9.x/configuration#environment-configuration">Environment Configuration</a></li>
+                            <li>This is the mechanism behind the <a href="https://laravel.com/docs/10.x/configuration#environment-configuration">Environment Configuration</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -667,7 +668,7 @@ DB_CONNECTION=sqlite</code></pre>
                             <li style="line-height: 1;">
                                 <code>docker-compose up</code>
                                 <br><code>docker-compose exec <span style="background-color: darkgreen;color: yellow;">-u 1000:1000</span> php-web bash</code>
-                                <br><code>$ composer create-project laravel/laravel . ^9.0</code>
+                                <br><code>$ composer create-project laravel/laravel . ^10.0</code>
                                 <br><code>$ chmod -R 777 storage bootstrap/cache</code>
                             </li>
                             <li>Craft <code>.env</code> and <code>config/*.php</code></li>
@@ -711,13 +712,13 @@ DB_CONNECTION=sqlite</code></pre>
             <section>
                 <h2>Sources</h2>
                 <ul>
-                    <li><a href="https://laravel.com/docs/9.x/installation">Laravel docs: Installation</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/configuration">Laravel docs: Configuration</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/installation">Laravel docs: Installation</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/configuration">Laravel docs: Configuration</a></li>
                     <li><a href="https://scotch.io/tutorials/understanding-laravel-environment-variables">Tutorial on environment config</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/structure">Laravel docs: Application structure</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/lifecycle">Laravel docs: Request Lifecycle</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/providers">Laravel docs: Service Providers</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/container">Laravel docs: Service Container</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/structure">Laravel docs: Application structure</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/lifecycle">Laravel docs: Request Lifecycle</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/providers">Laravel docs: Service Providers</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/container">Laravel docs: Service Container</a></li>
                 </ul>
             </section>
         </section>
