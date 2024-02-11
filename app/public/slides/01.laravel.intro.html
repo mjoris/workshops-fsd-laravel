@@ -46,7 +46,6 @@
                         <ul>
                             <li>Defines a structure to follow</li>
                             <li>Your project must follow that structure</li>
-                            </li>
                             <li>Internally, a framework will most likely contain/use a library</li>
                         </ul>
                     </li>
@@ -91,26 +90,70 @@
             <section>
                 <h2>Laravel</h2>
                 <ul>
-                    <li>Full-featured PHP Framework for the development of web applications and web APIs
+                    <li>°2011 by <a href="https://twitter.com/taylorotwell">Taylor Otwell</a></li>
+                    <li style="margin-top: 0.5em;">Full-featured PHP Framework for the development of web applications and web APIs
                         <ul>
                             <li>Model–View–Controller (MVC) pattern</li>
                             <li>
                                 A <strong>huge</strong> number of built-in features
-                                <ul>
+                                <ul style="font-size: 80%;">
                                     <li>Routing</li>
-                                    <li>Views and Template engine</li>
-                                    <li>DB-related: ORM, Query Builder, Migrations, &hellip;</li>
+                                    <li>Views and Template engine (<em>Blade</em>)</li>
+                                    <li>DB-related: ORM (<em>Eloquent</em>), Query Builder, Migrations, &hellip;</li>
                                     <li>Simple authentication</li>
                                     <li>Queues, Logging, &hellip;</li>
+                                    <li>Unit testing</li>
                                 </ul>
                             </li>
                             <li>Emphasis on <em>beautiful code</em> (through syntactic sugar)</li>
                             <li>Artisan CLI
-                                <ul>
+                                <ul style="font-size: 80%;">
                                     <li>Example usages: generate classes, clear cache</li>
                                 </ul>
                             </li>
                         </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Where to start &hellip;?</h2>
+                <ul>
+                    <li>
+                        Laravel is <em>huge</em> and still growing
+                        <ul style="font-size: 80%;">
+                            <li>A <strong>huge</strong> number of built-in features</li>
+                            <li>A <strong>huge</strong> number of first-party packages:
+                                <a href="https://laravel.com/docs/10.x/billing">Cashier</a>,
+                                <a href="https://laravel.com/docs/10.x/dusk">Dusk</a>,
+                                <a href="https://jetstream.laravel.com/">Jetstream</a>,
+                                <a href="https://laravel.com/docs/10.x/pulse">Pulse</a>,
+                                <a href="https://laravel.com/docs/10.x/socialite">Socialite</a>, &hellip;
+                            </li>
+                            <li>A <strong>huge</strong> number of <a href="https://laraveldaily.com/packages">external packages</a></li>
+                            <li>A <strong>huge</strong> <a href="https://ecosystem.laravel.io/">Ecosystem</a></li>
+                        </ul>
+                        &longrightarrow; we'll start with the framework basics
+                    </li>
+                    <li style="margin-top: 1em;">
+                        How does Laravel combine with front-end development?
+                        <br>
+                        There are multiple options
+                        (<a href="https://laravel.com/docs/10.x/frontend">docs</a>,
+                        <a href="https://vueschool.io/articles/vuejs-tutorials/the-ultimate-guide-for-using-vue-js-with-laravel/">with vue</a>):
+                        <ol style="font-size: 80%;">
+
+                            <li>Laravel with <em>oldskool</em> HTML template rendering (and some JS) in <strong>Blade</strong></li>
+                            <li>Decoupled: Laravel Web API project and front-end project</li>
+                            <li>Integrated development: use Laravel's <a href="https://laravel.com/docs/10.x/vite">Asset Building (Vite)</a> and load it from <strong>Blade</strong></li>
+                            <li>
+                                Develop SPAs using server-side patterns with packages like
+                                <a href="https://inertiajs.com/">Inertia.js</a>,
+                                <a href="https://inertiajs.com/">Livewire</a> or
+                                <a href="https://splade.dev/">Splade</a>
+                            </li>
+                        </ol>
+                        &longrightarrow; we'll stick with 1 & 2
                     </li>
                 </ul>
             </section>
