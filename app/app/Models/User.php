@@ -40,11 +40,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
-
-    // added in slides series 05.auth
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
 }
