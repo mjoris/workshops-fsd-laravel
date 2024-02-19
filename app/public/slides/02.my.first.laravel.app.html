@@ -146,67 +146,6 @@ Route::any('/foo', function () { &hellip;</code></pre>
 
             </section>
 
-            <section>
-                <h2>Controllers</h2>
-
-                <ul style="font-size: 80%; width: 85%;">
-                    <li>Create a <code>*Controller</code> in the folder <code>app/Http/Controllers</code>
-                        <pre class="bigger"><code class="hljs bash">php artisan make:controller TaskController</code></pre>
-                    </li>
-                    <li>
-                        Point to its <strong>methods</strong> in <code>/routes/web.php</code> (or in <code>/routes/api.php</code>)
-                        <pre class="bigger"><code class="hljs php">use App\Http\Controllers\TaskController;
-
-Route::get('/tasks', [TaskController::class, 'index']);
-Route::post('/tasks/create', [TaskController::class, 'store']);
-Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy'])->whereNumber('task');</code></pre>
-                    </li>
-                    <li>
-                        Write the appropriate method(s) in <code>*Controller</code>
-                        <pre class="bigger"><code class="hljs php">namespace App\Http\Controllers;
-
-class TaskController extends Controller
-{
-    public function index(Request $request) : View {
-        $tasks = DB::select('select * from tasks where user_id = ?',
-                            [$request-&gt;user_id]);
-        return view('tasks.index', ['tasks' =&gt; $tasks]);
-    }
-
-    public function destroy(Request $request, string $id) : RedirectResponse</code></pre>
-                    </li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>Route groups</h2>
-
-                <ul style="width: 100%;font-size: 85%;">
-                    <li>
-                        Specify a route (URI) prefix
-                        <pre class="bigger"><code class="hljs php">Route::prefix('/admin')-&gt;group(function () {
-    Route::get('/users', [AdminController::class, 'getUsers']);      // Matches the "/admin/users" URL
-    Route::get('/dashboard', [AdminController::class, 'dashboard']); // Matches the "/admin/dashboard" URL
-});</code></pre>
-                    </li>
-                    <li>
-                        Controller groups
-                        <pre class="bigger"><code class="hljs php">Route::controller(OrderController::class)-&gt;group(function () {
-    Route::get('/orders/{id}', 'show');
-    Route::post('/orders', 'store');
-});</code></pre>
-                    </li>
-                    <li>
-                        Specify wildcard sub-domain for a route group
-                        <pre class="bigger"><code class="hljs php">Route::domain('{account}.myapp.com')-&gt;group(function () {
-    Route::get('/user/{id}', function (string $account, string $id) {
-        //
-    });
-});</code></pre>
-                    </li>
-                </ul>
-            </section>
-
 
             <section>
                 <h2>The HTTP Request (1)</h2>
@@ -359,6 +298,68 @@ $name = $request-&gt;string('name')-&gt;trim();   // convert to a Stringable and
                                 </ul>
                             </li>
                         </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Controllers</h2>
+
+                <ul style="font-size: 80%; width: 85%;">
+                    <li>Create a <code>*Controller</code> in the folder <code>app/Http/Controllers</code>
+                        <pre class="bigger"><code class="hljs bash">php artisan make:controller TaskController</code></pre>
+                    </li>
+                    <li>
+                        Point to its <strong>methods</strong> in <code>/routes/web.php</code> (or in <code>/routes/api.php</code>)
+                        <pre class="bigger"><code class="hljs php">use App\Http\Controllers\TaskController;
+
+Route::get('/tasks', [TaskController::class, 'index']);
+Route::post('/tasks/create', [TaskController::class, 'store']);
+Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy'])->whereNumber('task');</code></pre>
+                    </li>
+                    <li>
+                        Write the appropriate method(s) in <code>*Controller</code>
+                        <pre class="bigger"><code class="hljs php">namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+
+class TaskController extends Controller
+{
+    public function index(Request $request) : View {
+        $tasks = DB::select('select * from tasks where user_id = ?',
+                            [$request-&gt;user_id]);
+        return view('tasks.index', ['tasks' =&gt; $tasks]);
+    }
+
+    public function destroy(Request $request, string $id) : RedirectResponse</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Route groups</h2>
+
+                <ul style="width: 100%;font-size: 85%;">
+                    <li>
+                        Specify a route (URI) prefix
+                        <pre class="bigger"><code class="hljs php">Route::prefix('/admin')-&gt;group(function () {
+    Route::get('/users', [AdminController::class, 'getUsers']);      // Matches the "/admin/users" URL
+    Route::get('/dashboard', [AdminController::class, 'dashboard']); // Matches the "/admin/dashboard" URL
+});</code></pre>
+                    </li>
+                    <li>
+                        Controller groups
+                        <pre class="bigger"><code class="hljs php">Route::controller(OrderController::class)-&gt;group(function () {
+    Route::get('/orders/{id}', 'show');
+    Route::post('/orders', 'store');
+});</code></pre>
+                    </li>
+                    <li>
+                        Specify wildcard sub-domain for a route group
+                        <pre class="bigger"><code class="hljs php">Route::domain('{account}.myapp.com')-&gt;group(function () {
+    Route::get('/user/{id}', function (string $account, string $id) {
+        //
+    });
+});</code></pre>
                     </li>
                 </ul>
             </section>
@@ -607,13 +608,13 @@ Hello, @{{ name }}.</code></pre>
                 <ul>
                     <li>
                         <a href="https://laravel.com/docs/10.x/facades">Facades</a>
-                        <ul>
+                        <ul style="font-size: 80%;">
                             <li>Static interfaces to basic Laravel classes available e.g. <code>Route</code>, <code>View</code></li>
                         </ul>
                     </li>
-                    <li>
+                    <li style="margin-top: 1em;">
                         <a href="https://laravel.com/docs/10.x/helpers">Helper functions</a>
-                        <ul>
+                        <ul style="font-size: 80%;">
                             <li><em>Historical</em> array helpers &mdash; complement PHP's array functions e.g.
                                 <a href="https://laravel.com/docs/10.x/helpers#method-array-pluck">Arr::pluck()</a>
                                 <a href="https://laravel.com/docs/10.x/helpers#method-array-flatten">Arr::flatten()</a>
@@ -635,9 +636,9 @@ Hello, @{{ name }}.</code></pre>
                             </li>
                         </ul>
                     </li>
-                    <li>
+                    <li style="margin-top: 1em;">
                         <a href="https://laravel.com/docs/10.x/strings">String functions</a>
-                        <ul>
+                        <ul  style="font-size: 80%;">
 
                             <li><em>Historical</em> string helpers &mdash; complement PHP's string functions
                             </li>
