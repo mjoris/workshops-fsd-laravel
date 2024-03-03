@@ -247,7 +247,7 @@ foreach ($events as $id =&gt; $name) {
                         Chain a multitude of QB methods (<a href="https://laravel.com/docs/10.x/queries">docs</a>)
                         <ul>
                             <li>aggregate methods e.g. <code>count()</code>, <code>max()</code></li>
-                            <li>much more e.g. <code>whereIn()</code>, <code>orWhere()</code>, joins e.g. <code>leftJoin()</code>, <code>on()</code> </li>
+                            <li>much more e.g. <code>whereIn()</code>, <code>orWhere()</code>; joins e.g. <code>leftJoin()</code>, <code>on()</code>; offset and limit with <code>skip()</code> and <code>take()</code>; chunking results with <code>chunk()</code> </li>
                             <li>Examples with <code>insert()</code>, <code>update()</code> and <code>delete()</code>
                                 <pre class="bigger"><code class="hljs php">$id = DB::table('users')->insertGetId(
     ['email' => 'john@example.com', 'votes' => 0]
@@ -356,7 +356,7 @@ protected $keyType = 'string';</code></pre>
                                     <li>Raw SQL Queries won't</li>
                                 </ul>
                             </li>
-                            <li>You don't need to add any information on the columns, but you can specify default values if you want
+                            <li>You don't need to add any information on the columns, but you can specify default column values if you want
                                 <pre class="bigger"><code class="hljs php">protected $attributes = [
    'delayed' => false,
 ];</code></pre>
@@ -486,17 +486,51 @@ $event-&gt;name = $request->name;
 $event-&gt;save();
 
 $event = Event::find(1);
-$event-&gt;name = 'Pukkelpop 2021';
+$event-&gt;name = 'Pukkelpop 2024';
 $event-&gt;save();
 
 $event-&gt;delete();
 </code></pre>
                         <ul>
-                            <li>Note: alternately, you can do the same stuff with Event's static methods in the next slides &hellip; - by the way Eloquent also enables deletion by PK:
+                            <li>Note: alternately, you can do the same stuff with mass-assignment (see next) &hellip; - by the way Eloquent also enables deletion by PK:
 
                             </li>
                         </ul>
                         <pre class="bigger"><code class="hljs php">Event::destroy(7);</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Fresh, clean and dirty</h2>
+
+                <ul style="width: 100%;font-size: 95%;">
+                    <li>
+                        <a href="https://laravel.com/docs/10.x/eloquent#refreshing-models">Refreshing</a> models
+                        <pre class="bigger"><code class="hljs php">$event = Event::where('name', 'Pukkelpop 2024')-&gt;first();
+
+$freshEvent = $event-&gt;fresh(); // reload from DB and create new Event object
+
+$event-&gt;price = 280;
+$event-&gt;refresh(); // reload from DB and "re-hydrate" existing Event object
+$event-&gt;price; // 200</code></pre>
+                    </li>
+                    <li>
+                        <a href="https://laravel.com/docs/10.x/eloquent#examining-attribute-changes">Examining attribute changes</a>
+                        <pre class="bigger"><code class="hljs php">$event = Event::where('name', 'Pukkelpop 2024')-&gt;first();
+
+$event-&gt;price = 280;
+$event-&gt;isDirty(); // true
+$event-&gt;isDirty('price'); // true
+$event-&gt;isDirty('name'); // false
+$event-&gt;isDirty(['price', 'name']); // true
+$event-&gt;isClean('price'); // false
+
+$event-&gt;save();
+
+$event-&gt;isDirty(); // false
+$event-&gt;isClean(); // true
+</code></pre>
                     </li>
                 </ul>
             </section>
@@ -509,7 +543,7 @@ $event-&gt;delete();
                         Mass assignment
                         <ul style="font-size: 90%;">
                             <li>Definition: use a method that accepts a <span style="text-decoration: underline">list of column-value pairs</span> to create/edit a model instance
-                                <pre class="bigger"><code class="hljs php">$user = User::create(['name' =&gt; 'Franky Pallemans', 'company' =&gt; 'Cynalco']);</code></pre>
+                                <pre class="bigger"><code class="hljs php">$user = User::create(['name' =&gt; 'Franky Pallemans', 'company' =&gt; 'Cynalco']); // does a DB INSERT</code></pre>
                             </li>
                             <li>It enables to pass all parameter/value-pairs of the HTTP request's querystring to the create method (think of &hellip; a registration form)
                                 <pre class="bigger"><code class="hljs php">$user = User::create($request-&gt;all());</code></pre>
@@ -557,17 +591,21 @@ $user-&gt;save();</code></pre>
             <section>
                 <h2>More mass-assignment methods</h2>
 
-                <ul style="width: 100%;font-size: 85%;">
+                <ul style="width: 100%;font-size: 80%;">
                     <li>
                         Model constructor with parameter
                         <pre class="bigger"><code class="hljs php">use App\Models\Event;
 
-$event = new Event(['name' => 'Pukkelpop 2021']);</code></pre>
+$event = new Event(['name' => 'Pukkelpop 2024']);</code></pre>
                     </li>
                     <li>
                         Apply <code>fill()</code> on a model instance
                         <pre class="bigger"><code class="hljs php">$event = new Event;
-$event-&gt;fill(['name' => 'Pukkelpop 2021']);</code></pre>
+$event-&gt;fill(['name' => 'Pukkelpop 2024']);</code></pre>
+                    </li>
+                    <li>
+                        Mass updates
+                        <pre class="bigger"><code class="hljs php">Event::where('price', '>', 300)-&gt;update(['active' => 0]);</code></pre>
                     </li>
                     <li>
                         Conditional creation
@@ -618,7 +656,7 @@ foreach ($user-&gt;tasks as $task) {
                         <ul>
 
                             <li>Add to the <code>User</code> class: <span class="warning">(! plural)</span>
-                                <pre class="bigger"><code class="hljs php">public function tasks()
+                                <pre class="bigger"><code class="hljs php">public function tasks(): HasMany
 {
         return $this-&gt;hasMany(Task::class);
 }
@@ -626,7 +664,7 @@ foreach ($user-&gt;tasks as $task) {
                             </li>
 
                             <li>Add to the <code>Task</code> class: <span class="warning">(! singular)</span>
-                                <pre class="bigger"><code class="hljs php">public function user()
+                                <pre class="bigger"><code class="hljs php">public function user(): BelongsTo
 {
         return $this-&gt;belongsTo(User::class);
 }
@@ -646,7 +684,7 @@ foreach ($user-&gt;tasks as $task) {
 
                 <ul style="font-size: 85%;">
                     <li>
-                        Interesting facts
+                        How to use these relationships?
                         <ul>
 
                             <li style="margin-top: 0.5em;">
@@ -691,7 +729,7 @@ foreach ($user-&gt;tasks as $task) {
                                 <pre class="bigger"><code class="hljs php">class Event extends Model
 {
     protected $casts = [
-        'event_date' => 'datetime:Y-m-d',
+        'event_date' => 'datetime',
         // you don't need to mention created_at and updated_at here!
     ];
 }
@@ -740,23 +778,23 @@ foreach ($user-&gt;tasks as $task) {
             <section>
                 <h2>HTTP Controllers (1)</h2>
 
-                <ul style="font-size: 80%; width: 70%;">
+                <ul style="font-size: 80%; width: 80%;">
                     <li>Create a <code>*Controller</code> in the folder <code>app/Http/Controllers</code>
                         <pre class="bigger"><code class="hljs bash">php artisan make:controller TaskController</code></pre>
                     </li>
                     <li>
-                        Point to its <strong>methods</strong> in <code>/routes/web.php</code>
+                        Point to its <strong>methods</strong> in <code>/routes/web.php</code> (or in <code>/routes/api.php</code>)
                         <pre class="bigger"><code class="hljs php">use App\Http\Controllers\TaskController;
 
 Route::get('/tasks', [TaskController::class, 'index']);
 Route::post('/tasks/create', [TaskController::class, 'store']);
-Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code></pre>
+Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy'])-&gt;whereNumber('task');</code></pre>
                     </li>
                     <li>
                         Write the appropriate method(s) in <code>*Controller</code>
                         <pre class="bigger"><code class="hljs php">class TaskController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $tasks = Task::where('user_id', $request-&gt;input('user_id'))
                     -&gt;orderBy('created_at', 'asc')
@@ -764,7 +802,7 @@ Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code><
         return view('tasks.index', ['tasks' =&gt; $tasks]);
     }
 
-    public function destroy(Request $request, $id) </code></pre>
+    public function destroy(Request $request, string $id): RedirectResponse </code></pre>
                     </li>
                 </ul>
             </section>
@@ -777,7 +815,7 @@ Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code><
                         Only include the (type-hinted) $request parameter when needed
                         <pre class="bigger"><code class="hljs php">class TaskController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         return view('tasks.index');
     }</code></pre>
@@ -788,7 +826,8 @@ Route::post('/tasks/{task}/delete', [TaskController::class, 'destroy']);</code><
                         <pre class="bigger"><code class="hljs php">class TaskController extends Controller
 {
     &hellip;
-    public function destroy(Task $task) // implicit model binding (on ID) + 404 on fail
+    // Task $task: implicit model binding (on ID) + 404 on fail
+    public function destroy(Task $task): RedirectResponse
     {
         $task-&gt;delete();
         return redirect('/tasks');

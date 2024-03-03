@@ -93,7 +93,7 @@ return redirect()-&gt;route('profile');</code></pre>
                         </ul>
                     </li>
                     <li style="margin-top: 1em;">
-                        Store and retrieve session variables with <br><em>put</em>, <em>get</em>, <em>has</em>, <em>exists</em>, <em>push</em>, <em>pull</em>, <em>forget</em>, <em>flush</em>&hellip; (<a href="https://laravel.com/docs/10.x/session">docs</a>)
+                        Store and retrieve session variables with <br><em>put</em>, <em>get</em>, <em>has</em>, <em>exists</em>, <em>increment</em>, <em>push</em>, <em>pull</em>, <em>forget</em>, <em>flush</em>&hellip; (<a href="https://laravel.com/docs/10.x/session">docs</a>)
                         <pre class="bigger"><code class="hljs php">$value = $request-&gt;session()-&gt;get('key');
 $value = $request-&gt;session()-&gt;get('key', 'default');
 $allData = $request-&gt;session()-&gt;all();
@@ -282,29 +282,29 @@ Route::post('blogposts/create', 'PostController@store');</code></pre>
                 <ul style="font-size: 85%;width: 80%;">
                     <li>
                         The controller
-                        <pre class="bigger"><code class="hljs php">public function create()
+                        <pre class="bigger"><code class="hljs php">public function create(): View
 {
-	return view('blogpost.add');
+    return view('blogpost.add');
 }
 
-public function store(Request $request)
+public function store(Request $request): RedirectResponse
 {
-	// building oldskool form errors &hellip;
-	$errors = array();
+    // building oldskool form errors &hellip;
+    $errors = array();
 
-	if (!(($request-&gt;has('title')) && (strlen($request-&gt;title) &gt; 0))) {
-		$errors[] = 'The title field is required.';
-	} else if (strlen($request-&gt;title) &gt; 125) {
-		$errors[] = 'The title may not be greater than 125 characters.';
-	} else if (Blogpost::where('title', $request-&gt;title)-&gt;exists()) {
-		$errors[] = 'The title has already been taken.';
-	}
+    if (!(($request-&gt;has('title')) && (strlen($request-&gt;title) &gt; 0))) {
+        $errors[] = 'The title field is required.';
+    } else if (strlen($request-&gt;title) &gt; 125) {
+        $errors[] = 'The title may not be greater than 125 characters.';
+    } else if (Blogpost::where('title', $request-&gt;title)-&gt;exists()) {
+        $errors[] = 'The title has already been taken.';
+    }
 
-	if (!(($request-&gt;has('content')) && (strlen($request-&gt;content) &gt; 0))) {
-		$errors[] = 'The content field is required.';
-	}
+    if (!(($request-&gt;has('content')) && (strlen($request-&gt;content) &gt; 0))) {
+        $errors[] = 'The content field is required.';
+    }
 
-	&hellip;</code></pre>
+    &hellip;</code></pre>
                     </li>
                 </ul>
             </section>
@@ -315,26 +315,26 @@ public function store(Request $request)
                 <ul style="font-size: 85%;width: 85%;">
                     <li>
                         The controller
-                        <pre class="bigger"><code class="hljs php">public function store(Request $request)
+                        <pre class="bigger"><code class="hljs php">public function store(Request $request): RedirectResponse
 {
-	// building oldskool form errors &hellip;
-	&hellip;
+    // building oldskool form errors &hellip;
+    &hellip;
 
-	if (count($errors) &gt; 0) {
-		// flash the form errors in the session
-		$request-&gt;session()-&gt;flash('errors', $errors);
+    if (count($errors) &gt; 0) {
+        // flash the form errors in the session
+        $request-&gt;session()-&gt;flash('errors', $errors);
 
-		// flash the request inputs in the session and take previous route
-		$request-&gt;flash();
-		return back();
-		// NOTE: flashing the request inputs was necessary since the user is REDIRECTED
+        // flash the request inputs in the session and take previous route
+        $request-&gt;flash();
+        return back();
+        // NOTE: flashing the request inputs was necessary since the user is REDIRECTED
 
-		// also possible: return back()-&gt;withInput();
+        // also possible: return back()-&gt;withInput();
 
-	} else {
-		Blogpost::create($request-&gt;all()); // mass assignment
-		return redirect('blogposts/success');
-	}
+    } else {
+        Blogpost::create($request-&gt;all()); // mass assignment
+        return redirect('blogposts/success');
+    }
 }
 </code></pre>
                     </li>
@@ -356,7 +356,7 @@ public function store(Request $request)
                                 redirects the user back to his previous location upon failure (+ auto-flash of errors and input values)
                             </li>
                         </ul>
-                        <pre class="bigger"><code class="hljs php">public function store(Request $request)
+                        <pre class="bigger"><code class="hljs php">public function store(Request $request): RedirectResponse
 {
     $request-&gt;validate([
         'title' =&gt; 'required|unique:blogposts|max:125',
@@ -391,7 +391,7 @@ public function store(Request $request)
 'avatar' =&gt; 'dimensions:min_width=100,min_height=200', // image with specified dimensions
 
 'state' =&gt; 'exists:states,abbreviation', // exists in column abbreviation of table states
-'email' =&gt; 'email:rfc,dns', // has email format and valid domain (requires extra package)
+'email' =&gt; 'email:rfc,dns', // has email format and valid domain (requires intl package)
 'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->uncompromised()],
 
 // for optional fields !!!!!!
@@ -438,21 +438,21 @@ public function store(Request $request)
                 <ul style="font-size: 85%;width: 85%;">
                     <li>
                         The new version of the controller
-                        <pre class="bigger"><code class="hljs php">public function create()
+                        <pre class="bigger"><code class="hljs php">public function create(): View
 {
-	return view('blogpost.add');
+    return view('blogpost.add');
 }
 
-public function store(Request $request)
+public function store(Request $request): RedirectResponse
 {
-	$request-&gt;validate([
-		'title' =&gt; 'required|unique:blogposts|max:125',
-		'content' =&gt; 'required'
-	]);
+    $request-&gt;validate([
+        'title' =&gt; 'required|unique:blogposts|max:125',
+        'content' =&gt; 'required'
+    ]);
 
-	Blogpost::create($request-&gt;all());
+    Blogpost::create($request-&gt;all());
 
-	return redirect('blogposts/success');
+    return redirect('blogposts/success');
 }</code></pre>
                     </li>
                 </ul>
@@ -620,7 +620,7 @@ The [public/storage] directory has been linked.</code></pre>
                             <li style="margin-top: 0.3em;">Set the <code>public</code> disk as the default disk in <code>config/filesystems.php</code></li>
                             <li style="margin-top: 0.3em;">Create a symbolic link to <code>storage/app/public</code> or configure Filesystem</li>
                             <li style="margin-top: 0.3em;">In your form (Views): check your <code>enctype</code> attribute (see
-                                <a href="https://intern.ikdoeict.be/apps/leercentrum/courses/wmss-course-materials/06.forms.html#/6/2">this course</a>)  </li>
+                                <a href="https://ikdoeict.gitlab.io/public/vakken/back-end-development/workshops/05.forms.html#/6/2">this course</a>)  </li>
                             <li style="margin-top: 0.3em;">Access the uploaded file through the HTTP request object (<a href="02.my.first.laravel.app.html#/1/7">code example</a>)</li>
                             <li style="margin-top: 0.3em;">Validation: check on file (MIME) type and eventually file size, dimension, &hellip;
                                 <ul>
@@ -918,9 +918,6 @@ if ($validator-&gt;passes()) {
                                 Use the pagination methods in separate pagination templates: <a href="https://laravel.com/docs/10.x/pagination#customizing-the-pagination-view">howto</a>
                             </li>
                             <li>Appending GET parameters to the links: <a href="https://laravel.com/docs/10.x/pagination#appending-query-string-values">howto</a></li>
-                            <li>
-                                Watch this <a href="https://gist.github.com/bramus/5d8f2e0269e57dff5136">clever algorithm</a>
-                            </li>
                         </ul>
                     </li>
 
@@ -938,15 +935,15 @@ if ($validator-&gt;passes()) {
                 <ul style="font-size: 85%;">
                     <li>Let's build an admin panel for last week's webshop
                         <ul>
-                            <li>overview of products</li>
-                            <li>product detail (parameter tampering)</li>
-                            <li>product creation form</li>
+                            <li><a href="/products">overview of products</a></li>
+                            <li><a href="/products/1">product detail (parameter tampering)</a></li>
+                            <li><a href="/products/create">product creation form</a></li>
 
                         </ul>
                     </li>
-                    <li style="margin-top: 1em;">Let's add the Blade templates &longrightarrow;</li>
-                    <li>Let's talk about URL design &longrightarrow;</li>
+                    <li style="margin-top: 1em;">Let's talk about URL design &longrightarrow;</li>
                     <li>Let's use Eloquent in the ProductController &longrightarrow;</li>
+                    <li>Let's add the Blade templates &longrightarrow;</li>
                     <li>Let's realize form validation and form persistence &longrightarrow;</li>
                 </ul>
             </section>
