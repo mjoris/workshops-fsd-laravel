@@ -82,7 +82,7 @@ return redirect()-&gt;route('profile');</code></pre>
 
                 <ul style="font-size: 85%">
                     <li>
-                        By default the middleware <code>\Illuminate\Session\Middleware\StartSession</code> backs a permanent <a href="https://laravel.com/docs/9.x/session">Session</a>, only for the routes in <code>routes/web.php</code>
+                        By default the middleware <code>\Illuminate\Session\Middleware\StartSession</code> backs a permanent <a href="https://laravel.com/docs/10.x/session">Session</a>, only for the routes in <code>routes/web.php</code>
                     </li>
                     <li><strong>Principle:</strong> store data across multiple requests for the user</li>
                     <li>
@@ -93,7 +93,7 @@ return redirect()-&gt;route('profile');</code></pre>
                         </ul>
                     </li>
                     <li style="margin-top: 1em;">
-                        Store and retrieve session variables with <br><em>put</em>, <em>get</em>, <em>has</em>, <em>exists</em>, <em>push</em>, <em>pull</em>, <em>forget</em>, <em>flush</em>&hellip; (<a href="https://laravel.com/docs/9.x/session">docs</a>)
+                        Store and retrieve session variables with <br><em>put</em>, <em>get</em>, <em>has</em>, <em>exists</em>, <em>push</em>, <em>pull</em>, <em>forget</em>, <em>flush</em>&hellip; (<a href="https://laravel.com/docs/10.x/session">docs</a>)
                         <pre class="bigger"><code class="hljs php">$value = $request-&gt;session()-&gt;get('key');
 $value = $request-&gt;session()-&gt;get('key', 'default');
 $allData = $request-&gt;session()-&gt;all();
@@ -184,7 +184,7 @@ Route::post('blogposts/create', 'PostController@store');</code></pre>
                                 only the verbs GET and POST are allowed (see <a href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fs-method">HTML standard</a>)
                             </li>
                             <li>
-                                &hellip; unless you're faking the verbs with <a href="https://laravel.com/docs/9.x/routing#form-method-spoofing">form method spoofing</a>
+                                &hellip; unless you're faking the verbs with <a href="https://laravel.com/docs/10.x/routing#form-method-spoofing">form method spoofing</a>
                             </li>
                             <li>
                                 &hellip; unless you're building a RESTful web API
@@ -235,7 +235,7 @@ Route::post('blogposts/create', 'PostController@store');</code></pre>
                         The <code>VerifyCsrfToken</code> middleware (part of the <code>web</code> group) is already activated and does the checking
                     </li>
                     <li style="margin-top: 1em;">
-                        Read the <a href="https://laravel.com/docs/9.x/csrf">Laravel docs on CSRF Protection</a> on excluding CSRF protection and CSRF support for JS frameworks
+                        Read the <a href="https://laravel.com/docs/10.x/csrf">Laravel docs on CSRF Protection</a> on excluding CSRF protection and CSRF support for JS frameworks
                     </li>
                 </ul>
             </section>
@@ -271,7 +271,7 @@ Route::post('blogposts/create', 'PostController@store');</code></pre>
 </code></pre>
                     </li>
                     <li>
-                        The helper method <a href="https://laravel.com/docs/9.x/helpers#method-old">old</a> retrieves an <a href="https://laravel.com/docs/9.x/requests#old-input">old input value</a> flashed into the session
+                        The helper method <a href="https://laravel.com/docs/10.x/helpers#method-old">old</a> retrieves an <a href="https://laravel.com/docs/10.x/requests#old-input">old input value</a> flashed into the session
                     </li>
                 </ul>
             </section>
@@ -380,7 +380,7 @@ public function store(Request $request)
                                 The <code>ShareErrorsFromSession</code> middleware (part of the <code>web</code> group) assures an <code>$errors</code> variable is available in your views
                             </li>
                             <li>
-                                Enjoy the richness of <a href="https://laravel.com/docs/9.x/validation#available-validation-rules">the rules available</a>
+                                Enjoy the richness of <a href="https://laravel.com/docs/10.x/validation#available-validation-rules">the rules available</a>
                             </li>
                         </ul>
                         <pre class="bigger"><code class="hljs php" style="font-size: 85%;">'start_date' =&gt; 'required|date|after:tomorrow',
@@ -406,7 +406,7 @@ public function store(Request $request)
 
                 <ul>
                     <li>
-                        Read the <a href="https://laravel.com/docs/9.x/validation">Laravel docs on Validation</a> on
+                        Read the <a href="https://laravel.com/docs/10.x/validation">Laravel docs on Validation</a> on
                         <ul>
                             <li>
                                 Stopping On First Validation Failure (bail)
@@ -464,7 +464,7 @@ public function store(Request $request)
                 <ul style="font-size: 85%;width: 85%;">
                     <li>
                         Change <code>common/errors.blade.php</code> such that it visualizes an <em>$errors</em> <a
-                        href="https://laravel.com/docs/9.x/validation#working-with-error-messages"><strong>MessageBag</strong></a>
+                        href="https://laravel.com/docs/10.x/validation#working-with-error-messages"><strong>MessageBag</strong></a>
                         <pre class="bigger"><code class="hljs">@if ($errors-&gt;any())
     &lt;!-- Form Error List --&gt;
     &lt;div class="alert alert-danger"&gt;
@@ -554,14 +554,14 @@ public function store(Request $request)
 
                 <ul>
                     <li>
-                        The <a href="https://laravel.com/docs/9.x/structure#the-public-directory">public folder</a> contains the assets (img, css, js, &hellip;)
+                        The <a href="https://laravel.com/docs/10.x/structure#the-public-directory">public folder</a> contains the assets (img, css, js, &hellip;)
                         <ul style="font-size: 80%">
                             <li>Assets directly accessible from the web server (link it with <code>asset()</code>)</li>
                             <li><em>By default,</em> you cannot handle (= store, edit, list, &hellip;) files there</li>
                         </ul>
                     </li>
                     <li style="margin-top: 1em;">
-                        <a href="https://laravel.com/docs/9.x/filesystem">File Storage</a> is an abstraction layer which allows you to handle files on local and remote (cloud) systems in a uniform way
+                        <a href="https://laravel.com/docs/10.x/filesystem">File Storage</a> is an abstraction layer which allows you to handle files on local and remote (cloud) systems in a uniform way
                         <ul style="font-size: 80%">
                             <li>
                                 To be configured in <code>config/filesystems.php</code>
@@ -633,7 +633,7 @@ The [public/storage] directory has been linked.</code></pre>
                                     </li>
                                 </ul>
                             </li>
-                            <li style="margin-top: 0.3em;">Of course you need to <a href="https://laravel.com/docs/9.x/filesystem#file-uploads">store the file upload</a>
+                            <li style="margin-top: 0.3em;">Of course you need to <a href="https://laravel.com/docs/10.x/filesystem#file-uploads">store the file upload</a>
                                 <ul>
                                     <li>
                                         <code>store()</code> will assign a unique ID filename. Most of the time, it's a good practice. (think of duplicates)
@@ -901,7 +901,7 @@ if ($validator-&gt;passes()) {
                 <h2>Pagination in Laravel (2)</h2>
                 <ul>
                     <li>
-                        Simple (Tailwind CSS or <a href="https://laravel.com/docs/9.x/pagination#using-bootstrap">bootstrap</a> compatible) display in Blade
+                        Simple (Tailwind CSS or <a href="https://laravel.com/docs/10.x/pagination#using-bootstrap">bootstrap</a> compatible) display in Blade
                         <pre class="bigger"><code class="hljs">&lt;div class="container"&gt;
 @foreach ($users as $user)
     {{ $user->name }}
@@ -915,9 +915,9 @@ if ($validator-&gt;passes()) {
                         It's up to you to find a better strategy than rendering all the page links
                         <ul>
                             <li>
-                                Use the pagination methods in separate pagination templates: <a href="https://laravel.com/docs/9.x/pagination#customizing-the-pagination-view">howto</a>
+                                Use the pagination methods in separate pagination templates: <a href="https://laravel.com/docs/10.x/pagination#customizing-the-pagination-view">howto</a>
                             </li>
-                            <li>Appending GET parameters to the links: <a href="https://laravel.com/docs/9.x/pagination#appending-query-string-values">howto</a></li>
+                            <li>Appending GET parameters to the links: <a href="https://laravel.com/docs/10.x/pagination#appending-query-string-values">howto</a></li>
                             <li>
                                 Watch this <a href="https://gist.github.com/bramus/5d8f2e0269e57dff5136">clever algorithm</a>
                             </li>
@@ -1063,11 +1063,11 @@ if ($validator-&gt;passes()) {
             <section>
                 <h2>Sources</h2>
                 <ul>
-                    <li><a href="https://laravel.com/docs/9.x/routing#route-groups">Laravel docs: Route Groups</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/routing#route-groups">Laravel docs: Route Groups</a></li>
                     <!--li><a href="https://github.com/LaravelCollective/docs/blob/6.0/html.md">Laravel Collective docs: Forms &amp; HTML</a></li-->
-                    <li><a href="https://laravel.com/docs/9.x/filesystem">Laravel docs: File Storage</a> </li>
-                    <li><a href="https://laravel.com/docs/9.x/pagination">Laravel docs: Pagination</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/session">Laravel docs: Session</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/filesystem">Laravel docs: File Storage</a> </li>
+                    <li><a href="https://laravel.com/docs/10.x/pagination">Laravel docs: Pagination</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/session">Laravel docs: Session</a></li>
                 </ul>
             </section>
         </section>
