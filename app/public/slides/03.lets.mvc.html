@@ -113,60 +113,8 @@
             </section>
 
             <section>
-                <h2>Plain PHP example v1 (part 1)</h2>
-
-                <ul style="font-size: 85%; width: 100%;">
-                    <li>
-                        Assume a DB table <code>todos</code> with columns <code>id</code> (PK), <code>what</code> and <code>priority</code>
-                        <pre class="bigger"><code class="hljs php" style="font-size: 85%">class Todo {
-
-    private $id = 0; // 0 means: not stored in DB
-    public $what;
-    public $priority;
-
-    public function __construct($assocArray = []) {
-        $this->id = array_key_exists('id', $assocArray)? $assocArray['id'] : 0;
-        $this->what = array_key_exists('what', $assocArray)? $assocArray['what'] : '';
-        $this->priority = array_key_exists('priority', $assocArray)? $assocArray['priority'] : 'low';
-    }
-
-    &hellip;</code></pre>
-                    </li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>Plain PHP example v1 (part 2)</h2>
-                <pre class="bigger"><code class="hljs php" style="font-size: 85%">    public function save() {
-        if ($this->id === 0) {
-            $stmt = Database::getDatabase()->prepare('INSERT INTO todos (what, priority) VALUES (?, ?);');
-            $stmt->execute(array($this->what, $this->priority ));
-            $this->id = Database::getDatabase()->lastInsertId();
-        } else {
-            $stmt = Database::getDatabase()->prepare('UPDATE todos SET what = ?, priority = ? WHERE id = ?;');
-            $stmt->execute(array($this->what, $this->priority, $this->id ));
-        }
-    }
-
-    public static function all() {
-        $todoObjects = [];
-        $stmt = Database::getDatabase()->query('SELECT * FROM todos;');
-        while ($todo = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $todoObjects[] = new Todo($todo);
-        }
-        return $todoObjects;
-    }
-}</code></pre>
-
-            </section>
-
-            <section>
-                <h2>Plain PHP example v1 (part 3)</h2>
-
-                <ul style="font-size: 85%">
-                    <li>
-                        Demo usage
-                        <pre class="bigger"><code class="hljs php" data-overlay-example="assets/02/examples/simple-mvc/01.php">$todos = Todo::all();
+                <h2>Example</h2>
+                <pre class="bigger"><code class="hljs php" data-overlay-example="assets/02/examples/simple-mvc/02.php">$todos = Todo::all();
 print_r($todos);
 
 echo $todos[0]->what;
@@ -179,118 +127,13 @@ $todo->save();
 print_r(Todo::all());
 $todo->delete();
 print_r(Todo::all());</code></pre>
-                    </li>
-                    <li style="margin-top: 1em;">
-                        Not too bad but ...
-                        <ul>
-                            <li>this version cannot be used as a library yet: the full ORM code needs to be generated or written, even when a column is added</li>
-                        </ul>
-                    </li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>Plain PHP example v2 (part 1)</h2>
-
-                <pre class="bigger"><code class="hljs php" style="font-size: 85%">class Model { // let's make a version of Todo that does not depend on the data model ...
-
-    private $assocArray = []; // 'id' => 0 means: not stored in DB
-
-    public function __get($key) { // magic method for inaccessible properties '->'
-        return $this->assocArray[$key];
-    }
-
-    public function __set($key, $value) { // magic method for inaccessible properties '->'
-        $this->assocArray[$key] = $value;
-    }
-
-    protected static function getTablename() {
-        return strtolower(get_called_class()) . 's'; // needs some linguistic optimization
-    }
-
-    public function __construct($assocArray = []) {
-        if (!array_key_exists('id', $assocArray)) {
-            $assocArray['id'] = 0;
-        }
-        $this->assocArray = $assocArray;
-    }
-    &hellip;</code></pre>
-            </section>
-
-            <section>
-                <h2>Plain PHP example v2 (part 2)</h2>
-                <pre class="bigger"><code class="hljs php" style="font-size: 85%">    public function save() {
-        $assocWithoutId = array_diff_key($this->assocArray, array('id' => 'dummy'));
-        if ($this->id === 0) {
-            $stmt = Database::getDatabase()->prepare('INSERT INTO ' . self::getTablename() . ' (' .
-                implode(',', array_keys($assocWithoutId)) . ') VALUES (' .
-                substr(str_repeat("?,", count($assocWithoutId)), 0, -1) . ');');
-            $stmt->execute(array_values($assocWithoutId));
-            $this->id = Database::getDatabase()->lastInsertId();
-        } else {
-            $stmt = Database::getDatabase()->prepare('UPDATE ' . self::getTablename() . ' SET ' .
-                implode(' = ?,', array_keys($assocWithoutId)) . ' = ? WHERE id = ?;');
-            $stmt->execute(array_values($this->assocArray));
-        }
-    }
-
-    public static function all() {
-        $todoObjects = [];
-        $stmt = Database::getDatabase()->query('SELECT * FROM ' . self::getTablename() . ';');
-        while ($todo = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $subclassName = get_called_class();
-            $todoObjects[] = new $subclassName($todo);
-        }
-        return $todoObjects;
-    }
-}</code></pre>
-
-            </section>
-
-            <section>
-                <h2>Plain PHP example v2 (part 3)</h2>
-
-                <ul style="font-size: 85%">
-                    <li>
-                        Demo usage
-                        <pre class="bigger"><code class="hljs php" data-overlay-example="assets/02/examples/simple-mvc/02.php">class Todo extends Model {
-    // override getTablename() if you need to
-}
-
-$todos = Todo::all();
-print_r($todos);
-
-echo $todos[0]->what;
-
-$todo = new Todo();
-$todo->what = 'Go lunching !!';
-$todo->priority = 'high';
-$todo->save();
-
-print_r(Todo::all());
-$todo->delete();
-print_r(Todo::all());</code></pre>
-                    </li>
+                <ul style="font-size: 80%">
                     <li style="margin-top: 0.2em;">
-                        That's better
+                        How could this be implemented in plain PHP? &longrightarrow; let's have a look at
                         <ul>
-                            <li>ORM implementation details hidden in the Model class and very few work to plug your own data model</li>
-                        </ul>
-                    </li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>Plain PHP example v2: epilogue</h2>
-
-                <ul style="font-size: 85%">
-                    <li>
-                        Of course this example is far from complete &hellip;
-                        <ul>
-                            <li>Eliminate <code>id</code> as the required PK column name &rarr; see v3</li>
-                            <li>Robustness: code safety and type checking</li>
-                            <li>Support for <code>WHERE</code>, <code>GROUP BY</code>, <code>ORDER BY</code>, &hellip;</li>
-                            <li>Foreign key support</li>
+                            <li><code>public/slides/assets/02/examples/simple-mvc/01.php</code> with a <code>Todo</code> class</li>
+                            <li><code>public/slides/assets/02/examples/simple-mvc/02.php</code> with a generic <code>Model</code> class</li>
+                            <li>Many features missing: dynamic PK, FKs, code safety and type checking, <code>WHERE</code>, <code>GROUP BY</code>, ...</li>
                         </ul>
                     </li>
                     <li style="margin-top: 1em;">
