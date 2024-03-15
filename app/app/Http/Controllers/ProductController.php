@@ -151,6 +151,10 @@ class ProductController extends Controller
 
         $product->save();
 
+        /* Or, all at once:
+        Product::create($request->collect()->map(fn ($i) => ($i ?? ''))->all());
+        */
+
         return redirect('products');
 
     }
