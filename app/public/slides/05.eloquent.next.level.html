@@ -131,6 +131,23 @@ Smurf::find(666)->friends() // only returns a Builder object ...</code></pre>
                     </li>
                 </ul>
             </section>
+            <section>
+                <h2>Fun fact: Comparing Model Instances</h2>
+                <ul style="">
+                    <li>Determine if 2 model instances are the "same" = they have the same PK entry and are from the same table and database connection</li>
+                </ul>
+                <pre class="bigger" style="width: 60%;"><code class="hljs php">if ($post-&gt;is($anotherPost)) {
+    // ...
+}
+
+if ($post-&gt;isNot($anotherPost)) {
+    // ...
+}
+
+if ($post-&gt;author()-&gt;is($user)) {
+    // ...
+}</code></pre>
+            </section>
         </section>
         <section>
             <section>
@@ -151,7 +168,7 @@ foreach ($books as $book) {
 }</code></pre>
                     </li>
                     <li>
-                        The method <code>with()</code> supports <a href="https://laravel.com/docs/9.x/eloquent-relationships#eager-loading"><strong>eager loading</strong></a> and <em>adds a question to</em> prefetch the related model objects in the Builder object:
+                        The method <code>with()</code> supports <a href="https://laravel.com/docs/10.x/eloquent-relationships#eager-loading"><strong>eager loading</strong></a> and <em>adds a question to</em> prefetch the related model objects in the Builder object:
                         <pre class="bigger"><code class="hljs php">$books = Book::with('author')-&gt;get(); // generates 2 queries
 
 foreach ($books as $book) {
@@ -180,16 +197,20 @@ dump($eagerProduct-&gt;brand->name);
                     </li>
                     <li>
                         Nested relationships: <pre><code class="hljs php">Book::with('author.contacts')-&gt;get();</code></pre>
+                        <pre><code class="hljs php">Book::with(['author' =&gt; ['contacts', 'publisher']])-&gt;get();</code></pre>
                     </li>
                     <li>
                         Constraining columns: <pre><code class="hljs php">Book::with('author:id,name')-&gt;get(); // include internally required PK/FK columns </code></pre>
                     </li>
                     <li>
                         Constraining eager loads:
-                        <pre><code class="hljs php">// you do not need to to this when the gain is insignificant
-$books = Book::with(['reviews' => function ($query) {
-    $query->where('rating', '>', 4.0);
-}])->get();</code></pre>
+                        <pre><code class="hljs php">use App\Models\Book;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+
+// you do not need to to this when the benefit is insignificant
+$books = Book::with(['reviews' =&gt; function (Builder $query) {
+    $query-&gt;where('rating', '&gt;', 4.0)-&gt;orderBy('created_at', 'asc');
+}])-&gt;get();</code></pre>
                     </li>
                 </ul>
             </section>
@@ -220,7 +241,7 @@ $books = Book::with(['reviews' => function ($query) {
             </section>
             <section>
                 <h2>Eager Loading by Default</h2>
-                <ul style="width:80%;">
+                <ul style="width:80%;font-size: 95%;">
                     <li>Add to your <code>protected $with</code> to the model class
                 <pre class="bigger"><code class="hljs php">class Book extends Model
 {
@@ -234,11 +255,14 @@ $books = Book::with(['reviews' => function ($query) {
     /**
      * Get the author that wrote the book.
      */
-    public function author()
+    public function author(): BelongsTo
     {
         return $this-&gt;belongsTo(Author::class);
     }
 }</code></pre></li>
+                    <li>Do you want to undo/override <em>eager loading defaults</em> for a single query?
+                        <pre class="bigger"><code class="hljs php">$books = Book::without('author')-&gt;get();
+$books = Book::withOnly('genre')-&gt;get();</code></pre></li>
                 </ul>
             </section>
             <section>
@@ -266,18 +290,21 @@ if ($someOtherCondition) {
             <section>
                 <h2>Local Query Scopes</h2>
                 <ul style="width: 100%; font-size: 85%;">
-                    <li><a href="https://laravel.com/docs/9.x/eloquent#local-scopes">Local scopes</a> enable the reuse of frequently used query <strong>Builder</strong> parts</li>
+                    <li><a href="https://laravel.com/docs/10.x/eloquent#local-scopes">Local scopes</a> enable the reuse of frequently used query <strong>Builder</strong> parts</li>
 
 
                 </ul>
-                <pre class="bigger"><code class="hljs php">class User extends Model
+                <pre class="bigger"><code class="hljs php">use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
 {
-    public function scopeActive($query)
+    public function scopeActive(Builder $query)
     {
         return $query-&gt;where('active', 1);
     }
 
-    public function scopeOfType($query, $type)
+    public function scopeOfType(Builder $query, string $type)
     {
         return $query-&gt;where('type', $type);
     }
@@ -299,14 +326,17 @@ $users = User::ofType('admin')-&gt;orWhere-&gt;active()-&gt;get(); // orWhere sp
                 <h2>Accessors &amp; Mutators (1)</h2>
                 <ul style="width: 100%; font-size: 80%;">
                     <li>2 applications (<a
-                        href="https://laravel.com/docs/9.x/eloquent-mutators#accessors-and-mutators">docs</a>)
+                        href="https://laravel.com/docs/10.x/eloquent-mutators#accessors-and-mutators">docs</a>)
                         <ul>
                             <li>Override default attribute behaviour (such as <code>$user-&gt;first_name</code>), typically for data transformation  </li>
                             <li>Define custom attributes (such as <code>$user-&gt;full_name</code>) while there is no such column or relation</li>
                         </ul>
                     </li>
                     <li>How? Define in your model class a <code>protected function attributeName()</code> returning an instance of <code>Illuminate\Database\Eloquent\Casts\Attribute</code>
-                        <pre class="bigger"><code class="hljs php">class User extends Model
+                        <pre class="bigger"><code class="hljs php">use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
 {
     protected function firstName(): Attribute
     {
@@ -354,7 +384,7 @@ $user-&gt;save();</code></pre>
                 <h2>Remark: Accessor Caching</h2>
                 <ul style="width: 85%; font-size: 85%;">
                     <li>When an <strong><u>accessor</u></strong> returns an <strong>object</strong> (<a
-                        href="https://laravel.com/docs/9.x/eloquent-mutators#accessor-caching">example</a>)
+                        href="https://laravel.com/docs/10.x/eloquent-mutators#accessor-caching">example</a>)
                         <ul>
                             <li>any changes to the object are synced back to the model
                                 <pre class="bigger"><code class="hljs php">$user = User::find(1);
@@ -385,7 +415,7 @@ $user->save(); // unchanged</code></pre>
             <section>
                 <h2>Casting</h2>
                 <ul style="width: 100%; font-size: 80%;">
-                    <li>You don't need accessors &amp; mutators to implement <a href="https://laravel.com/docs/9.x/eloquent-mutators#attribute-casting">auto-casting of attributes</a>
+                    <li>You don't need accessors &amp; mutators to implement <a href="https://laravel.com/docs/10.x/eloquent-mutators#attribute-casting">auto-casting of attributes</a>
                     </li>
                     <li>Check the documentation for the supported cast types</li>
 
@@ -406,7 +436,7 @@ $user->save(); // unchanged</code></pre>
     ];
 
 }</code></pre>
-                <footer><small>Remark: when your database column is in JSON, the cast type <code>'array'</code> will not automatically sync array manipulation back to the model. It will return a PHP error. Use the cast type <code>AsArrayObject::class</code> or <code>AsCollection::class</code> in stead </small></footer>
+                <footer><small>Remark: when your database column is in JSON, the cast type <code>'array'</code> will not automatically sync array manipulation back to the model. <code>$user-&gt;options['key'] = $value;</code> will trigger a PHP error; <code>$user->update(['options->key' =&gt; 'value']);</code> will work. Better use the cast type <code>AsArrayObject::class</code> or <code>AsCollection::class</code> in stead.</small></footer>
 
             </section>
 
@@ -424,8 +454,8 @@ $user->save(); // unchanged</code></pre>
             <section>
                 <h2>Sources</h2>
                 <ul>
-                    <li><a href="https://laravel.com/docs/9.x/eloquent-mutators">Laravel docs: Eloquent Mutators and Casting</a></li>
-
+                    <li><a href="https://laravel.com/docs/10.x/eloquent-mutators">Laravel docs: Eloquent Mutators and Casting</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/eloquent-relationships#eager-loading">Laravel docs: Eager Loading</a></li>
                 </ul>
             </section>
         </section>

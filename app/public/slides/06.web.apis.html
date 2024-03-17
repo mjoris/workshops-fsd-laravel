@@ -44,14 +44,14 @@
                     <li>
                         You remember &hellip;
                         <ul style="font-size: 90%;">
-                            <li>how to design the Web API <strong>end points</strong> taking into account <a href="https://jorismaervoet.ikdoeict.be/workshops-wmss/12.webapis.html#/3/3">resource hierarchy and consistency</a>  </li>
-                            <li style="margin-top: 0.7em;">you should only use GET-parameters for <a href="https://jorismaervoet.ikdoeict.be/workshops-wmss/12.webapis.html#/3/4">filtering, sorting, pagination and passing a PK</a></li>
+                            <li>how to design the Web API <strong>end points</strong> taking into account <a href="https://ikdoeict.gitlab.io/public/vakken/back-end-development/workshops/12.webapis.html#/3/3">resource hierarchy and consistency</a>  </li>
+                            <li style="margin-top: 0.7em;">you should only use GET-parameters for <a href="https://ikdoeict.gitlab.io/public/vakken/back-end-development/workshops/12.webapis.html#/3/4">filtering, sorting, pagination and passing a PK</a></li>
                             <li style="margin-top: 0.7em;">when to accept  <a
-                                href="https://jorismaervoet.ikdoeict.be/workshops-wmss/12.webapis.html#/3/6">which HTTP verb</a></li>
+                                href="https://ikdoeict.gitlab.io/public/vakken/back-end-development/workshops/12.webapis.html#/3/6">which HTTP verb</a></li>
                             <li style="margin-top: 0.7em;">when to return <a
-                                href="https://jorismaervoet.ikdoeict.be/workshops-wmss/12.webapis.html#/3/8">which HTTP status code</a></li>
+                                href="https://ikdoeict.gitlab.io/public/vakken/back-end-development/workshops/12.webapis.html#/3/8">which HTTP status code</a></li>
                             <li style="margin-top: 0.7em;">we'll be using <a
-                                href="https://jorismaervoet.ikdoeict.be/workshops-wmss/12.webapis.html#/3/11">JSON</a>, both in the response and in the request body</li>
+                                href="https://ikdoeict.gitlab.io/public/vakken/back-end-development/workshops/12.webapis.html#/3/11">JSON</a>, both in the response and in the request body</li>
 
                         </ul>
                     </li>
@@ -105,7 +105,7 @@
                     <li>Let's define in <code>routes/api.php</code></li>
 
                 </ul>
-                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function ($id) {
+                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function (string $id): Product {
 
     $product = Product::findOrFail($id);
 
@@ -114,7 +114,8 @@
 })-&gt;where('id', '[0-9]+');</code></pre>
 
                 <ul style="width: 100%; font-size: 90%;">
-                    <li style="margin-top: 0.5em;">When the product exists, the Eloquent model object <code>$product</code> will automatically be serialized into JSON (<code>$product-&gt;toJson()</code>) and converted into a <code>Response</code> object</li>
+                    <li style="margin-top: 0.5em;">When the product exists, the Eloquent model object <code>$product</code> will automatically be serialized into JSON (<code>$product-&gt;toJson()</code>) and converted into a <code>Response</code> object
+                        <br>(with <code>Content-Type: application/json</code>)</li>
 
                     <li style="margin-top: 0.5em;">When the product doesn't exist, <code>findOrFail()</code> launches a <code>NotFoundHttpException</code> resulting in a <code>404</code> response</li>
 
@@ -124,12 +125,18 @@
 
             <section>
                 <h2>Demo v1 with Postman</h2>
-                <pre class="bigger"><code class="hljs php">Route::get('/v1/products/{id}', function ($id) {
+                <pre class="bigger"><code class="hljs php">use App\Models\Product;
+use Illuminate\Database\Eloquent\Collection;
+
+Route::get('/v1/products/{id}', function (string $id): Product {
+
     $product = Product::findOrFail($id);
+
     return $product;
 })-&gt;where('id', '[0-9]+');
 
-Route::get('/v1/products', function () {
+Route::get('/v1/products', function (): Collection {
+
     return Product::all();
 });</code></pre>
             </section>
@@ -138,7 +145,7 @@ Route::get('/v1/products', function () {
                 <h2>Eloquent Serialization (1)</h2>
 
                 <ul style="width: 100%; font-size: 90%;">
-                    <li><a href="https://laravel.com/docs/9.x/eloquent-serialization">Eloquent Serialization</a> determines how exactly the eloquent model is converted into JSON</li>
+                    <li><a href="https://laravel.com/docs/10.x/eloquent-serialization">Eloquent Serialization</a> determines how exactly the eloquent model is converted into JSON</li>
                     <li>Use <code>$hidden</code> in the Eloquent model class to exclude properties:</li>
                 </ul>
                 <pre class="bigger"><code class="hljs php">class Product extends Model
@@ -164,9 +171,9 @@ Route::get('/v1/products', function () {
                 <h2>Eloquent Serialization (2)</h2>
 
                 <ul style="width: 100%; font-size: 90%;">
-                    <li>Only <strong>loaded</strong> relationships are (resursively) converted to JSON</li>
+                    <li>Only <strong>loaded</strong> relationships are (resursively) converted to JSON (unless listed in <code>$hidden</code>)</li>
                 </ul>
-                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function ($id) {
+                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function (string $id): Product {
 
     $product = Product::with('brand')-&gt;findOrFail($id);
 
@@ -209,7 +216,7 @@ $product->append('html_description')</code></pre>
                         &longrightarrow; always return a single JSON object with fields like <code>message</code>, <code>data</code> and <code>meta</code>
                     </li>
                 </ul>
-                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function ($id) {
+                <pre class="bigger"><code class="hljs php">Route::get('/products/{id}', function (string $id): array {
 
     $product = Product::with('brand')-&gt;findOrFail($id);
 
@@ -221,19 +228,19 @@ $product->append('html_description')</code></pre>
 
             <section>
                 <h2>A CR<s>UD</s> Example</h2>
-                <pre class="bigger"><code class="hljs php">Route::get('/v2/products/{id}', function ($id) {
+                <pre class="bigger"><code class="hljs php">Route::get('/v2/products/{id}', function (string $id): array {
 
     $product = Product::with('brand')-&gt;findOrFail($id);
     return ['data' =&gt; $product];
 
 })-&gt;where('id', '[0-9]+');
 
-Route::get('/v2/products', function () {
+Route::get('/v2/products', function (): array {
 
     return ['data' =&gt; Product::with('brand')-&gt;get()];
 });
 
-Route::post('/v2/products', function (Request $request) {
+Route::post('/v2/products', function (Request $request): array {
 
     $request-&gt;validate([
         'name' =&gt; 'required|unique:products|max:125',
@@ -242,7 +249,6 @@ Route::post('/v2/products', function (Request $request) {
         'brand_id' =&gt; 'required|exists:brands,id'
     ]);
     $product = new Product($request-&gt;all());
-    $product-&gt;user_id = 1; // we don't have authentication yet
     $product-&gt;save();
     return ['message' =&gt; 'The product has been created'];
 });</code></pre>
@@ -257,9 +263,10 @@ Route::post('/v2/products', function (Request $request) {
                         <ul>
                             <li>the fields <code>id</code>, <code>isbn</code> and <code>title</code> (these are columns in the DB)</li>
                             <li>the field <code>internal_code</code> (which is a concatenation of the book's <code>id</code> and <code>location</code> columns)</li>
+                            <li>the related author's JSON</li>
                         </ul>
                     </li>
-                    <li style="margin-top: 1em;">Which 3 things should be added to the model class Book?</li>
+                    <li style="margin-top: 1em;">Which 4 things should be added to the model class Book?</li>
                     <li style="margin-top: 1em;">In 1 endpoint, the book should contain the <code>description</code> column in stead of <code>isbn</code>. How can this be overridden? </li>
                 </ul>
             </section>
@@ -278,7 +285,7 @@ Route::post('/v2/products', function (Request $request) {
                 <ul style="font-size: 90%;width: 80%;">
                     <li>Again: you'd better put your code in controllers, having 1 controller per resource</li>
                     <li style="margin-top: 1em;">The methods and structure of these controllers and corresponding routes will be very similar</li>
-                    <li style="margin-top: 1em;">Streamline your controllers with <a href="https://laravel.com/docs/9.x/controllers#resource-controllers">Resource Controllers</a></li>
+                    <li style="margin-top: 1em;">Streamline your controllers with <a href="https://laravel.com/docs/10.x/controllers#resource-controllers">Resource Controllers</a></li>
                 </ul>
             </section>
 
@@ -349,6 +356,8 @@ Route::post('/v2/products', function (Request $request) {
                                     </tr>
                                     </tbody>
                                 </table>
+                                Check this out with:
+                                <pre class="bigger"><code class="hljs bash">php artisan route:list</code></pre>
                             </li>
                             <li>In a web app, you will need to spoof the methods DELETE, PUT and PATCH</li>
                         </ul>
@@ -358,7 +367,7 @@ Route::post('/v2/products', function (Request $request) {
 
             <section>
                 <h2>"API" Resource Controllers</h2>
-                <ul style="font-size: 80%">
+                <ul style="font-size: 80%;width: 85%;">
                     <li>
                         Assign all your <em>CRUD</em> routes to a controller in a single line of code
                         <ul>
@@ -411,8 +420,10 @@ Route::post('/v2/products', function (Request $request) {
                                     </tr>
                                     </tbody>
                                 </table>
+                                Check this out with:
+                                <pre class="bigger"><code class="hljs bash">php artisan route:list</code></pre>
                             </li>
-                            <li>Extend with <a href="https://laravel.com/docs/9.x/controllers#restful-nested-resources">Nested Resources</a></li>
+                            <li>Extend with <a href="https://laravel.com/docs/10.x/controllers#restful-nested-resources">Nested Resources</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -433,7 +444,7 @@ Route::post('/v2/products', function (Request $request) {
                 <h2>Introduction</h2>
                 <ul>
                     <li>In certain situations, defining one single JSON response per Eloquent model is not satisfactory</li>
-                    <li style="margin-top: 1em;"><a href="https://laravel.com/docs/9.x/eloquent-resources">Eloquent API Resources</a> forms a transformation layer between your Eloquent models and JSON responses</li>
+                    <li style="margin-top: 1em;"><a href="https://laravel.com/docs/10.x/eloquent-resources">Eloquent API Resources</a> form a transformation layer between your Eloquent models and JSON responses</li>
                     <li style="margin-top: 1em;">You will define <code>Resource</code> classes, defining a transformation between an Eloquent model and a JSON response</li>
                 </ul>
             </section>
@@ -455,10 +466,9 @@ Route::post('/v2/products', function (Request $request) {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * @return array&lt;string, mixed&gt;
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'id' =&gt; $this-&gt;id,
@@ -492,10 +502,9 @@ Route::post('/v2/products', function (Request $request) {
     /**
      * Transform the resource collection into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * @return array&lt;int|string, mixed&gt;
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'data' =&gt; $this-&gt;collection,
@@ -518,20 +527,20 @@ Route::post('/v2/products', function (Request $request) {
                         <pre class="bigger"><code class="hljs php">use App\Http\Resources\ProductResource;
 use App\Models\Product;
 
-Route::get('/v3/products/{id}', function ($id) {
+Route::get('/v3/products/{id}', function (string $id): ProductResource {
     return new ProductResource(Product::findOrFail($id));
 });
 
-Route::get('/v3/products', function () {
+Route::get('/v3/products', function (): ProductCollection {
     return new ProductCollection(Product::all());
-    // if you don't have a ProductCollection:
+    // or, if you don't have a ProductCollection:
     // return ProductResource::collection(Product::all());
 });</code></pre>
                     </li>
                     <li>By default, all data is <strong>wrapped</strong> in a <code>data</code> key (configurable)</li>
                     <li>When passing a <strong>paginated</strong> result, the response contains <code>meta</code> and <code>links</code> keys describing the paginator's state</li>
-                    <li>Read more about <a href="https://laravel.com/docs/9.x/eloquent-resources#conditional-attributes">conditional attributes</a> and
-                        <a href="https://laravel.com/docs/9.x/eloquent-resources#conditional-relationships">conditional relationships</a></li>
+                    <li>Read more about <a href="https://laravel.com/docs/10.x/eloquent-resources#conditional-attributes">conditional attributes</a> and
+                        <a href="https://laravel.com/docs/10.x/eloquent-resources#conditional-relationships">conditional relationships</a></li>
                 </ul>
             </section>
 
@@ -554,9 +563,9 @@ Route::get('/v3/products', function () {
             <section>
                 <h2>Sources</h2>
                 <ul>
-                    <li><a href="https://laravel.com/docs/9.x/eloquent-mutators">Laravel docs: Eloquent Mutators and Casting</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/eloquent-serialization">Laravel docs: Eloquent Serialization</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/eloquent-resources">Laravel docs: Eloquent API Resources</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/eloquent-mutators">Laravel docs: Eloquent Mutators and Casting</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/eloquent-serialization">Laravel docs: Eloquent Serialization</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/eloquent-resources">Laravel docs: Eloquent API Resources</a></li>
 
                 </ul>
             </section>
