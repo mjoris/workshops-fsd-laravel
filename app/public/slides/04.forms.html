@@ -758,13 +758,13 @@ if ($validator-&gt;passes()) {
         $products-&gt;where('brand_id', $request-&gt;brand_id); // chaining changes the state of the Builder object anyway !
     }
 
-    $products-&gt;when($request-&gt;filled('category_id'), function ($query, $categoryId)  { // syntactic sugar using when()
+    $products-&gt;when($request-&gt;filled('category_id'), function (Builder $query, string $categoryId)  { // syntactic sugar using when()
         return $query-&gt;where('category_id', $categoryId);
     });
 
     // Never do: $products->where('size', 'L')->orWhere('size', 'XL')
     // use logical grouping in stead
-    $products-&gt;where(function ($query) {
+    $products-&gt;where(function (Builder $query) {
         $query-&gt;where('size', 'L')
               -&gt;orWhere('size', 'XL')
     });
@@ -885,7 +885,7 @@ if ($validator-&gt;passes()) {
                                 returns a paginator object which is loopable like a result set
                             </li>
                         </ul>
-                        <pre class="bigger"><code class="hljs php">public function index() // controller method
+                        <pre class="bigger"><code class="hljs php">public function index(): View // controller method
 {
     $users = User::where('votes', '&gt;', 100)-&gt;paginate(15);
     // uncomment next line to change the paginator's target URL
