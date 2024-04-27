@@ -66,3 +66,4 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->whereNumb
 Route::get('/products/create', [ProductController::class, 'showCreateForm']);
 Route::post('/products/create', [ProductController::class, 'create']);
 
+require __DIR__.'/auth.php';
