@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductControllerWithAuth;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -59,11 +60,23 @@ Route::get('/eloquent-demo-4', [ProductController::class, 'demo4']);
 Route::get('/eloquent-demo-5', [ProductController::class, 'demo5']);
 
 // Routes for concluding demo 'webshop' of 04.forms
-
+/*
 Route::get('/products', [ProductController::class, 'overview']);
 Route::get('/products/{product}', [ProductController::class, 'show'])->whereNumber('product');
 
 Route::get('/products/create', [ProductController::class, 'showCreateForm']);
 Route::post('/products/create', [ProductController::class, 'create']);
+*/
+
+// Routes for concluding demo 'webshop' of 09.auth
+
+Route::get('/products', [ProductControllerWithAuth::class, 'overview']);
+Route::get('/products/{product}', [ProductControllerWithAuth::class, 'show'])->whereNumber('product');
+
+Route::get('/products/create', [ProductControllerWithAuth::class, 'showCreateForm'])->middleware(['auth']);
+Route::post('/products/create', [ProductControllerWithAuth::class, 'create'])->middleware(['auth']);
+
+
 
 require __DIR__.'/auth.php';
+
