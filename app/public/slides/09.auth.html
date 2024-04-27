@@ -46,38 +46,43 @@
             <section>
                 <h2>Authentication</h2>
 
-                <ul>
-                    <li style="font-size: 85%;">
-                        Laravel's <a href="https://laravel.com/docs/9.x/authentication">Authentication</a>
-                        <ul >
+                <ul style="font-size: 85%;">
+                    <li>
+                        Laravel's <a href="https://laravel.com/docs/10.x/authentication">Authentication</a>
+                        <ul style="font-size: 90%;">
                             <li>
                                 API containing basic authentication methods such as <code>Auth::login()</code>
                             </li>
                             <li>
                                 To be configured in <code>config/auth.php</code>
                                 <ul>
-                                    <li><strong>Guards:</strong> how are users authenticated technically? e.g. session, token
+                                    <li><strong>Guards:</strong> how are users authenticated technically? e.g. session
                                     </li>
                                     <li><strong>Providers:</strong> where is the user information stored and how can it be retrieved? e.g. in the <code>users</code> table with Eloquent</li>
                                     <li>Resetting passwords: reset token table, timeouts, &hellip;</li>
                                 </ul>
                             </li>
-                            <li>Default config: <strong>session</strong> &longrightarrow; <em>stateful</em></li>
+                            <li>
+                                Default (and only) config: <strong>session</strong> <br> &longrightarrow; <em>stateful</em>
+                                <br>
+                                &longrightarrow; intended for <code>routes/web.php</code> routes, not for <code>routes/api.php</code> routes
+                            </li>
 
                         </ul>
                     </li>
-                    <li style="margin-top: 1em;font-size: 85%;">
-                        You <strong>could</strong> write your own authentication logic (controllers, views, routes) but this might be cumbersome and insecure
-                    </li>
 
-                    <li style="margin-top: 1em;font-size: 85%;">
-                         What can be part of this authentication logic? Controllers, views, routes for
-                        <ul>
+                    <li style="margin-top: 1em;">
+                        <strong>Authentication logic = </strong>Controllers, views, routes for
+                        <ul style="font-size: 90%;">
                             <li>logging in/out</li>
                             <li>registration</li>
                             <li>password reset scenarios</li>
                             <li>email verification</li>
                         </ul>
+                    </li>
+
+                    <li style="margin-top: 1em;">
+                        You <strong>could</strong> write your own authentication logic (controllers, views, routes) but this might be cumbersome and insecure
                     </li>
                 </ul>
             </section>
@@ -93,7 +98,7 @@
                                 <a href="https://github.com/laravel/ui">Laravel UI</a> 4.x (bootstrap, vue or react; considered as <em>obsolete</em>)
                             </li>
                             <li>
-                                <a href="https://laravel.com/docs/9.x/starter-kits#laravel-breeze">Laravel Breeze</a> (tailwind or inertia)
+                                <a href="https://laravel.com/docs/10.x/starter-kits#laravel-breeze">Laravel Breeze</a> (tailwind or inertia)
                             </li>
                         </ul>
                     </li>
@@ -101,7 +106,7 @@
                         A package/library containing the <u>controllers</u> &amp; <u>routes</u> of the authentication logic
                         <ul>
                             <li>
-                                <a href="https://laravel.com/docs/9.x/fortify">Laravel Fortify</a> (front-end agnostic)
+                                <a href="https://laravel.com/docs/10.x/fortify">Laravel Fortify</a> (front-end agnostic)
                                 <br> &longrightarrow; logic is inside the library &longrightarrow; black-box-like customization through ServiceProvider
                             </li>
                         </ul>
@@ -120,7 +125,10 @@
             <section>
                 <h2>The Next Steps &hellip;</h2>
                 <p>
-                    &hellip; explain Laravel's authentication <strong>without</strong> starter kit
+                    &hellip; explain Laravel's authentication <strong>without</strong> a starter kit
+                </p>
+                <p>
+                    &hellip; for a <code>web</code> application
                 </p>
             </section>
 
@@ -159,7 +167,7 @@
                         <pre class="bigger"><code class="hljs php">class UserSeeder extends Seeder
 {
 
-    public function run()
+    public function run(): void
     {
         DB::table('users')-&gt;insert([
             'name' =&gt; Str::random(10),
@@ -183,18 +191,15 @@
                         <pre class="bigger"><code class="hljs php">class User extends Authenticatable
 {
     // The attributes that are mass assignable.
-    protected $fillable = [
-        'name', 'email', 'password',
-    ];
+    protected $fillable = ['name', 'email', 'password', ];
 
     // The attributes that should be hidden for arrays. (think of JSON serialization)
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token', ];
 
     // The attributes that should be cast to native types
     protected $casts = [
         'email_verified_at' =&gt; 'datetime',
+        'password' =&gt; 'hashed',
     ];
 }</code></pre>
                     </li>
@@ -208,7 +213,7 @@
                 <h2>Step 3: Deploy the Authentication Logic</h2>
                 <ul style="width: 100%;font-size: 85%;">
                     <li>
-                        Manual example loggin in/out
+                        Manual example logging in/out
                         <ul>
                             <li>
                                 routes
@@ -219,12 +224,12 @@ Route::post('/logout', [AuthController::class, 'logout'])-&gt;middleware('auth')
                             <li>
                                 AuthController
                             </li>
-                            <pre class="bigger" ><code class="hljs php" style="height: 20em;">public function showLogin()
+                            <pre class="bigger" ><code class="hljs php" style="height: 20em;">public function showLogin(): View
 {
     return view('login');
 }
 
-public function login(Request $request)
+public function login(Request $request): RedirectResponse
 {
     $credentials = $request-&gt;validate([
         'email' =&gt; 'required|string|email',
@@ -239,7 +244,7 @@ public function login(Request $request)
     return back()-&gt;withErrors(['email' =&gt; 'The provided credentials do not match our records.'])-&gt;onlyInput('email');
 }
 
-public function logout(Request $request)
+public function logout(Request $request): RedirectResponse
 {
     Auth::logout();
     $request-&gt;session()-&gt;invalidate(); // remove session data and regenerate session id
@@ -259,7 +264,7 @@ public function logout(Request $request)
                 <h2>Step 3 continued</h2>
                 <ul style="width: 100%;font-size: 85%;">
                     <li>
-                        Manual example loggin in/out
+                        Manual example logging in/out
                         <ul>
                             <li>
                                 login.blade.php (simplified)
@@ -295,15 +300,13 @@ public function logout(Request $request)
                         <ul>
                             <li style="margin-top: 1em;">
                                 In <code>app/Providers/RouteServiceProvider.php</code>:
-                                <pre class="bigger"><code class="hljs php">public const HOME = '/tasks'; // '/dashboard' by default</code></pre>
+                                <pre class="bigger"><code class="hljs php">public const HOME = '/tasks'; // '/home' or '/dashboard' by default</code></pre>
                             </li>
                             <li  style="margin-top: 1em;">
                                 and set your redirect path if unauthenticated in <code>app/Http/Middleware/Authenticate.php</code>
-                                <pre class="bigger"><code class="hljs php">protected function redirectTo($request)
+                                <pre class="bigger"><code class="hljs php">protected function redirectTo(Request $request): ?string
 {
-    if (! $request->expectsJson()) {
-        return route('login');
-    }
+    return $request-&gt;expectsJson() ? null : route('login');
 }</code></pre>
                             </li>
                         </ul>
@@ -320,7 +323,7 @@ public function logout(Request $request)
                         <strong>Step 5A:</strong> plug the <code>auth</code> middleware to each action requiring authentication
                         <ul>
                             <li style="margin-top: 1.5em;">
-                                How? See the <a href="07.intermezzo.html#/3/6">slides about middleware</a>
+                                How? See the <a href="08.intermezzo.html#/3/6">slides about middleware</a>
                             </li>
                         </ul>
                     </li>
@@ -372,7 +375,7 @@ Auth::logout();</code></pre>
 
                 <ul>
                     <li>
-                        Read the <a href="https://laravel.com/docs/9.x/authentication">Laravel docs on Authentication</a> on
+                        Read the <a href="https://laravel.com/docs/10.x/authentication">Laravel docs on Authentication</a> on
                         <ul>
                             <li>
                                 Authentication Throttling
@@ -386,7 +389,7 @@ Auth::logout();</code></pre>
                             <li>
                                 Customizing guards and providers
                             </li>
-                            <li>Social authentication with <a href="https://laravel.com/docs/9.x/socialite">Laravel Socialite</a></li>
+                            <li>Social authentication with <a href="https://laravel.com/docs/10.x/socialite">Laravel Socialite</a></li>
                         </ul>
                     </li>
 
@@ -405,7 +408,7 @@ Auth::logout();</code></pre>
                     <li>
                         As said before, you'd better use a starter kit instead of programming your <strong>application logic</strong> manually
                     </li>
-                    <li><a href="https://laravel.com/docs/9.x/starter-kits#laravel-breeze">Laravel Breeze</a> is such a kit</li>
+                    <li><a href="https://laravel.com/docs/10.x/starter-kits#laravel-breeze">Laravel Breeze</a> is such a kit</li>
                     <li>So Breeze replaces step 3 &hellip;</li>
                 </ul>
             </section>
@@ -428,7 +431,7 @@ $ npm run build
                         specify the stack you want to install after <code>breeze:install</code>
                         <br><code>blade</code> - templates with <a href="https://tailwindcss.com/">Tailwind CSS</a>
                         <br><code>react</code>/<code>vue</code> - <a href="https://inertiajs.com/">Inertia.js</a> with React/Vue
-                        <br><code>api</code> - only API, compatible with <a href="https://nextjs.org/">Next</a>/<a href="https://nuxtjs.org/">Nuxt</a>
+                        <br><code>api</code> - only API, compatible with <a href="https://nextjs.org/">Next</a>/<a href="https://nuxtjs.org/">Nuxt</a> (inside <code>routes/web.php</code>)
                     </li>
                 </ul>
             </section>
@@ -467,7 +470,7 @@ $ docker compose exec -u 1000:1000 php-web bash
                             <li>1 <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/app/Http/Requests/Auth">form request</a> </li>
                             <li>2 trivial <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/app/View/Components">Blade component classes</a></li>
                             <li>a large set of <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/resources/views">Blade templates</a></li>
-                            <li>a <a href="https://laravel.com/docs/9.x/mix">Laravel Mix</a> (= a webpack wrapper) entrypoint <code>webpack.mix.js</code> for the compilation of js/css
+                            <li>a <a href="https://laravel.com/docs/10.x/vite">Laravel Vite</a> (= asset bundling) entrypoint <code>vite.config.js</code> for the compilation of js/css
                                 <a href="https://github.com/laravel/breeze/tree/1.x/stubs/default/resources">resources</a> into the <code>public/build</code> folder</li>
                         </ul>
                     </li>
@@ -518,7 +521,7 @@ $ docker compose exec -u 1000:1000 php-web bash
 
                 <ul>
                     <li>
-                        Laravel's <a href="https://laravel.com/docs/9.x/authorization">Authorization</a>
+                        Laravel's <a href="https://laravel.com/docs/10.x/authorization">Authorization</a>
                         <ul style="font-size: 85%;">
                             <li>
                                 Principle: <strong>once</strong> a user is authenticated, allow or prevent user <strong>actions</strong> against a given <strong>resource</strong>
@@ -534,7 +537,7 @@ $ docker compose exec -u 1000:1000 php-web bash
                                         </ul>
                                 </ul>
                             </li>
-                            <li>With Laravel's <a href="https://laravel.com/docs/9.x/authorization">Authorization</a>, you can check this in a <strong>structured</strong> way</li>
+                            <li>With Laravel's <a href="https://laravel.com/docs/10.x/authorization">Authorization</a>, you can check this in a <strong>structured</strong> way</li>
                         </ul>
                     </li>
                     <li style="margin-top: 1em;">
@@ -543,7 +546,7 @@ $ docker compose exec -u 1000:1000 php-web bash
                             <li><strong>Gates:</strong> simple mechanism where you express an authorization feature as a function
                             </li>
                             <li><strong>Policies:</strong> group all authorization logic by resource</li>
-                            <li>It's fine to mix them</li>
+                            <li>Robust Laravel applications are using <strong>policies</strong></li>
                         </ul>
                     </li>
                 </ul>
@@ -563,10 +566,11 @@ $ docker compose exec -u 1000:1000 php-web bash
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 
-public function boot()
+/**
+ * Register any authentication / authorization services.
+ */
+public function boot(): void
 {
-    $this-&gt;registerPolicies();
-
     Gate::define('update-post', function (User $user, Post $post) {
         return $user-&gt;id === $post-&gt;user_id;
     });
@@ -593,7 +597,7 @@ public function boot()
 // Update the post...</code></pre>
                     </li>
                     <li>Alternately, if you are in a <strong>form request</strong>, <code>authorize()</code> will automatically generate <code>403</code> when it fails
-                        <pre class="bigger"><code class="hljs php">public function authorize()
+                        <pre class="bigger"><code class="hljs php">public function authorize(): bool
 {
     return Gate::allows('update-post', $post);
 }</code></pre>
@@ -601,6 +605,7 @@ public function boot()
                     <li>Check single permissions with <code>Gate::allows()</code> and <code>Gate::denies()</code></li>
                     <li>Check combinations of permissions with <code>Gate::check()</code>, <code>Gate::any()</code> and <code>Gate::none()</code> </li>
                     <li>Check for other users with <code>Gate::forUser($user)</code></li>
+                    <li><a href="https://laravel.com/docs/10.x/authorization#customising-gate-response-status">Customize your 403 responses</a></li>
                 </ul>
             </section>
 
@@ -648,23 +653,16 @@ class ProductPolicy
 {
     /**
      * Determine if the given product can be updated by the user.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Product  $post
-     * @return bool
      */
-    public function update(User $user, Product $product)
+    public function update(User $user, Product $product): bool
     {
         return $user-&gt;id === $product-&gt;user_id;
     }
 
     /**
      * Determine if the given user can create products.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
         return $user-&gt;role == 'admin';
     }
@@ -693,7 +691,7 @@ class ProductPolicy
 // Update the product...</code></pre>
                     </li>
                     <li>Alternately, if you are in a <strong>form request</strong>, <code>authorize()</code> will automatically generate <code>403</code> when it fails
-                        <pre class="bigger"><code class="hljs php">public function authorize()
+                        <pre class="bigger"><code class="hljs php">public function authorize(): bool
 {
     $product = Product::find($this->product_id); // given product_id is an input value of the Request
     return $this->user()->can('update', $product);
@@ -721,6 +719,18 @@ Route::put('/product/{product}', function (Product $product) {
 Route::post('/product', function () {
     // The current user may create products...
 })-&gt;middleware('can:create,App\Models\Product');</code></pre>
+                    </li>
+                    <li>
+                        Some syntactic sugar:
+                        <pre class="bigger"><code class="hljs php">use App\Models\Product;
+
+Route::put('/product/{product}', function (Product $product) {
+    // The current user may update the product...
+})-&gt;can('update', 'product');
+
+Route::post('/product', function () {
+    // The current user may create products...
+})-&gt;can('create', Product::class);</code></pre>
                     </li>
 
                 </ul>
@@ -778,7 +788,6 @@ Route::post('/product', function () {
         <section>
             <section>
                 <h2>09.5<br>Web API Authentication</h2>
-                <p><strong>Token</strong>-based authentication</p>
             </section>
 
             <section>
@@ -786,7 +795,7 @@ Route::post('/product', function () {
 
                 <ul>
                     <li>
-                        <strong>Laravel Passport</strong> the official <a href="https://laravel.com/docs/9.x/passport">library</a> implementing pseudo-authentication with OAuth 2.0, the industry-standard protocol
+                        <strong>Laravel Passport</strong> the official <a href="https://laravel.com/docs/10.x/passport">library</a> implementing pseudo-authentication with OAuth 2.0, the industry-standard protocol
                     </li>
                     <li style="margin-top: 1em;">
                         <strong>Laravel Sanctum</strong>: the official <em>lightweight</em> Web API Authentication library
@@ -802,9 +811,6 @@ Route::post('/product', function () {
                                 <br>
                                 &longrightarrow; we'll only talk about this type
                             </li>
-
-
-
                         </ul>
                     </li>
 
@@ -816,11 +822,10 @@ Route::post('/product', function () {
 
                 <ul style="font-size: 85%;width: 85%;">
                     <li>
-                        As described in the <a href="https://laravel.com/docs/9.x/sanctum#spa-authentication">Sanctum docs</a>:
+                        As described in the <a href="https://laravel.com/docs/10.x/sanctum#spa-authentication">Sanctum docs</a>:
                         <ul>
-                            <li><pre class="bigger"><code class="hljs bash">composer require laravel/sanctum</code></pre></li>
-                            <li><pre class="bigger"><code class="hljs bash">php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"</code></pre></li>
-                            <li>(migration is only required for API Token Authentication)</li>
+                            <li><code>composer require laravel/sanctum</code></li>
+                            <li>(<code>vendor:publish</code> and migration is only required for API Token Authentication)</li>
                             <li>add Sanctum's middleware to the <code>api</code> middleware group in <code>app/Http/Kernel.php</code>
 
 
@@ -830,8 +835,8 @@ Route::post('/product', function () {
     \Illuminate\Routing\Middleware\SubstituteBindings::class,
 ],</code></pre>
                             </li>
-                            <li>open <code>config/sanctum.php</code> and make sure that your <code>domain:port</code> combination is in <code>SANCTUM_STATEFUL_DOMAINS</code>. This setting determines for which domains authentication cookies are set.
-                                <br><strong>Attention:</strong> <code>localhost:8080</code> is not the same as <code>127.0.0.1:8080</code>
+                            <li>open <code>config/sanctum.php</code> and make sure that your <strong>front-end</strong> <code>domain:port</code> combination is in <code>SANCTUM_STATEFUL_DOMAINS</code>. This setting determines for which domains authentication cookies are set.
+                                <br><strong>Attention:</strong> <code>localhost:3000</code> is not the same as <code>127.0.0.1:3000</code>
                             </li>
 
                         </ul>
@@ -857,7 +862,7 @@ Route::post('/product', function () {
                         <ul>
                             <li>
                                 For example, <code>POST /api/login</code>
-                                <pre class="bigger"><code class="hljs php">Route::post('/api/login', function (Request $request) {
+                                <pre class="bigger"><code class="hljs php">Route::post('/api/login', function (Request $request): Response {
     $credentials = $request-&gt;only('email', 'password');
     if (Auth::attempt($credentials)) {
         return response(['message' =&gt; 'The user has been authenticated successfully'], 200);
@@ -866,7 +871,6 @@ Route::post('/product', function () {
 
 });</code></pre>
                             </li>
-                            <li>Unfortunately, Breeze's login route is not compatible as it redirects after login even if the request only accepts JSON</li>
                             <li>As the <em>normal</em> <code>web</code> mechanisms apply here, after successful login the user receives a session cookie <code>myapplicationname_session</code>, of which the server remembers there is successful authentication and by whom</li>
                         </ul>
                     </li>
@@ -881,7 +885,7 @@ Route::post('/product', function () {
                 <ul style="font-size: 85%;width: 90%;">
                     <li>
                         Protect the Web API routes in <code>routes/api.php</code> by plugging the <code>auth:sanctum</code> middleware:
-                        <pre class="bigger"><code class="hljs php">Route::middleware('auth:sanctum')-&gt;get('/secret1', function (Request $request) {
+                        <pre class="bigger"><code class="hljs php">Route::middleware('auth:sanctum')-&gt;get('/secret1', function (Request $request): User {
     return $request-&gt;user();
 });</code></pre>
                         <ul>
@@ -896,7 +900,7 @@ Route::post('/product', function () {
                         <ul>
                             <li>
                                 For example, <code>POST /api/logout</code>
-                                <pre class="bigger"><code class="hljs php">Route::post('/api/logout', function (Request $request) {
+                                <pre class="bigger"><code class="hljs php">Route::post('/api/logout', function (Request $request): Response {
     Auth::guard('web')-&gt;logout();
     $request-&gt;session()-&gt;invalidate();
     return response(['message' =&gt; 'The user has been logged out successfully'], 200);
@@ -931,7 +935,7 @@ Route::post('/product', function () {
                 <ul style="font-size: 85%;width: 90%;">
                     <li>
                         Use authentication and authorization as you were used to:
-                        <pre class="bigger"><code class="hljs php">Route::post('/v4/products', function (Request $request) {
+                        <pre class="bigger"><code class="hljs php">Route::post('/v4/products', function (Request $request): array {
 
     Gate::authorize('add-product');
 
@@ -977,8 +981,8 @@ Route::post('/product', function () {
             <section>
                 <h2>Sources</h2>
                 <ul>
-                    <li><a href="https://laravel.com/docs/9.x/authentication">Laravel docs: Authentication</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/authorization">Laravel docs: Authorization</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/authentication">Laravel docs: Authentication</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/authorization">Laravel docs: Authorization</a></li>
                 </ul>
             </section>
         </section>
