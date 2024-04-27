@@ -46,7 +46,7 @@
                         Definition: custom class encapsulating validation and authorization logic
                     </li>
                     <li style="margin-top: 1.5em;">
-                        Typically for 1 form
+                        Typically for handling 1 request sent by a form
                     </li>
                     <li style="margin-top: 1.5em;">
                         It's called a request because <code>FormRequest extends Request</code>
@@ -74,9 +74,8 @@
     /**
      * Determine if the user is authorized to make this request.
      *
-     * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return false;
     }
@@ -84,9 +83,9 @@
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array&lt;string, mixed&gt;
+     * @return array&lt;string, \Illuminate\Contracts\Validation\Rule|array|string&gt;
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             //
@@ -106,9 +105,9 @@
                         <pre class="bigger"><code class="hljs php">/**
  * Get the validation rules that apply to the request.
  *
- * @return array
+ * @return array&lt;string, \Illuminate\Contracts\Validation\Rule|array|string&gt;
  */
-public function rules()
+public function rules(): array
 {
     return [
         'title' =&gt; 'required|unique:posts|max:255',
@@ -128,9 +127,8 @@ public function rules()
                         <pre class="bigger"><code class="hljs php">/**
  * Determine if the user is authorized to make this request.
  *
- * @return bool
  */
-public function authorize()
+public function authorize(): bool
 {
     // assuming my 'users' table has an enum column 'role'
     return $this-&gt;user()-&gt;role == 'blogger';
@@ -150,13 +148,12 @@ public function authorize()
                         <pre class="bigger"><code class="hljs php">/**
  * Store a new blog post.
  *
- * @param  \App\Http\Requests\StorePostRequest  $request
- * @return Illuminate\Http\Response
  */
-public function store(StorePostRequest $request)
+public function store(StorePostRequest $request): RedirectResponse
 {
     // The incoming request is valid and authorized ...
     Blogpost::create($request->all());
+    return redirect('/posts');
 }</code></pre>
                     </li>
                     <li>You see? <code>FormRequest extends Request</code></li>
@@ -169,8 +166,10 @@ public function store(StorePostRequest $request)
                 <h2>Further Customization</h2>
 
                 <ul style="width: 85%;">
-                    <li>Customizing <a href="https://laravel.com/docs/9.x/validation#customizing-the-error-messages"> the error messages and attribute names (!)</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/validation#preparing-input-for-validation">Preparing</a> the input for validation</li>
+                    <li>Performing <a
+                        href="https://laravel.com/docs/10.x/validation#performing-additional-validation-on-form-requests">additional validation</a></li>
+                    <li>Customizing <a href="https://laravel.com/docs/10.x/validation#customizing-the-error-messages"> the error messages and attribute names (!)</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/validation#preparing-input-for-validation">Preparing</a> the input for validation</li>
                 </ul>
             </section>
 
@@ -293,7 +292,7 @@ public function store(StorePostRequest $request)
                 <h2>Blade Components: Interested?</h2>
                 <ul>
                     <li>This was just a simple introduction. Read more in the <a
-                        href="https://laravel.com/docs/9.x/blade#components">docs</a></li>
+                        href="https://laravel.com/docs/10.x/blade#components">docs</a></li>
                 </ul>
             </section>
 
@@ -312,7 +311,7 @@ public function store(StorePostRequest $request)
 
                 <ul>
                     <li>
-                        Middleware<small><a href="https://laravel.com/docs/9.x/middleware">&#9873;</a></small> = code executed before or after a request is handled by the application
+                        Middleware<small><a href="https://laravel.com/docs/10.x/middleware">&#9873;</a></small> = code executed before or after a request is handled by the application
                     </li>
                     <li style="margin-top: 1em;">
                         Middlewares can be global, or only for a specific route or controller
@@ -338,18 +337,20 @@ public function store(StorePostRequest $request)
                 <ul>
                     <li>
                         First step: generate the middleware with Artisan (location: <code>app/Http/Middleware</code>)
-                        <pre class="bigger"><code class="hljs bash">$ php artisan make:middleware EnsureRequestHasMinimalAge</code></pre>
+                        <pre class="bigger"><code class="hljs bash">$ php artisan make:middleware EnsureTokenIsValid</code></pre>
                     </li>
                     <li>
                         Example of <em>Before Middleware</em>
                         <pre class="bigger"><code class="hljs php">namespace App\Http\Middleware;
 use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class EnsureRequestHasMinimalAge
+class EnsureTokenIsValid
 {
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        if ($request-&gt;age &lt;= 200) {
+        if ($request-&gt;input('token') !== 'my-secret-token') {
             return redirect('home');
         }
         return $next($request);
@@ -363,7 +364,7 @@ class EnsureRequestHasMinimalAge
                 <h2>Before vs. After Middleware</h2>
                 <pre class="bigger"><code class="hljs php">class BeforeMiddleware
 {
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         // Perform action
 
@@ -372,7 +373,7 @@ class EnsureRequestHasMinimalAge
 }</code></pre>
                 <pre class="bigger"><code class="hljs php">class AfterMiddleware
 {
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
 
@@ -410,18 +411,20 @@ class EnsureRequestHasMinimalAge
 
                 <ul>
                     <li>
-                        <strong>Step 1:</strong> assign a short-hand key to the <code>$middleware</code> property of your <code>app/Http/Kernel.php</code> class
+                        <strong>Step 1:</strong> assign a short-hand key to the <code>$middlewareAliases</code> property of your <code>app/Http/Kernel.php</code> class
                     </li>
                     <li style="margin-top: 1em;">
                         What's already in there?
-                        <pre class="bigger"><code class="hljs php">    protected $routeMiddleware = [
+                        <pre class="bigger"><code class="hljs php" style="font-size: 90%;">    protected $middlewareAliases = [
         'auth' =&gt; \App\Http\Middleware\Authenticate::class,
         'auth.basic' =&gt; \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'bindings' =&gt; \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        'auth.session' =&gt; \Illuminate\Session\Middleware\AuthenticateSession::class,
         'cache.headers' =&gt; \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' =&gt; \Illuminate\Auth\Middleware\Authorize::class,
         'guest' =&gt; \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'signed' =&gt; \Illuminate\Routing\Middleware\ValidateSignature::class,
+        'password.confirm' =&gt; \Illuminate\Auth\Middleware\RequirePassword::class,
+        'precognitive' =&gt; \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+        'signed' =&gt; \App\Http\Middleware\ValidateSignature::class,
         'throttle' =&gt; \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' =&gt; \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];</code></pre>
@@ -439,6 +442,11 @@ class EnsureRequestHasMinimalAge
                         <pre class="bigger"><code class="hljs php">Route::get('/', function () {
     //
 })-&gt;middleware(['first', 'second']);</code></pre>
+                        or, without aliases:
+                        <pre class="bigger"><code class="hljs php">Route::get('admin/profile', 'UserController@showProfile')-&gt;middleware(Authenticate::class);</code></pre>
+                        <pre class="bigger"><code class="hljs php">Route::get('/', function () {
+    //
+})-&gt;middleware([First::class, Second::class]);</code></pre>
                     </li>
                 </ul>
             </section>
@@ -448,7 +456,7 @@ class EnsureRequestHasMinimalAge
 
                 <ul>
                     <li>
-                        <strong>Step 2 option 2:</strong> plug the middleware <a href="https://laravel.com/docs/9.x/controllers#controller-middleware">to a specific controller</a>
+                        <strong>Step 2 option 2:</strong> plug the middleware <a href="https://laravel.com/docs/10.x/controllers#controller-middleware">to a specific controller</a>
                         <ul>
                             <li>Call the middleware from the controller's constructor</li>
                             <li>It is assigned to all actions in the controller</li>
@@ -480,8 +488,8 @@ class EnsureRequestHasMinimalAge
     });
 
     Route::get('user/profile', function () {
-        // Uses first and second Middleware
-    });
+        // Uses second Middleware
+    })->withoutMiddleware(['first']);
 });</code></pre>
                     </li>
                 </ul>
@@ -497,12 +505,17 @@ class EnsureRequestHasMinimalAge
                     <li style="margin-top: 1em;">
                         What's already in there?
                         <pre class="bigger"><code class="hljs php">protected $middlewareGroups = [
-    'web' =&gt; [ // can be assigned to a route, a route group or a controller
+    // your own group can be assigned to a route, a route group or a controller
+    'web' =&gt; [
         \App\Http\Middleware\EncryptCookies::class,
         \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \App\Http\Middleware\VerifyCsrfToken::class,
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    ],
+    'api' =&gt; [
+        \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
     ],</code></pre>
                     </li>
@@ -513,16 +526,18 @@ class EnsureRequestHasMinimalAge
             <section>
                 <h2>Middleware Parameters</h2>
 
-                <ul>
+                <ul style="font-size: 90%;">
 
                     <li>
                         Check this interesting example (simple authorization)
                         <pre class="bigger"><code class="hljs php">namespace App\Http\Middleware;
 use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserHasRole
 {
-    public function handle($request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, string $role): Response
     {
         if (! $request->user()-&gt;hasRole($role)) {
             // Redirect...
@@ -536,6 +551,7 @@ class EnsureUserHasRole
                         <pre class="bigger"><code class="hljs php">Route::post('blogposts/create', 'PostController@store')->middleware('role:editor');</code></pre>
                     </li>
                 </ul>
+                <footer style="color: #dd5566;">Caution!!! In your project you will use Gates or Policies for Authorization. DON'T write your own authorization middleware.</footer>
             </section>
 
 
@@ -555,9 +571,9 @@ class EnsureUserHasRole
             <section>
                 <h2>Sources</h2>
                 <ul>
-                    <li><a href="https://laravel.com/docs/9.x/validation#form-request-validation">Laravel docs: Form Request Validation</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/blade#components">Laravel docs: Blade Components</a></li>
-                    <li><a href="https://laravel.com/docs/9.x/middleware">Laravel docs: Middleware</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/validation#form-request-validation">Laravel docs: Form Request Validation</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/blade#components">Laravel docs: Blade Components</a></li>
+                    <li><a href="https://laravel.com/docs/10.x/middleware">Laravel docs: Middleware</a></li>
                 </ul>
             </section>
         </section>
