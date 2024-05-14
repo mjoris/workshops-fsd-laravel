@@ -28,13 +28,13 @@
     <div class="slides">
         <section data-background="#b5533c">
             <h3>Full-stack Development  [OGI03<span style="text-transform: none">r</span>]</h3>
-            <h1>09. Document,<br> Test &amp; Deploy</h1>
+            <h1>10. Document,<br> Test &amp; Deploy</h1>
         </section>
 
         <!-- Digging deeper -->
         <section>
             <section>
-                <h2>09.1<br>Digging deeper</h2>
+                <h2>10.1<br>Digging deeper</h2>
             </section>
 
             <section>
@@ -44,30 +44,30 @@
                         Let's have a tiny introduction to &hellip;
                         <ul>
                             <li>
-                                <a href="https://laravel.com/docs/9.x/logging">Logging</a>
+                                <a href="https://laravel.com/docs/10.x/logging">Logging</a>
                                 <br>
-                                Hint: check 1 of the Laravel log readers, or try <a href="https://laravel.com/docs/9.x/telescope">Laravel Telescope</a>
+                                Hint: check 1 of the Laravel log readers, or try <a href="https://laravel.com/docs/10.x/telescope">Laravel Telescope</a>
                             </li>
                             <li>
-                                <a href="https://laravel.com/docs/9.x/artisan#writing-commands">Writing commands</a> for Artisan Console
+                                <a href="https://laravel.com/docs/10.x/artisan#writing-commands">Writing commands</a> for Artisan Console
                             </li>
                             <li>
-                                <a href="https://laravel.com/docs/9.x/mail">Mail</a> and Mailables
+                                <a href="https://laravel.com/docs/10.x/mail">Mail</a> and Mailables
                             </li>
                             <li>
-                                <a href="https://laravel.com/docs/9.x/scheduling">Task Scheduling</a> (<a href="https://laravel.com/docs/9.x/scheduling#running-the-scheduler">how to run the scheduler</a>)
+                                <a href="https://laravel.com/docs/10.x/scheduling">Task Scheduling</a> (<a href="https://laravel.com/docs/10.x/scheduling#running-the-scheduler">how to run the scheduler</a>)
                             </li>
                             <li>
-                                <a href="https://laravel.com/docs/9.x/localization">Localization</a> and <a
+                                <a href="https://laravel.com/docs/10.x/localization">Localization</a> and <a
                                 href="https://laravel-lang.com/">Laravel Lang</a>
                             </li>
                         </ul>
                     </li>
                     <li>
                         And there's much more:
-                        <a href="https://laravel.com/docs/9.x/cache">Cache</a>
-                        <a href="https://laravel.com/docs/9.x/events">Events</a>
-                        <a href="https://laravel.com/docs/9.x/socialite">Socialite</a>
+                        <a href="https://laravel.com/docs/10.x/cache">Cache</a>
+                        <a href="https://laravel.com/docs/10.x/events">Events</a>
+                        <a href="https://laravel.com/docs/10.x/socialite">Socialite</a>
                         &hellip;
                     </li>
                 </ul>
@@ -78,7 +78,7 @@
         <!-- Web API Documentation -->
         <section>
             <section>
-                <h2>09.2<br>Web API Documentation</h2>
+                <h2>10.2<br>Web API Documentation</h2>
             </section>
 
             <section>
@@ -136,225 +136,98 @@
         <!-- Testing -->
         <section>
             <section>
-                <h2>09.3<br>Testing</h2>
+                <h2>10.3<br>Testing</h2>
             </section>
 
             <section>
-                <h2>2 Types of Tests in Laravel</h2>
+                <h2>Testing overview</h2>
 
-                <ul style="font-size: 90%;width: 80%;">
-                    <li><strong>Unit</strong> tests
-                        <ul>
-                            <li>
-                                Test a method or a class
+                <ul>
+                    <li>Check the <a href="07.testing.html">slides on Testing</a>
+
+                        <ul style="font-size: 90%;">
+                            <li>Unit tests</li>
+                            <li><a href="https://laravel.com/docs/10.x/http-tests">HTTP tests</a> (= <em>scenario</em> or <em>feature</em> tests)</li>
+                            <li><a href="https://laravel.com/docs/10.x/console-tests">Console Tests</a>
                             </li>
-                            <li>
-                                Directory: <code>tests/Unit</code>
-                            </li>
-                            <li>
-                                Your Laravel app is not booted (!) so you cannot access the database or other services
-                            </li>
-                            <li>
-                                Recommended: only when you need to test some logic you created yourself e.g. class <code>Cart</code>, a helper method, &hellip;
-                            </li>
+                            <li>Browser Tests with <a href="https://laravel.com/docs/10.x/dusk">Laravel Dusk</a></li>
+                            <li>Creating <a href="https://laravel.com/docs/10.x/database-testing">test database</a> records with model factories and seeders</li>
                         </ul>
                     </li>
-                    <li style="margin-top: 1.5em;"><strong>Feature</strong> tests
-                        <ul>
-                            <li>
-                                Test larger portions of your code, even the response to a full HTTP request
-                            </li>
-                            <li>
-                                Directory: <code>tests/Feature</code>
-                            </li>
-                            <li>
-                                Your Laravel app is booted
-                            </li>
-                            <li>
-                                Most of your Laravel tests should be feature tests ~ your system as a whole is functioning
-                            </li>
-                        </ul>
-                    </li>
-
                 </ul>
 
             </section>
 
             <section>
-                <h2>Configuration</h2>
+                <h2>What to test?</h2>
 
-                <ul style="font-size: 90%;width: 80%;">
-                    <li><code>/phpunit.xml</code> contains your testing environment variables
-                        <ul>
-                            <li>e.g. session and cache drivers are set to <code>array</code></li>
-                            <li>e.g. <code>DB_CONNECTION</code> can be set to <code>sqlite</code></li>
-                            <li>run <code>php artisan config:clear</code> before testing</li>
-                        </ul>
-                    </li>
-                    <li style="margin-top: 1.5em;">optionally you can create <code>.env.testing</code>
-                        <ul>
-                            <li>
-                                <code>.env.testing</code> overrules <code>.env</code> when testing (or when adding <code>--env=testing</code> to artisan commands)
-                            </li>
-                        </ul>
-                    </li>
-                    <li style="margin-top: 1.5em;"><code>tests/CreatesApplication</code> bootstraps your application before running the tests.
-                        Leave it there!
-                    </li>
-
-                </ul>
-
-            </section>
-
-            <section>
-                <h2>Creating and running (1)</h2>
-
-                <ul style="font-size: 90%;width: 80%;">
-                    <li>Creating a unit test
-                        <pre class="bigger"><code class="hljs bash">php artisan make:test ExampleTest --unit</code></pre>
-                    </li>
-                    <li>Creating a feature test
-                        <pre class="bigger"><code class="hljs bash">php artisan make:test UserTest</code></pre>
-                    </li>
-                    <li>In this test you may code any tests as you would in <a
-                        href="https://phpunit.readthedocs.io/en/9.5/writing-tests-for-phpunit.html">PHPUnit</a>
-                        <pre class="bigger"><code class="hljs php">&lt;?php
-namespace Tests\Unit;
-use PHPUnit\Framework\TestCase;
-
-class ExampleTest extends TestCase
-{
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function test_basic_test()
-    {
-        $this-&gt;assertTrue(true);
-    }
-}</code></pre>
-                    </li>
-
-                </ul>
-
-            </section>
-
-            <section>
-                <h2>Creating and running (2)</h2>
-
-                <ul style="font-size: 90%;width: 80%;">
-                    <li>Running all tests
-                        <pre class="bigger"><code class="hljs bash">php artisan test</code></pre>
-                    </li>
-                    <li><a href="https://phpunit.readthedocs.io/en/9.5/textui.html#command-line-options">Any option</a> passed to the <code>phpunit</code> command, may passed here as well
-                        <pre class="bigger"><code class="hljs bash">php artisan test --testsuite=Feature --filter=UserTest --stop-on-failure</code></pre>
-                    </li>
-                    <li style="margin-top: 1.5em;">
-                        Speed up the process by <a href="https://laravel.com/docs/9.x/testing#running-tests-in-parallel">running tests in parallel</a>
-                    </li>
-
-
-                </ul>
-
-            </section>
-
-            <section>
-                <h2>HTTP Tests</h2>
-
-                <ul style="font-size: 90%;width: 80%;">
-                    <li>Fluent API internally invokes simulated <code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code> or
-                        <code>delete</code> HTTP request, returning a <code>Illuminate\Testing\TestResponse</code> object
-                        <pre class="bigger"><code class="hljs php">use Tests\TestCase;
-
-class ExampleTest extends TestCase
-{
-    public function test_a_basic_request()
-    {
-        $response = $this-&gt;get('/');
-
-        $response-&gt;assertStatus(200);
-    }
-}</code></pre>
-                    </li>
-                    <li>Customizing request headers e.g.
-                        <pre class="bigger"><code class="hljs php">$this->withHeaders([
-    'X-Header' =&gt; 'Value',
-])-&gt;post('/user', ['name' =&gt; 'Sally']);</code></pre>
-                        <pre class="bigger"><code class="hljs php">$user = User::factory()-&gt;create(); // see database/factories/UserFactory.php
-
-$response = $this-&gt;actingAs($user)
-    ->withSession(['banned' =&gt; false])
-    ->get('/');</code></pre>
-                    </li>
+                <ul>
                     <li>
-                        Debugging responses with <code>$response->dumpHeaders()</code>, <code>$response->dumpSession()</code> and <code>$response->dump()</code>
+                        What to test in a Web API or Web application?
+                        <ul style="font-size: 90%;">
+                            <li>This is <em>opinionated</em></li>
+                            <li>
+                                At least
+                                <ul>
+                                    <li>Unit test your <em>own</em> classes (e.g. <code>ShoppingCart</code>, <code>Address</code>); testing Eloquent models is unnecessary</li>
+                                    <li>HTTP test the <em>expected</em> (e.g. can a user register for this website?)</li>
+                                    <li>HTTP test the <em>unexpected</em> (e.g. what happens if a user registers with wrong input?)</li>
+                                </ul>
+                            </li>
+                        </ul>
                     </li>
-
                 </ul>
+            </section>
 
+        </section>
+
+
+        <!-- Testing -->
+        <section>
+            <section>
+                <h2>10.4<br>Linting &amp; Code Analysis</h2>
             </section>
 
             <section>
-                <h2>Testing JSON APIs</h2>
+                <h2>Overview</h2>
 
-                <ul style="font-size: 90%;width: 80%;">
-                    <li>Issue JSON requests with <code>getJson</code>, <code>postJson</code>, &hellip;
-                        <pre class="bigger"><code class="hljs php">$response = $this->postJson('/api/user', ['name' => 'Sally']);
+                <ul>
+                    <li>
+                        Goals
+                        <ul style="font-size: 90%;">
+                            <li>improve code quality</li>
+                            <li>catch potential bugs</li>
+                            <li>improve performance</li>
+                            <li>improve security</li>
+                        </ul>
 
-$response
-    -&gt;assertStatus(201)
-    -&gt;assertJson([
-        'created' =&gt; true,
-    ]);
+                    <li style="margin-top: 0.5em;">Tools
 
-// in array format:
-// $this-&gt;assertTrue($response['created']);</code></pre>
-                    </li>
-                    <li>More goodies
-                        <pre class="bigger"><code class="hljs php">-&gt;assertExactJson(['created' =&gt; true,])</code></pre>
-                        <pre class="bigger"><code class="hljs php">-&gt;assertJsonPath('team.owner.name', 'Darian')</code></pre>
-                        <pre class="bigger"><code class="hljs php">-&gt;assertJson(fn (AssertableJson $json) =>
-    $json-&gt;where('id', 1)
-         -&gt;where('name', 'Victoria Faith')
-         -&gt;missing('password')
-         -&gt;etc()
-    );</code></pre>
-                        Read more on <a href="https://laravel.com/docs/9.x/http-tests#fluent-json-testing">Fluent JSON Testing</a>
+                        <ul style="font-size: 90%;">
+                            <li><a href="https://laravel.com/docs/10.x/pint">Laravel Pint</a> (style)</li>
+                            <li><a href="https://github.com/larastan/larastan">Larastan</a> (code analysis)</li>
+                            <li><a href="https://www.laravel-enlightn.com/">Enlightn</a> (performance &amp; security)</li>
+                        </ul>
                     </li>
 
+                    <li style="margin-top: 0.5em;">Integrate them as Git hooks
+
+                        <ul style="font-size: 90%;">
+                            <li>
+                                Manual example:
+                                <a href="https://laraveldaily.com/post/laravel-pint-pre-commit-hooks-github-actions">Pint pre-commit hook</a>
+                            </li>
+                            <li>
+                                Auto-install by <a href="https://github.com/igorsgm/laravel-git-hooks">igorsgm/laravel-git-hooks</a>
+
+                            </li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 0.5em;">
+                        Integrate them in your CI/CD pipeline
+                    </li>
                 </ul>
 
-            </section>
-
-            <section>
-                <h2>More on HTTP Tests</h2>
-
-                <ul style="font-size: 90%;width: 80%;">
-                    <li>Testing <a href="https://laravel.com/docs/9.x/http-tests#testing-file-uploads">File Uploads</a>
-                    </li>
-                    <li style="margin-top: 1.5em;">
-                        Testing <a href="https://laravel.com/docs/9.x/http-tests#testing-views">Views</a>
-                    </li>
-
-                    <li style="margin-top: 1.5em;">
-                        <a href="https://laravel.com/docs/9.x/http-tests#available-assertions">List of all available assertions</a> on a <code>TestResponse</code> object
-                    </li>
-
-
-                </ul>
-
-            </section>
-
-            <section>
-                <h2>More Laravel Testing</h2>
-
-                <ul style="font-size: 90%;width: 80%;">
-                    <li><a href="https://laravel.com/docs/9.x/console-tests">Console Tests</a>
-                    </li>
-                    <li>Browser Tests with <a href="https://laravel.com/docs/9.x/dusk">Laravel Dusk</a></li>
-                    <li>Creating <a href="https://laravel.com/docs/9.x/database-testing">test database</a> records with model factories and seeders</li>
-                </ul>
             </section>
 
         </section>
@@ -362,7 +235,7 @@ $response
         <!-- (Manual) Deployment -->
         <section>
             <section>
-                <h2>09.4<br>(Manual) Deployment</h2>
+                <h2>10.5<br>(Manual) Deployment</h2>
             </section>
 
             <section>
@@ -371,23 +244,18 @@ $response
                     <li>Some technical details on ikdoeict-plesk
                     <ul>
                         <li>
-                            You login to Plesk on <a href="https://webpanel.ikdoeict.be">webpanel.ikdoeict.be</a> using your Odisee-credentials
+                            You login to Plesk on <code>https://firstnamelastname.ikdoeict.be:8443/</code> using your Odisee-credentials
                         </li>
                         <li style="margin-top: 0.5em;">
                             You can use the SSH Terminal (in order to run commands) from the Plesk web interface, or with an SSH client (like PuTTY)
                         </li>
                         <li style="margin-top: 0.5em;">
-                            In order to set a username and password for an SSH client:
-                            <br>
-                            Open your domain in Plesk &gt; Hosting &amp; DNS &gt; Web Hosting Access
-                        </li>
-                        <li style="margin-top: 0.5em;">
-                            In order to connect from an SSH client (like PuTTY):
+                            Set up for an SSH client:
                             <ol>
-                                <li>Be in the odisee-network or <a
-                                    href="https://ikdoeict.freshdesk.com/support/solutions/articles/31000136666-howto-verbinding-maken-naar-het-schoolnetwerk-via-vpn">connect over VPN</a> </li>
-                                <li>Start an SSH connection to <strong>10.129.28.188</strong> (not the 193.* address) on port 22</li>
-                                <li>Enter SSH-username and SSH-password</li>
+                                <li>Generate a key pair e.g. <code>ssh-keygen -t rsa -b 2048</code></li>
+                                <li>Register the public key in Plesk (pull button &gt; SSH Keys Manager)</li>
+                                <li>Find IP address and username in Plesk (tab Hosting &amp; DNS &gt; Hosting &gt; Hosting Settings)</li>
+                                <li>Configure your SSH client with private key, IP address and username</li>
                             </ol>
                         </li>
                     </ul>
@@ -402,7 +270,7 @@ $response
                         <pre class="bigger"><code class="hljs bash">git clone https://gitlab.com/ikdoeict/joris.maervoet/laravel-tasks-api.git</code></pre>
                     </li>
                     <li>
-                        In Plesk, add a subdomain <code>wmfs.jorismaervoet.ikdoeict.be</code>
+                        In Plesk, add a subdomain <code>tasks.jorismaervoet.ikdoeict.be</code>
                         <br>
                         and point the Document Root of the subdomain to the public folder of the Laravel project:
                         <code>&lt;home&gt;/laravel-tasks-api/app/public</code>
@@ -413,7 +281,7 @@ $response
                             <li>Click on SSL/TLS certificate and add valid SSL/TLS certificate from Let's Encrypt</li>
                             <li>Click on PHP-settings and choose the most recent PHP version (display_errors should be "Off" - you're in production)</li>
                             <li>Click on Databases and create an empty database and copy db name, user name and password to notepad</li>
-                            <li>Click on PHP Composer and try to install the Laravel-packages
+                            <li>Click on PHP Composer and try to install the Laravel-packages (or just run <code>composer install --no-dev</code>)
                                 <ul>
                                     <li>Problems? remove <code>composer.lock</code> and <code>vendor</code> in the File Manager and retry</li>
                                 </ul>
@@ -429,24 +297,24 @@ $response
                     <li>From SSH Terminal
                         <pre class="bigger"><code class="hljs bash">cd laravel-tasks-api/app/
 cp .env.example .env
-/opt/plesk/php/8.1/bin/php artisan key:generate</code></pre>
+php artisan key:generate</code></pre>
                     </li>
                     <li>
                         Manually edit <code>.env</code>
                         <pre class="bigger"><code class="hljs bash">APP_DEBUG=false
-APP_URL=https://wmfs.jorismaervoet.ikdoeict.be
+APP_URL=https://tasks.jorismaervoet.ikdoeict.be
 DB_HOST=localhost
 DB_DATABASE=(copy from your notepad)
 DB_USERNAME=(copy from your notepad)
 DB_PASSWORD=(copy from your notepad)</code></pre>
                         In case it's a web API used from an SPA from other subdomain with auth:
-                        <pre class="bigger"><code class="hljs bash">SANCTUM_STATEFUL_DOMAINS=ikdoeict.be,wmfs.bartdelrue.ikdoeict.be
-SESSION_DOMAIN=.ikdoeict.be</code></pre>
+                        <pre class="bigger"><code class="hljs bash">SANCTUM_STATEFUL_DOMAINS=ikdoeict.be,frontend.bartdelrue.ikdoeict.be
+SESSION_DOMAIN=ikdoeict.be</code></pre>
                     </li>
                     <li style="margin-top: 0.5em;">Further run in SSH Terminal
-                        <pre class="bigger"><code class="hljs bash">/opt/plesk/php/8.1/bin/php artisan storage:link
-/opt/plesk/php/8.1/bin/php artisan migrate
-/opt/plesk/php/8.1/bin/php artisan db:seed</code></pre>
+                        <pre class="bigger"><code class="hljs bash">php artisan storage:link
+php artisan migrate
+php artisan db:seed</code></pre>
 
                     </li>
                 </ol>
@@ -455,7 +323,7 @@ SESSION_DOMAIN=.ikdoeict.be</code></pre>
             <section>
                 <h2>Further optimization</h2>
                 <ul style="font-size: 80%;width:80%;">
-                    <li>Read the <a href="https://laravel.com/docs/9.x/deployment#optimization">docs on Optimization</a> carefully and further optimize production with
+                    <li>Read the <a href="https://laravel.com/docs/10.x/deployment#optimization">docs on Optimization</a> carefully and further optimize production with
                         <pre class="bigger"><code class="hljs bash">composer install --optimize-autoloader --no-dev
 php artisan config:cache
 php artisan route:cache
@@ -471,7 +339,7 @@ php artisan view:cache</code></pre>
                 <h2>Maintenance mode</h2>
                 <ul style="font-size: 80%;width:80%;">
                     <li>Did you know you can put the whole application in <a
-                        href="https://laravel.com/docs/9.x/configuration#maintenance-mode">maintenance mode</a>?
+                        href="https://laravel.com/docs/10.x/configuration#maintenance-mode">maintenance mode</a>?
                         <pre class="bigger"><code class="hljs bash">php artisan down</code></pre>
 
                     </li>
@@ -486,7 +354,7 @@ php artisan view:cache</code></pre>
                     <li>Boils down to running a set of commands, for example (just an example !)
                         <pre class="bigger"><code class="hljs bash">php artisan down
 git pull
-composer install # does not work like this in plesk
+composer install --optimize-autoloader --no-dev
 php artisan migrate
 php artisan cache:clear
 php artisan route:cache
@@ -509,13 +377,13 @@ php artisan up</code></pre>
 
         <section>
             <section>
-                <h2>09.5<br>Laravel Envoy</h2>
+                <h2>10.6<br>Laravel Envoy</h2>
             </section>
 
             <section>
                 <h2>Laravel Envoy</h2>
                 <ul>
-                    <li>a tool executing commands over SSH on remote servers</li>
+                    <li>a tool executing commands (over SSH) on remote servers</li>
                     <li>uses the Blade syntax to define tasks for deployment</li>
                 </ul>
             </section>
@@ -539,7 +407,9 @@ php artisan up</code></pre>
                         Run a task by
                         <pre class="bigger"><code class="hljs bash">php vendor/bin/envoy run deploy --branch=master</code></pre>
                     </li>
-                    <li>Want more? <a href="https://laravel.com/docs/9.x/envoy">Envoy Docs</a> </li>
+                    <li>Want more? <a href="https://laravel.com/docs/10.x/envoy">Envoy Docs</a> </li>
+                    <li><a href="https://warrickbayman.medium.com/zero-downtime-laravel-deployments-with-envoy-version-2-227c8259e31c#1ed2">Example</a></li>
+                    <li>In a CI/CD context often executed only on the production server</li>
                 </ul>
             </section>
 
@@ -547,7 +417,7 @@ php artisan up</code></pre>
 
         <section>
             <section>
-                <h2>09.6<br>CI/CD: an Introduction</h2>
+                <h2>10.7<br>CI/CD: an Introduction</h2>
             </section>
 
             <section>
