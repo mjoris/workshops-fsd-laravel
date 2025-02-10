@@ -1,4 +1,4 @@
-FROM php:8.3-apache
+FROM php:8.4-apache
 ENV APACHE_DOCUMENT_ROOT=/var/www/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN a2enmod rewrite
@@ -7,6 +7,6 @@ RUN apt-get install -y locales locales-all
 RUN apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libxml2-dev && docker-php-ext-install soap && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && docker-php-ext-install gd
 RUN apt-get install -y libicu-dev && docker-php-ext-configure intl && docker-php-ext-install intl
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
+RUN curl -sL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs
 WORKDIR /var/www
 VOLUME /usr/local/etc/php
