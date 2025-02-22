@@ -48,10 +48,10 @@ Route::get('/eloquent-demo-4', [ProductController::class, 'demo4']);
 Route::get('/eloquent-demo-5', [ProductController::class, 'demo5']);
 
 // Routes for concluding demo 'webshop' of 04.forms
-/*
+
 Route::get('/products', [ProductController::class, 'overview']);
 Route::get('/products/{product}', [ProductController::class, 'show'])->whereNumber('product');
 
 Route::get('/products/create', [ProductController::class, 'showCreateForm']);
 Route::post('/products/create', [ProductController::class, 'create']);
-*/
+
