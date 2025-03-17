@@ -597,7 +597,63 @@ Route::get('/v3/products', function (): ProductCollection {
         </section>
 
 
+        <!-- Web API Documentation -->
+        <section>
+            <section>
+                <h2>06.5<br>Web API Documentation</h2>
+            </section>
 
+            <section>
+                <h2>Web API Documentation</h2>
+
+                <ul style="font-size: 90%;">
+                    <li>
+                        Technical document containing instructions how to effectively use a Web API
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        Concise but containing all information required to work with the Web API
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        Typically: web doc automatically generated from code (annotations)
+                    </li>
+                    <li style="margin-top: 1.5em;">
+                        <strong>Why is it important? </strong> Better dev experience, so better adoption of your Web API, save support
+                        time, &hellip;
+                    </li>
+
+                </ul>
+                <p  style="font-size: 90%;">&longrightarrow; let's have a look at <a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a>, generating documentation from <em>OpenAPI specs</em>
+                </p>
+
+            </section>
+            <section>
+                <h2>Documenting your Laravel REST API</h2>
+
+                <ul style="font-size: 90%;">
+                    <li>OpenAPI / Swagger (<a href="https://gdebrauwer.dev/blog/documenting-your-laravel-rest-api/">article</a>)
+                        <ul>
+                            <li>
+                                generate from docblocks in your code with packages like <a href="https://github.com/DarkaOnLine/L5-Swagger">L5-swagger</a> (<a
+                                href="https://blog.quickadminpanel.com/laravel-api-documentation-with-openapiswagger/">tutorial</a>)
+                            </li>
+                            <li>
+                                DIY with a tool like <a href="https://stoplight.io/studio">Stoplight Studio</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1.5em;">Other projects rely on a <em>JavaDoc-like</em> docblocks
+                        <ul>
+                            <li><a href="https://scribe.knuckles.wtf/">Scribe</a></li>
+                            <li><a href="https://github.com/ovac/idoc">ovac/idoc</a></li>
+                            <li>not supported any more: <a href="https://github.com/mpociot/laravel-apidoc-generator">mpociot/laravel-apidoc-generator</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+
+            </section>
+
+        </section>
 
 
 
