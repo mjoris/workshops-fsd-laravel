@@ -134,7 +134,7 @@ Smurf::find(666)->friends() // only returns a Builder object ...</code></pre>
             <section>
                 <h2>Fun fact: Comparing Model Instances</h2>
                 <ul style="">
-                    <li>Determine if 2 model instances are the "same" = they have the same PK entry and are from the same table and database connection</li>
+                    <li>Determine if 2 model <a href="https://laravel.com/docs/11.x/eloquent#comparing-models">instances are the "same"</a> = they have the same PK entry and are from the same table and database connection</li>
                 </ul>
                 <pre class="bigger" style="width: 60%;"><code class="hljs php">if ($post-&gt;is($anotherPost)) {
     // ...
@@ -168,7 +168,7 @@ foreach ($books as $book) {
 }</code></pre>
                     </li>
                     <li>
-                        The method <code>with()</code> supports <a href="https://laravel.com/docs/10.x/eloquent-relationships#eager-loading"><strong>eager loading</strong></a> and <em>adds a question to</em> prefetch the related model objects in the Builder object:
+                        The method <code>with()</code> supports <a href="https://laravel.com/docs/11.x/eloquent-relationships#eager-loading"><strong>eager loading</strong></a> and <em>adds a question to</em> prefetch the related model objects in the Builder object:
                         <pre class="bigger"><code class="hljs php">$books = Book::with('author')-&gt;get(); // generates 2 queries
 
 foreach ($books as $book) {
@@ -290,7 +290,7 @@ if ($someOtherCondition) {
             <section>
                 <h2>Local Query Scopes</h2>
                 <ul style="width: 100%; font-size: 85%;">
-                    <li><a href="https://laravel.com/docs/10.x/eloquent#local-scopes">Local scopes</a> enable the reuse of frequently used query <strong>Builder</strong> parts</li>
+                    <li><a href="https://laravel.com/docs/11.x/eloquent#local-scopes">Local scopes</a> enable the reuse of frequently used query <strong>Builder</strong> parts</li>
 
 
                 </ul>
@@ -299,12 +299,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
-    public function scopeActive(Builder $query)
+    public function scopeActive(Builder $query): void
     {
         return $query-&gt;where('active', 1);
     }
 
-    public function scopeOfType(Builder $query, string $type)
+    public function scopeOfType(Builder $query, string $type): void
     {
         return $query-&gt;where('type', $type);
     }
@@ -326,7 +326,7 @@ $users = User::ofType('admin')-&gt;orWhere-&gt;active()-&gt;get(); // orWhere sp
                 <h2>Accessors &amp; Mutators (1)</h2>
                 <ul style="width: 100%; font-size: 80%;">
                     <li>2 applications (<a
-                        href="https://laravel.com/docs/10.x/eloquent-mutators#accessors-and-mutators">docs</a>)
+                        href="https://laravel.com/docs/11.x/eloquent-mutators#accessors-and-mutators">docs</a>)
                         <ul>
                             <li>Override default attribute behaviour (such as <code>$user-&gt;first_name</code>), typically for data transformation  </li>
                             <li>Define custom attributes (such as <code>$user-&gt;full_name</code>) while there is no such column or relation</li>
@@ -381,11 +381,49 @@ $user-&gt;save();</code></pre>
             </section>
 
             <section>
+                <h2>Accessors &amp; Mutators (3)</h2>
+                <ul style="width: 100%; font-size: 80%;">
+                    <li>
+                        Transform multiple attributes into a "value object"
+                        <ul>
+                            <li>
+                                First, create a helper class by <code>php artisan make:class Support/Address</code>
+                                and write the constructor, getters and setters &hellip;
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <pre class="bigger"><code class="hljs php" style="font-size: 80%;">use App\Support\Address;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
+{
+    protected function address(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes) =&gt; new Address(
+                $attributes['address_line_one'],
+                $attributes['address_line_two'],
+            ),
+            set: fn (Address $value) => [ // return array with database column keys
+                'address_line_one' => $value->lineOne,
+                'address_line_two' => $value->lineTwo,
+            ],
+        );
+    }
+}</code></pre>
+
+            </section>
+
+            <section>
                 <h2>Remark: Accessor Caching</h2>
                 <ul style="width: 85%; font-size: 85%;">
                     <li>When an <strong><u>accessor</u></strong> returns an <strong>object</strong> (<a
-                        href="https://laravel.com/docs/10.x/eloquent-mutators#accessor-caching">example</a>)
+                        href="https://laravel.com/docs/11.x/eloquent-mutators#accessor-caching">example</a>)
                         <ul>
+                            <li>same object instance is returned each time the accessor(<code>-></code>) is invoked</li>
                             <li>any changes to the object are synced back to the model
                                 <pre class="bigger"><code class="hljs php">$user = User::find(1);
 $address = $user->address_object;
@@ -395,7 +433,7 @@ $user->save(); // updates zip</code></pre>
                             <li>undo this behaviour by <code>Attribute::make()-&gt;withoutObjectCaching();</code></li>
                         </ul>
                     </li>
-                    <li style="margin-top: 1em;">When an <strong><u>accessor</u></strong> returns <strong>primitive value</strong> (string, int, &hellip;)
+                    <li style="margin-top: 1em;">When an <strong><u>accessor</u></strong> returns a <strong>primitive value</strong> (string, int, &hellip;)
                         <ul>
                             <li>any changes to the returned value are not synced back to the model
                                 <pre class="bigger"><code class="hljs php">$user = User::find(1);
@@ -415,28 +453,31 @@ $user->save(); // unchanged</code></pre>
             <section>
                 <h2>Casting</h2>
                 <ul style="width: 100%; font-size: 80%;">
-                    <li>You don't need accessors &amp; mutators to implement <a href="https://laravel.com/docs/10.x/eloquent-mutators#attribute-casting">auto-casting of attributes</a>
+                    <li>You don't need accessors &amp; mutators to implement <a href="https://laravel.com/docs/11.x/eloquent-mutators#attribute-casting">auto-casting of attributes</a>
                     </li>
                     <li>Check the documentation for the supported cast types</li>
 
                 </ul>
-                <pre class="bigger"><code class="hljs php">class User extends Model
+                <pre class="bigger"><code class="hljs php"  style="font-size: 85%;">class User extends Model
 {
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array
+     * @return array&lt;string, string&gt;
      */
-    protected $casts = [
-        'is_admin' =&gt; 'boolean',
-        'options' =&gt; 'array', // handy when the column options contains JSON
-        'date_of_birth' =&gt; 'datetime:Y-m-d', // auto-convert to Carbon objects (date format is only for serialization)
-        // created_at and updated_at are already known as datetime
-        'directory' =&gt; AsStringable::class, // cast to fluent string
-    ];
-
+    protected function casts(): array
+    {
+        return [
+            'is_admin' =&gt; 'boolean',
+            'options' =&gt; 'array', // handy when this column contains JSON
+            'date_of_birth' =&gt; 'datetime:Y-m-d',
+            // auto-convert to Carbon objects (date format is only for serialization)
+            // created_at and updated_at are already known as datetime
+            'directory' =&gt; AsStringable::class, // cast to fluent string
+        ];
+    }
 }</code></pre>
-                <footer><small>Remark: when your database column is in JSON, the cast type <code>'array'</code> will not automatically sync array manipulation back to the model. <code>$user-&gt;options['key'] = $value;</code> will trigger a PHP error; <code>$user->update(['options->key' =&gt; 'value']);</code> will work. Better use the cast type <code>AsArrayObject::class</code> or <code>AsCollection::class</code> in stead.</small></footer>
+                <footer><small>Remark: when your database column is in JSON, the cast type <code>'array'</code> will not automatically sync array manipulation back to the model. <code>$user-&gt;options['key'] = $value;</code> will trigger a PHP error; <code>$user->update(['options-&gt;key' =&gt; 'value']);</code> will work. Better use the cast type <code>AsArrayObject::class</code> or <code>AsCollection::class</code> in stead.</small></footer>
 
             </section>
 
@@ -454,8 +495,8 @@ $user->save(); // unchanged</code></pre>
             <section>
                 <h2>Sources</h2>
                 <ul>
-                    <li><a href="https://laravel.com/docs/10.x/eloquent-mutators">Laravel docs: Eloquent Mutators and Casting</a></li>
-                    <li><a href="https://laravel.com/docs/10.x/eloquent-relationships#eager-loading">Laravel docs: Eager Loading</a></li>
+                    <li><a href="https://laravel.com/docs/11.x/eloquent-mutators">Laravel docs: Eloquent Mutators and Casting</a></li>
+                    <li><a href="https://laravel.com/docs/11.x/eloquent-relationships#eager-loading">Laravel docs: Eager Loading</a></li>
                 </ul>
             </section>
         </section>
