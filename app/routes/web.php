@@ -39,7 +39,6 @@ Route::get('/types-demo', function (Request $request): void {
     }
 });
 
-
 // Routes for concluding demo 'webshop' of 03.lets.mvc
 Route::get('/eloquent-demo-1', [ProductController::class, 'demo1']);
 Route::get('/eloquent-demo-2', [ProductController::class, 'demo2']);
@@ -54,4 +53,3 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->whereNumb
 
 Route::get('/products/create', [ProductController::class, 'showCreateForm']);
 Route::post('/products/create', [ProductController::class, 'create']);
-

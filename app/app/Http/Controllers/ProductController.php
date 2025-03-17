@@ -22,18 +22,18 @@ class ProductController extends Controller
 
         // retrieve the product's brand (data record) through many-to-one
         $brand = $product->brand;
-        dump('brand: ' . $brand->name);
+        dump('brand: '.$brand->name);
 
         // retrieve the product's categories (collection of data records) through many-to-many
         $categories = $product->categories;
         foreach ($categories as $category) {
-            dump('category: ' . $category->name);
+            dump('category: '.$category->name);
         }
 
         // retrieve all products (collection of data records)
         $products = Product::all();
-        dump('# products: ' . $products->count()); // count of collection
-        dump('# products: ' . Product::count());   // count in DB query (faster!)
+        dump('# products: '.$products->count()); // count of collection
+        dump('# products: '.Product::count());   // count in DB query (faster!)
     }
 
     public function demo2(): void
@@ -44,7 +44,6 @@ class ProductController extends Controller
         dump($productsOfBrandOne->pluck('name', 'id')); // pluck of collection
         dump($productsOfBrandOne->pluck('name', 'id')->all()); // ... as a plain array
         dump(Product::where('brand_id', 1)->orderBy('price', 'desc')->pluck('name', 'id')); // pluck integrated in DB query
-
 
         // retrieve all products of category 2
         dump('all products of category 2 ---');
@@ -84,7 +83,7 @@ class ProductController extends Controller
         dump('faulty products ---');
         $faultyProductsBuilder = Product::where('price', 0.00)->orDoesntHave('categories');
         $faultyProductStrings = $faultyProductsBuilder->get()->map(function ($product) {
-            return $product->id . '. ' . $product->name . ' (' . $product->price . '€)';
+            return $product->id.'. '.$product->name.' ('.$product->price.'€)';
         });
         dump($faultyProductStrings->all());
 
@@ -138,7 +137,7 @@ class ProductController extends Controller
             'name' => 'required|unique:products|max:125',
             'price' => 'required|numeric|min:0.10',
             'description' => 'nullable', // because of ConvertEmptyStringsToNull
-            'brand_id' => 'required|exists:brands,id'
+            'brand_id' => 'required|exists:brands,id',
         ]);
 
         $product = new Product($request->all());
