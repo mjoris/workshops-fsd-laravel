@@ -633,19 +633,27 @@ Route::get('/v3/products', function (): ProductCollection {
                     <li>OpenAPI / Swagger (<a href="https://gdebrauwer.dev/blog/documenting-your-laravel-rest-api/">article</a>)
                         <ul>
                             <li>
-                                generate from docblocks in your code with packages like <a href="https://github.com/DarkaOnLine/L5-Swagger">L5-swagger</a> (<a
+                                generate from Open API docblocks in your code with packages like <a href="https://github.com/DarkaOnLine/L5-Swagger">L5-swagger</a> (<a
                                 href="https://blog.quickadminpanel.com/laravel-api-documentation-with-openapiswagger/">tutorial</a>)
+                            </li>
+                            <li>
+                                generate from PHPDoc docblocks in your code with <a href="https://vyuldashev.github.io/laravel-openapi/">vyuldashev/laravel-openapi</a>
+                            </li>
+                            <li>
+                                <a href="https://uselaradoc.com/">Laradoc</a> is a <strong>commercial</strong> tool that automatically generates OpenAPI documentation by executing your code and tests in a containerized env
+                            </li>
+                            <li>
+                                <a href="https://scramble.dedoc.co/">Scramble</a> generates Open API documentation just by analyzing your code (only common patterns)
                             </li>
                             <li>
                                 DIY with a tool like <a href="https://stoplight.io/studio">Stoplight Studio</a>
                             </li>
                         </ul>
                     </li>
-                    <li style="margin-top: 1.5em;">Other projects rely on a <em>JavaDoc-like</em> docblocks
+                    <li style="margin-top: 1.5em;">Other projects rely on a <em>PHPDoc-like</em> docblocks
                         <ul>
                             <li><a href="https://scribe.knuckles.wtf/">Scribe</a></li>
                             <li><a href="https://github.com/ovac/idoc">ovac/idoc</a></li>
-                            <li>not supported any more: <a href="https://github.com/mpociot/laravel-apidoc-generator">mpociot/laravel-apidoc-generator</a></li>
                         </ul>
                     </li>
 
