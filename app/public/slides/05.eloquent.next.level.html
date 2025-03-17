@@ -426,7 +426,7 @@ class User extends Model
                             <li>same object instance is returned each time the accessor(<code>-></code>) is invoked</li>
                             <li>any changes to the object are synced back to the model
                                 <pre class="bigger"><code class="hljs php">$user = User::find(1);
-$address = $user->address_object;
+$address = $user->address;
 $address->zip = 9000; // changes the zip of address inside $user
 $user->save(); // updates zip</code></pre>
                             </li>
