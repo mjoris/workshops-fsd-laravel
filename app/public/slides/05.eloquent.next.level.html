@@ -191,25 +191,30 @@ dump($eagerProduct-&gt;brand->name);
             </section>
             <section>
                 <h2>Specifying Relationships and Columns</h2>
-                <ul style="font-size: 85%;width: 75%;">
+                <ul style="font-size: 80%;width: 75%;">
                     <li>
                         Multiple relationships: <pre><code class="hljs php">Book::with(['author', 'publisher'])-&gt;get();</code></pre>
                     </li>
                     <li>
-                        Nested relationships: <pre><code class="hljs php">Book::with('author.contacts')-&gt;get();</code></pre>
-                        <pre><code class="hljs php">Book::with(['author' =&gt; ['contacts', 'publisher']])-&gt;get();</code></pre>
+                        Nested relationships: <pre><code class="hljs php">Book::with('author.contacts')-&gt;get();
+Book::with(['author' =&gt; ['contacts', 'publisher']])-&gt;get();</code></pre>
                     </li>
                     <li>
                         Constraining columns: <pre><code class="hljs php">Book::with('author:id,name')-&gt;get(); // include internally required PK/FK columns </code></pre>
                     </li>
                     <li>
-                        Constraining eager loads:
+                        Constraining (and/or customizing) eager loads:
                         <pre><code class="hljs php">use App\Models\Book;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 
 // you do not need to to this when the benefit is insignificant
 $books = Book::with(['reviews' =&gt; function (Builder $query) {
     $query-&gt;where('rating', '&gt;', 4.0)-&gt;orderBy('created_at', 'asc');
+}])-&gt;get();
+
+// not to be confused with withWhereHas, only querying the books with rating > 4.0
+$books = Book::withWhereHas(['reviews' =&gt; function (Builder $query) {
+    $query-&gt;where('rating', '&gt;', 4.0);
 }])-&gt;get();</code></pre>
                     </li>
                 </ul>
