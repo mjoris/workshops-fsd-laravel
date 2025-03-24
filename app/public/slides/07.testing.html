@@ -41,15 +41,15 @@
                 <h2>Testing overview</h2>
 
                 <ul>
-                    <li>Check the <a href="07.testing.html">slides on Testing</a>
+                    <li>Testing capabilities in Laravel</a>
 
                         <ul style="font-size: 90%;">
                             <li>Unit tests</li>
-                            <li><a href="https://laravel.com/docs/10.x/http-tests">HTTP tests</a> (= <em>scenario</em> or <em>feature</em> tests)</li>
-                            <li><a href="https://laravel.com/docs/10.x/console-tests">Console Tests</a>
+                            <li><a href="https://laravel.com/docs/11.x/http-tests">HTTP tests</a> (= <em>scenario</em> or <em>feature</em> tests)</li>
+                            <li><a href="https://laravel.com/docs/11.x/console-tests">Console Tests</a> (= <em>scenario</em> or <em>feature</em> tests)
                             </li>
-                            <li>Browser Tests with <a href="https://laravel.com/docs/10.x/dusk">Laravel Dusk</a></li>
-                            <li>Creating <a href="https://laravel.com/docs/10.x/database-testing">test database</a> records with model factories and seeders</li>
+                            <li>Browser Tests with <a href="https://laravel.com/docs/11.x/dusk">Laravel Dusk</a></li>
+                            <li>Creating <a href="https://laravel.com/docs/11.x/database-testing">test database</a> records with model factories and seeders</li>
                         </ul>
                     </li>
                 </ul>
@@ -87,9 +87,9 @@
             </section>
 
             <section>
-                <h2>2 Types of Tests in Laravel</h2>
+                <h2>3 main Types of Tests in Laravel</h2>
 
-                <ul style="font-size: 90%;width: 80%;">
+                <ul style="font-size: 85%;width: 80%;">
                     <li><strong>Unit</strong> tests
                         <ul>
                             <li>
@@ -106,10 +106,10 @@
                             </li>
                         </ul>
                     </li>
-                    <li style="margin-top: 1.5em;"><strong>Feature</strong> tests
+                    <li style="margin-top: 1em;"><strong>Feature</strong> tests
                         <ul>
                             <li>
-                                Test larger portions of your code, even the response to a full HTTP request
+                                Test larger portions of your code, even the response to a full HTTP request <small>(or the result after some interaction with you own console command)</small>
                             </li>
                             <li>
                                 Directory: <code>tests/Feature</code>
@@ -122,9 +122,42 @@
                             </li>
                         </ul>
                     </li>
-
+                    <li style="margin-top: 1em;"><strong>Browser</strong> tests
+                        <ul>
+                            <li>Laravel <a href="https://laravel.com/docs/11.x/dusk">Dusk</a>: test your application by (a) browser instance(s)</li>
+                        </ul>
+                    </li>
                 </ul>
 
+            </section>
+
+            <section>
+                <h2>Pest or PHPUnit?</h2>
+
+                <ul style="font-size: 90%;width: 80%;">
+                    <li>Laravel supports testing with <a href="https://pestphp.com">Pest</a> and <a href="https://phpunit.de">PHPUnit</a>
+                        <ul>
+                            <li>However your project can only have installed Pest <strong>or</strong> PHPUnit</li>
+                            <li>Since Laravel 11, <strong>Pest</strong> is the official default</li>
+                            <li>
+                                The <a href="https://laravel.com/docs/11.x/installation#creating-an-application">Laravel installer</a>
+                                lets you choose, but <code>composer create-project</code>* installs <strong>PHPUnit</strong> 🤔
+                            </li>
+                            <li>&longrightarrow; we'll continue with <strong>PHPUnit</strong></li>
+                            <li style="margin-top: 1em;">Pest is built on top of PHPUnit</li>
+                            <li>Currently in Laravel 11, if you want to switch from PHPUnit to Pest, follow <a
+                                href="https://pestphp.com/docs/installation">these instructions</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <footer style="margin-top: 1em;">
+                    <small>
+                        * Since Laravel 11, this installation method has been removed from the documentation.
+                        <br>
+                        So, officially you need <a href="https://github.com/laravel/installer">another piece of software</a>
+                        to install the <a href="https://github.com/laravel/laravel">Laravel software</a>.
+                    </small>
+                </footer>
             </section>
 
             <section>
@@ -145,7 +178,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li style="margin-top: 1.5em;"><code>tests/CreatesApplication</code> bootstraps your application before running the tests.
+                    <li style="margin-top: 1.5em;"><code>tests/TestCase.php</code> is the parent class of all test classes.
                         Leave it there!
                     </li>
 
@@ -164,7 +197,7 @@
                         <pre class="bigger"><code class="hljs bash">php artisan make:test UserTest</code></pre>
                     </li>
                     <li>In this test you may code any tests as you would in <a
-                        href="https://phpunit.readthedocs.io/en/10.5/writing-tests-for-phpunit.html">PHPUnit</a>
+                        href="https://phpunit.readthedocs.io/en/11.5/writing-tests-for-phpunit.html">PHPUnit</a>
                         <pre class="bigger"><code class="hljs php">&lt;?php
 namespace Tests\Unit;
 use PHPUnit\Framework\TestCase;
@@ -194,11 +227,11 @@ class ExampleTest extends TestCase
                     <li>Running all tests
                         <pre class="bigger"><code class="hljs bash">php artisan test</code></pre>
                     </li>
-                    <li><a href="https://phpunit.readthedocs.io/en/10.5/textui.html#command-line-options">Any option</a> passed to the <code>phpunit</code> command, may passed here as well
+                    <li><a href="https://phpunit.readthedocs.io/en/11.5/textui.html#command-line-options">Any option</a> passed to the <code>phpunit</code> command, may passed here as well
                         <pre class="bigger"><code class="hljs bash">php artisan test --testsuite=Feature --filter=UserTest --stop-on-failure</code></pre>
                     </li>
                     <li style="margin-top: 1.5em;">
-                        Speed up the process by <a href="https://laravel.com/docs/10.x/testing#running-tests-in-parallel">running tests in parallel</a>
+                        Speed up the process by <a href="https://laravel.com/docs/11.x/testing#running-tests-in-parallel">running tests in parallel</a>
                     </li>
 
 
@@ -267,7 +300,7 @@ $response
          -&gt;missing('password')
          -&gt;etc()
     );</code></pre>
-                        Read more on <a href="https://laravel.com/docs/10.x/http-tests#fluent-json-testing">Fluent JSON Testing</a>
+                        Read more on <a href="https://laravel.com/docs/11.x/http-tests#fluent-json-testing">Fluent JSON Testing</a>
                     </li>
 
                 </ul>
@@ -278,14 +311,14 @@ $response
                 <h2>More on HTTP Tests</h2>
 
                 <ul style="font-size: 90%;width: 80%;">
-                    <li>Testing <a href="https://laravel.com/docs/10.x/http-tests#testing-file-uploads">File Uploads</a>
+                    <li>Testing <a href="https://laravel.com/docs/11.x/http-tests#testing-file-uploads">File Uploads</a>
                     </li>
                     <li style="margin-top: 1.5em;">
-                        Testing <a href="https://laravel.com/docs/10.x/http-tests#testing-views">Views</a>
+                        Testing <a href="https://laravel.com/docs/11.x/http-tests#testing-views">Views</a>
                     </li>
 
                     <li style="margin-top: 1.5em;">
-                        <a href="https://laravel.com/docs/10.x/http-tests#available-assertions">List of all available assertions</a> on a <code>TestResponse</code> object
+                        <a href="https://laravel.com/docs/11.x/http-tests#available-assertions">List of all available assertions</a> on a <code>TestResponse</code> object
                     </li>
 
 
@@ -297,10 +330,10 @@ $response
                 <h2>More Laravel Testing</h2>
 
                 <ul style="font-size: 90%;width: 80%;">
-                    <li><a href="https://laravel.com/docs/10.x/console-tests">Console Tests</a>
+                    <li><a href="https://laravel.com/docs/11.x/console-tests">Console Tests</a>
                     </li>
-                    <li>Browser Tests with <a href="https://laravel.com/docs/10.x/dusk">Laravel Dusk</a></li>
-                    <li>Creating <a href="https://laravel.com/docs/10.x/database-testing">test database</a> records with model factories and seeders</li>
+                    <li>Browser Tests with <a href="https://laravel.com/docs/11.x/dusk">Laravel Dusk</a></li>
+                    <li>Creating <a href="https://laravel.com/docs/11.x/database-testing">test database</a> records with model factories and seeders</li>
                 </ul>
             </section>
 
