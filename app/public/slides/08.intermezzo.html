@@ -153,6 +153,9 @@ public function store(StorePostRequest $request): RedirectResponse
 {
     // The incoming request is valid and authorized ...
     Blogpost::create($request->all());
+    // Extra FormRequest functionality:
+    //     $request->validated()
+    //     $request->safe()->only(['name', 'email'])
     return redirect('/posts');
 }</code></pre>
                     </li>
@@ -167,9 +170,9 @@ public function store(StorePostRequest $request): RedirectResponse
 
                 <ul style="width: 85%;">
                     <li>Performing <a
-                        href="https://laravel.com/docs/10.x/validation#performing-additional-validation-on-form-requests">additional validation</a></li>
-                    <li>Customizing <a href="https://laravel.com/docs/10.x/validation#customizing-the-error-messages"> the error messages and attribute names (!)</a></li>
-                    <li><a href="https://laravel.com/docs/10.x/validation#preparing-input-for-validation">Preparing</a> the input for validation</li>
+                        href="https://laravel.com/docs/11.x/validation#performing-additional-validation-on-form-requests">additional validation</a></li>
+                    <li>Customizing <a href="https://laravel.com/docs/11.x/validation#customizing-the-error-messages"> the error messages and attribute names (!)</a></li>
+                    <li><a href="https://laravel.com/docs/11.x/validation#preparing-input-for-validation">Preparing</a> the input for validation</li>
                 </ul>
             </section>
 
@@ -187,7 +190,8 @@ public function store(StorePostRequest $request): RedirectResponse
 
                 <ul>
                     <li>
-                        System similar to Blade sections, layouts and includes
+                        System similar to Blade sections, layouts and includes &hellip;<br>
+                        but better: components provide data and attribute binding
                     </li>
                     <li style="margin-top: 1.5em;">
                         2 types of components: class based and anonymous
@@ -292,7 +296,7 @@ public function store(StorePostRequest $request): RedirectResponse
                 <h2>Blade Components: Interested?</h2>
                 <ul>
                     <li>This was just a simple introduction. Read more in the <a
-                        href="https://laravel.com/docs/10.x/blade#components">docs</a></li>
+                        href="https://laravel.com/docs/11.x/blade#components">docs</a></li>
                 </ul>
             </section>
 
@@ -309,24 +313,28 @@ public function store(StorePostRequest $request): RedirectResponse
             <section>
                 <h2>Middleware Introduction</h2>
 
-                <ul>
+                <ul style="font-size: 90%;">
                     <li>
-                        Middleware<small><a href="https://laravel.com/docs/10.x/middleware">&#9873;</a></small> = code executed before or after a request is handled by the application
+                        Middleware<small><a href="https://laravel.com/docs/11.x/middleware">&#9873;</a></small> = code executed before or after a request is handled by the application
                     </li>
                     <li style="margin-top: 1em;">
-                        Middlewares can be global, or only for a specific route or controller
+                        Middlewares can be
                         <ul>
-                            <li>Application middleware</li>
-                            <li>Route/controller specific middleware</li>
+                            <li>global (= run for every HTTP request)</li>
+                            <li>applied to a specific route (group) or controller</li>
+                            <li>part of a <em>middleware group</em>, like the predefined <code>web</code> and <code>api</code> groups </li>
                         </ul>
                     </li>
-                    <li>
-                        Laravel offers pre-built middlewares located in the <code>app/Http/Middleware</code> directory e.g.
+                    <li style="margin-top: 1em;">
+                        Laravel offers pre-built middlewares (inside the Laravel library) e.g.
                         <ul>
                             <li>authentication</li>
                             <li>CSRF protection</li>
                             <li>&hellip;</li>
                         </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        You can define your own middleware
                     </li>
                 </ul>
             </section>
@@ -388,56 +396,116 @@ class EnsureTokenIsValid
             <section>
                 <h2>Registering Global Middleware</h2>
 
-                <ul style="width: 100%;">
+                <ul style="width: 100%;font-size: 90%;">
                     <li>
-                        Add it to the <code>$middleware</code> property of your <code>app/Http/Kernel.php</code> class
+                        In <code>bootstrap/app.php</code>, the 7 default global middlewares are loaded by
+                        <pre class="bigger"><code class="hljs php">-&gt;withMiddleware(function (Middleware $middleware) {})</code></pre>
+                    </li>
+                    <li>
+                        In order to add your own global middleware, replace it by
+                        <pre class="bigger"><code class="hljs php">-&gt;withMiddleware(function (Middleware $middleware) {
+     $middleware-&gt;append(EnsureTokenIsValid::class); // prepend = add it to the beginning of the list
+})</code></pre>
                     </li>
                     <li style="margin-top: 1em;">
-                        What's already in there?
-                        <pre class="bigger"><code class="hljs php">    protected $middleware = [
-        \App\Http\Middleware\TrustProxies::class,
+                        Or manage the global middleware stack yourself:
+                        <pre class="bigger"><code class="hljs php">-&gt;withMiddleware(function (Middleware $middleware) { // this is the default stack (!)
+    $middleware-&gt;use([
+        \Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks::class,
+        // \Illuminate\Http\Middleware\TrustHosts::class,
+        \Illuminate\Http\Middleware\TrustProxies::class,
         \Illuminate\Http\Middleware\HandleCors::class,
-        \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
-        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        \App\Http\Middleware\TrimStrings::class,
+        \Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance::class,
+        \Illuminate\Http\Middleware\ValidatePostSize::class,
+        \Illuminate\Foundation\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-    ];</code></pre>
+    ]);
+})</code></pre>
                     </li>
                 </ul>
+            </section>
+
+            <section data-background="#fdfdfd">
+                <h2>Middleware Aliases</h2>
+                <ul style="width: 85%;font-size: 85%;">
+                    <li>
+                        Some of Laravel's built-in middleware have aliases by default:
+                    </li>
+                </ul>
+                <div style="font-size: 85%;">
+                    <table style="width: 50%;">
+                        <thead>
+                        <tr style="background-color: #0d99a5;color: #ffffff;">
+                            <th>Alias</th>
+                            <th>Middleware</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>auth</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Auth\Middleware\Authenticate</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>auth.basic</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Auth\Middleware\AuthenticateWithBasicAuth</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>auth.session</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Session\Middleware\AuthenticateSession</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>cache.headers</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Http\Middleware\SetCacheHeaders</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>can</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Auth\Middleware\Authorize</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>guest</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Auth\Middleware\RedirectIfAuthenticated</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>password.confirm</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Auth\Middleware\RequirePassword</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>precognitive</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>signed</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Routing\Middleware\ValidateSignature</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>subscribed</code></td>
+                            <td style="padding: 0 0.5em;"><code>\Spark\Http\Middleware\VerifyBillableIsSubscribed</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>throttle</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Routing\Middleware\ThrottleRequests</code> or <code>Illuminate\Routing\Middleware\ThrottleRequestsWithRedis</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0 0.5em;"><code>verified</code></td>
+                            <td style="padding: 0 0.5em;"><code>Illuminate\Auth\Middleware\EnsureEmailIsVerified</code></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <ul style="width: 85%;font-size: 85%;margin-top: 0.5em;">
+                    <li>
+                        If you want, you can <a href="https://laravel.com/docs/11.x/middleware#middleware-aliases">assign aliases</a> to your own middlewares.
+                    </li>
+                </ul>
+
             </section>
 
             <section>
                 <h2>Registering specific middleware (1)</h2>
 
-                <ul>
-                    <li>
-                        <strong>Step 1:</strong> assign a short-hand key to the <code>$middlewareAliases</code> property of your <code>app/Http/Kernel.php</code> class
-                    </li>
-                    <li style="margin-top: 1em;">
-                        What's already in there?
-                        <pre class="bigger"><code class="hljs php" style="font-size: 90%;">    protected $middlewareAliases = [
-        'auth' =&gt; \App\Http\Middleware\Authenticate::class,
-        'auth.basic' =&gt; \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'auth.session' =&gt; \Illuminate\Session\Middleware\AuthenticateSession::class,
-        'cache.headers' =&gt; \Illuminate\Http\Middleware\SetCacheHeaders::class,
-        'can' =&gt; \Illuminate\Auth\Middleware\Authorize::class,
-        'guest' =&gt; \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'password.confirm' =&gt; \Illuminate\Auth\Middleware\RequirePassword::class,
-        'precognitive' =&gt; \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
-        'signed' =&gt; \App\Http\Middleware\ValidateSignature::class,
-        'throttle' =&gt; \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'verified' =&gt; \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-    ];</code></pre>
-                    </li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>Registering specific middleware (2)</h2>
-
                 <ul style="width: 100%;">
                     <li>
-                        <strong>Step 2 option 1:</strong> plug the middleware to a specific route
+                        <strong>Option 1:</strong> plug the middleware to a specific route
                         <pre class="bigger"><code class="hljs php">Route::get('admin/profile', 'UserController@showProfile')-&gt;middleware('auth');</code></pre>
                         <pre class="bigger"><code class="hljs php">Route::get('/', function () {
     //
@@ -452,38 +520,13 @@ class EnsureTokenIsValid
             </section>
 
             <section>
-                <h2>Registering specific middleware (3)</h2>
+                <h2>Registering specific middleware (2)</h2>
 
-                <ul>
+                <ul style="width: 100%;">
                     <li>
-                        <strong>Step 2 option 2:</strong> plug the middleware <a href="https://laravel.com/docs/10.x/controllers#controller-middleware">to a specific controller</a>
-                        <ul>
-                            <li>Call the middleware from the controller's constructor</li>
-                            <li>It is assigned to all actions in the controller</li>
-                        </ul>
-                        <pre class="bigger"><code class="hljs php">class TaskController extends Controller
-{
-    public function __construct()
-    {
-        $this-&gt;middleware('auth');
-
-        $this-&gt;middleware('log')-&gt;only('index');
-
-        $this-&gt;middleware('subscribed')-&gt;except('store');
-    }
-}</code></pre>
-                    </li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>Registering specific middleware (4)</h2>
-
-                <ul>
-                    <li>
-                        <strong>Step 2 option 3:</strong> plug the middleware to a route group
+                        <strong>Option 2:</strong> plug the middleware to a route group
                         <pre class="bigger"><code class="hljs php">Route::middleware(['first', 'second'])-&gt;group(function () {
-    Route::get('/', function ()    {
+    Route::get('/', function () {
         // Uses first and second Middleware
     });
 
@@ -496,37 +539,98 @@ class EnsureTokenIsValid
             </section>
 
             <section>
-                <h2>Middleware Groups</h2>
+                <h2>Registering specific middleware (3)</h2>
 
                 <ul>
                     <li>
-                        Build groups of middleware in the <code>$middlewareGroups</code> property of your <code>app/Http/Kernel.php</code> class
+                        <strong>Option 3:</strong> plug the middleware <a href="https://laravel.com/docs/11.x/controllers#controller-middleware">to a specific controller</a>
+                        <ul>
+                            <li>Implement the <code>HasMiddleware</code> interface</li>
+                            <li>The static function <code>middleware()</code> returns any middlewares that should be applied to the controller's actions</li>
+                        </ul>
+                        <pre class="bigger"><code class="hljs php">class TaskController extends Controller implements HasMiddleware
+{
+    public static function middleware(): array
+    {
+        return [
+            'auth',
+            new Middleware('log', only: ['index']),
+            new Middleware('subscribed', except: ['store']),
+        ];
+    }
+}</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+
+
+            <section>
+                <h2>Middleware Groups (1)</h2>
+
+                <ul style="font-size: 90%;">
+                    <li>Group several middleware under a single <em>key</em></li>
+                    <li style="margin-top: 1em;">
+                        In <code>bootstrap/app.php</code>, the 2 default middleware groups <code>web</code> and <code>api</code> are loaded by
+                        <pre class="bigger"><code class="hljs php">-&gt;withMiddleware(function (Middleware $middleware) {})</code></pre>
                     </li>
                     <li style="margin-top: 1em;">
-                        What's already in there?
-                        <pre class="bigger"><code class="hljs php">protected $middlewareGroups = [
-    // your own group can be assigned to a route, a route group or a controller
-    'web' =&gt; [
-        \App\Http\Middleware\EncryptCookies::class,
+                        The <code>web</code> group applies to any route in <code>routes/web.php</code>
+                    </li>
+                    <li>
+                        The <code>api</code> group applies to any route in <code>routes/api.php</code>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Make your own group or add your middleware to an existing group by:
+                        <pre class="bigger"><code class="hljs php">-&gt;withMiddleware(function (Middleware $middleware) {
+    $middleware-&gt;appendToGroup('my-group', [ // you can also prepend, replace and remove
+        First::class,
+        Second::class,
+    ]);
+
+    $middleware-&gt;web(append: [ // shorthand for appendToGroup('web', ...
+        EnsureUserIsSubscribed::class,
+    ]);
+})</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Middleware Groups (2)</h2>
+
+                <ul style="font-size: 90%;">
+                    <li>
+                        Assign to routes and controller actions using the same syntax as individual middleware:
+                        <pre class="bigger"><code class="hljs php">Route::get('/', 'TaskController@showTask')-&gt;middleware('my-group'); // this is just 1 of the options</code></pre>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Customize the default groups yourself in <code>bootstrap/app.php</code>:
+                        <pre class="bigger"><code class="hljs php">-&gt;withMiddleware(function (Middleware $middleware) { // these are the group defaults (!)
+    $middleware-&gt;group('web', [
+        \Illuminate\Cookie\Middleware\EncryptCookies::class,
         \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \App\Http\Middleware\VerifyCsrfToken::class,
+        \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
-    ],
-    'api' =&gt; [
-        \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+        // \Illuminate\Session\Middleware\AuthenticateSession::class,
+    ]);
+
+    $middleware-&gt;group('api', [
+        // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        // 'throttle:api',
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
-    ],</code></pre>
+    ]);
+})</code></pre>
                     </li>
-                    <li>The web middleware group is automatically applied to your <code>routes/web.php</code> file by the <code>RouteServiceProvider</code> !</li>
                 </ul>
             </section>
 
             <section>
                 <h2>Middleware Parameters</h2>
 
-                <ul style="font-size: 90%;">
+                <ul style="font-size: 85%;">
 
                     <li>
                         Check this interesting example (simple authorization)
@@ -548,6 +652,7 @@ class EnsureUserHasRole
                     </li>
                     <li>
                         Pass your parameters (separated by <code>,</code>) by adding a <code>:</code> after the middleware name
+                        <pre class="bigger"><code class="hljs php">Route::post('blogposts/create', 'PostController@store')->middleware(EnsureUserHasRole::class.':editor');</code></pre>
                         <pre class="bigger"><code class="hljs php">Route::post('blogposts/create', 'PostController@store')->middleware('role:editor');</code></pre>
                     </li>
                 </ul>
@@ -571,9 +676,9 @@ class EnsureUserHasRole
             <section>
                 <h2>Sources</h2>
                 <ul>
-                    <li><a href="https://laravel.com/docs/10.x/validation#form-request-validation">Laravel docs: Form Request Validation</a></li>
-                    <li><a href="https://laravel.com/docs/10.x/blade#components">Laravel docs: Blade Components</a></li>
-                    <li><a href="https://laravel.com/docs/10.x/middleware">Laravel docs: Middleware</a></li>
+                    <li><a href="https://laravel.com/docs/11.x/validation#form-request-validation">Laravel docs: Form Request Validation</a></li>
+                    <li><a href="https://laravel.com/docs/11.x/blade#components">Laravel docs: Blade Components</a></li>
+                    <li><a href="https://laravel.com/docs/11.x/middleware">Laravel docs: Middleware</a></li>
                 </ul>
             </section>
         </section>
