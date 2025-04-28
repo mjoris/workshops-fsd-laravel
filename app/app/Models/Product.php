@@ -21,6 +21,12 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    // added in slides series 09.auth
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     // DEMO ON SERIALIZATION
     //    protected $hidden = ['user_id', 'brand_id'];
     //
