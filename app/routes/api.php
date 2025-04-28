@@ -2,6 +2,7 @@
 
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -62,3 +63,28 @@ Route::get('/v3/products', function (): \Illuminate\Http\Resources\Json\Resource
     // if you don't have a ProductCollection:
     return ProductResource::collection(Product::all());
 });
+
+
+// Version 4: adding products with authentication & authorization
+
+Route::middleware('auth:sanctum')->get('/secret1', function (Request $request): User {
+    return $request->user();
+});
+
+Route::post('/v4/products', function (Request $request): array {
+
+    Gate::authorize('add-product');
+
+    $request->validate([
+        'name' => 'required|unique:products|max:125',
+        'price' => 'required|numeric|min:0.10',
+        'description' => 'required',
+        'brand_id' => 'required|exists:brands,id'
+    ]);
+
+    $product = new Product($request->all());
+    $product->user()->associate(Auth::user());
+    $product->save();
+    return ['message' => 'The product has been created'];
+
+})->middleware('auth:sanctum');
