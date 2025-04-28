@@ -810,7 +810,7 @@ Route::post('/product', function () {
             </section>
         </section>
 
-        <!--section>
+        <section>
             <section>
                 <h2>09.5<br>Web API Authentication</h2>
             </section>
@@ -832,7 +832,7 @@ Route::post('/product', function () {
                                 <strong>API Token Authentication</strong>: your application can issue API tokens, having a very long expiration time, to end users (typically developers). When a 3rd party application makes a request to your Web API, the token should be included in the <code>Authorization</code> header
                             </li>
                             <li style="margin-top: 1em;">
-                                <strong>SPA Authentication</strong>: your SPA is in a trusted domain and can send requests in order to authenticate individual users. Actually, Sanctum &plusmn; falls back to the <em>stateful</em> authentication (with session cookies) you already know.
+                                <strong>SPA Authentication</strong>: your SPA is in the same top-level domain and can send requests in order to authenticate individual users. Actually, Sanctum &plusmn; falls back to the <em>stateful</em> authentication (with session cookies) you already know.
                                 <br>
                                 &longrightarrow; we'll only talk about this type
                             </li>
@@ -849,19 +849,33 @@ Route::post('/product', function () {
                     <li>
                         As described in the <a href="https://laravel.com/docs/11.x/sanctum#spa-authentication">Sanctum docs</a>:
                         <ul>
-                            <li><code>composer require laravel/sanctum</code></li>
-                            <li>(<code>vendor:publish</code> and migration is only required for API Token Authentication)</li>
-                            <li>add Sanctum's middleware to the <code>api</code> middleware group in <code>app/Http/Kernel.php</code>
+                            <li><code>php artisan install:api</code> (we already did so)</li>
+                            <li>(migration is only required for API Token Authentication)</li>
+                            <li>Add Sanctum's middleware in <code>bootstrap/app.php</code>
 
 
-                                <pre class="bigger"><code class="hljs php">'api' =&gt; [
-    \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-    'throttle:api',
-    \Illuminate\Routing\Middleware\SubstituteBindings::class,
-],</code></pre>
+                                <pre class="bigger"><code class="hljs php">-&gt;withMiddleware(function (Middleware $middleware) {
+    $middleware-&gt;statefulApi();
+})</code></pre>
                             </li>
-                            <li>open <code>config/sanctum.php</code> and make sure that your <strong>front-end</strong> <code>domain:port</code> combination is in <code>SANCTUM_STATEFUL_DOMAINS</code>. This setting determines for which domains authentication cookies are set.
-                                <br><strong>Attention:</strong> <code>localhost:3000</code> is not the same as <code>127.0.0.1:3000</code>
+                            <li>Open <code>config/sanctum.php</code> and make sure that your <strong>front end</strong> <code>domain:port</code> combination is in <code>SANCTUM_STATEFUL_DOMAINS</code>. This setting determines for which domains authentication cookies are set.
+                                <br><strong>Attention:</strong> <code>localhost:5173</code> is not the same as <code>127.0.0.1:5173</code>
+                            </li>
+                            <li>
+                                Is your <strong>front end</strong> on a separate subdomain?
+                                <ul>
+                                    <li>
+                                        Publish <code>config/cors.php</code> by <code>php artisan config:publish cors</code>.
+                                        <br>
+                                        Set <code>'supports_credentials' => true</code>.
+                                        <br>
+                                        This will enable HTTP responses with <code>Access-Control-Allow-Credentials: true</code>
+                                    </li>
+                                    <li>
+                                        Still in trouble? Set <code>SESSION_DOMAIN=.my-domain.com</code> in <code>.env</code>.
+                                        The leading <code>.</code> will ensure session cookies are set for any subdomain of the root domain.
+                                    </li>
+                                </ul>
                             </li>
 
                         </ul>
@@ -890,6 +904,7 @@ Route::post('/product', function () {
                                 <pre class="bigger"><code class="hljs php">Route::post('/api/login', function (Request $request): Response {
     $credentials = $request-&gt;only('email', 'password');
     if (Auth::attempt($credentials)) {
+        $request-&gt;session()-&gt;regenerate(); // do your tests first without this line
         return response(['message' =&gt; 'The user has been authenticated successfully'], 200);
     }
     return response(['message' =&gt; 'The provided credentials do not match our records.'], 401);
@@ -910,14 +925,14 @@ Route::post('/product', function () {
                 <ul style="font-size: 85%;width: 90%;">
                     <li>
                         Protect the Web API routes in <code>routes/api.php</code> by plugging the <code>auth:sanctum</code> middleware:
-                        <pre class="bigger"><code class="hljs php">Route::middleware('auth:sanctum')-&gt;get('/secret1', function (Request $request): User {
+                        <pre class="bigger"><code class="hljs php">Route::get('/user', function (Request $request): User {
     return $request-&gt;user();
-});</code></pre>
+})-&gt;middleware('auth:sanctum');</code></pre>
                         <ul>
-                            <li>Actually, Sanctum is just applying the <em>normal</em> <code>web</code> and <code>auth</code> middlewares here</li>
+                            <li>Actually, Sanctum is just applying the <em>normal</em> <code>auth</code> and session-related middlewares here</li>
                             <li>So, if the user includes the right session cookie <code>myapplicationname_session</code>, the user is authenticated in the route</li>
                             <li>Some JavaScript libraries do this automatically for you</li>
-                            <li>Needs a <code>Referer</code> header (!!!)</li>
+                            <li>Needs a <code>Referer</code> or <code>Origin</code> header (!!!)</li>
                         </ul>
                     </li>
                     <li style="margin-top: 1em;">
@@ -941,13 +956,13 @@ Route::post('/product', function () {
             <section data-background="#fdfdfd">
                 <h2>Demo with Insomnia or Postman</h2>
                 <figure class="zoomable-20">
-                    <img src="assets/05/sanctum1.png" alt="Sanctum example 1" height="140">
+                    <a href="assets/05/sanctum1.png" target="_blank"><img src="assets/05/sanctum1.png" alt="Sanctum example 1" height="140"></a>
                 </figure>
                 <figure class="zoomable-20">
-                    <img src="assets/05/sanctum2.png" alt="Sanctum example 2" height="140">
+                    <a href="assets/05/sanctum2.png" target="_blank"><img src="assets/05/sanctum2.png" alt="Sanctum example 2" height="140"></a>
                 </figure>
                 <figure class="zoomable-20">
-                    <img src="assets/05/sanctum3.png" alt="Sanctum example 3" height="140">
+                    <a href="assets/05/sanctum3.png" target="_blank"><img src="assets/05/sanctum3.png" alt="Sanctum example 3" height="140"></a>
                 </figure>
                 <footer><small>demo with Postman on <a
                     href="https://blog.codecourse.com/laravel-sanctum-airlock-with-postman/">codecourse</a></small></footer>
@@ -985,13 +1000,12 @@ Route::post('/product', function () {
 
             </section>
 
-            <section>
+            <!--section>
                 <h2>Full example: laravel-tasks-api</h2>
                 <p><a href="https://gitlab.com/ikdoeict/joris.maervoet/laravel-tasks-api">https://gitlab.com/ikdoeict/joris.maervoet/laravel-tasks-api</a></p>
-            </section>
+            </section-->
 
-
-        </section-->
+        </section>
 
 
 
