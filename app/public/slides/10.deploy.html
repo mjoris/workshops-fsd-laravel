@@ -31,10 +31,10 @@
             <h1>10. Deploy</h1>
         </section>
 
-        <!-- Digging deeper -->
+        <!-- Before we conclude &hellip; -->
         <section>
             <section>
-                <h2>10.1<br>Digging deeper</h2>
+                <h2>10.1<br>Before we conclude &hellip;</h2>
             </section>
 
             <section>
@@ -44,37 +44,37 @@
                         Let's have a tiny introduction to &hellip;
                         <ul>
                             <li>
-                                <a href="https://laravel.com/docs/10.x/logging">Logging</a>
+                                <a href="https://laravel.com/docs/11.x/logging">Logging</a>
                                 <br>
-                                Hint: check 1 of the Laravel log readers, or try <a href="https://laravel.com/docs/10.x/telescope">Laravel Telescope</a>
+                                Hint: check 1 of the Laravel log readers, or try <a href="https://laravel.com/docs/11.x/telescope">Laravel Telescope</a>
                             </li>
                             <li>
-                                <a href="https://laravel.com/docs/10.x/artisan#writing-commands">Writing commands</a> for Artisan Console
+                                <a href="https://laravel.com/docs/11.x/artisan#writing-commands">Writing commands</a> for Artisan Console
                             </li>
                             <li>
-                                <a href="https://laravel.com/docs/10.x/mail">Mail</a> and Mailables
+                                <a href="https://laravel.com/docs/11.x/mail">Mail</a> and Mailables
                             </li>
                             <li>
-                                <a href="https://laravel.com/docs/10.x/scheduling">Task Scheduling</a> (<a href="https://laravel.com/docs/10.x/scheduling#running-the-scheduler">how to run the scheduler</a>)
+                                <a href="https://laravel.com/docs/11.x/scheduling">Task Scheduling</a> (<a href="https://laravel.com/docs/11.x/scheduling#running-the-scheduler">how to run the scheduler</a>)
                             </li>
                             <li>
-                                <a href="https://laravel.com/docs/10.x/localization">Localization</a> and <a
+                                <a href="https://laravel.com/docs/11.x/localization">Localization</a> and <a
                                 href="https://laravel-lang.com/">Laravel Lang</a>
                             </li>
                         </ul>
                     </li>
                     <li>
                         And there's much more:
-                        <a href="https://laravel.com/docs/10.x/cache">Cache</a>
-                        <a href="https://laravel.com/docs/10.x/events">Events</a>
-                        <a href="https://laravel.com/docs/10.x/socialite">Socialite</a>
+                        <a href="https://laravel.com/docs/11.x/cache">Cache</a>
+                        <a href="https://laravel.com/docs/11.x/events">Events</a>
+                        <a href="https://laravel.com/docs/11.x/socialite">Socialite</a>
                         &hellip;
                     </li>
                 </ul>
             </section>
         </section>
 
-        <!-- Testing -->
+        <!-- Linting &amp; Code Analysis -->
         <section>
             <section>
                 <h2>10.2<br>Linting &amp; Code Analysis</h2>
@@ -96,8 +96,9 @@
                     <li style="margin-top: 0.5em;">Tools
 
                         <ul style="font-size: 90%;">
-                            <li><a href="https://laravel.com/docs/10.x/pint">Laravel Pint</a> (style)</li>
-                            <li><a href="https://github.com/larastan/larastan">Larastan</a> (code analysis)</li>
+                            <li><a href="https://laravel.com/docs/11.x/pint">Laravel Pint</a> (style)</li>
+                            <li><a href="https://github.com/larastan/larastan">Larastan</a> (code <a
+                                href="https://github.com/larastan/larastan/blob/3.x/docs/rules.md">analysis</a>)</li>
                             <li><a href="https://www.laravel-enlightn.com/">Enlightn</a> (performance &amp; security)</li>
                         </ul>
                     </li>
@@ -116,7 +117,7 @@
                         </ul>
                     </li>
                     <li style="margin-top: 0.5em;">
-                        Integrate them in your CI/CD pipeline
+                        Integrate them in your CI/CD pipeline, together with your tests
                     </li>
                 </ul>
 
@@ -139,16 +140,7 @@
                             You login to Plesk on <code>https://firstnamelastname.ikdoeict.be:8443/</code> using your Odisee-credentials
                         </li>
                         <li style="margin-top: 0.5em;">
-                            You can use the SSH Terminal (in order to run commands) from the Plesk web interface, or with an SSH client (like PuTTY)
-                        </li>
-                        <li style="margin-top: 0.5em;">
-                            Set up for an SSH client:
-                            <ol>
-                                <li>Generate a key pair e.g. <code>ssh-keygen -t rsa -b 2048</code></li>
-                                <li>Register the public key in Plesk (pull button &gt; SSH Keys Manager)</li>
-                                <li>Find IP address and username in Plesk (tab Hosting &amp; DNS &gt; Hosting &gt; Hosting Settings)</li>
-                                <li>Configure your SSH client with private key, IP address and username</li>
-                            </ol>
+                            You can use the SSH Terminal (in order to run commands) from the Plesk web interface
                         </li>
                     </ul>
                     </li>
@@ -184,7 +176,7 @@
             </section>
 
             <section>
-                <h2>Demo: deployment on Plesk (2)</h2>
+                <h2>Demo: deployment on Plesk (3)</h2>
                 <ol style="font-size: 80%;width:75%;" start="4">
                     <li>From SSH Terminal
                         <pre class="bigger"><code class="hljs bash">cd laravel-tasks-api/app/
@@ -201,7 +193,7 @@ DB_USERNAME=(copy from your notepad)
 DB_PASSWORD=(copy from your notepad)</code></pre>
                         In case it's a web API used from an SPA from other subdomain with auth:
                         <pre class="bigger"><code class="hljs bash">SANCTUM_STATEFUL_DOMAINS=ikdoeict.be,frontend.bartdelrue.ikdoeict.be
-SESSION_DOMAIN=ikdoeict.be</code></pre>
+SESSION_DOMAIN=.ikdoeict.be</code></pre>
                     </li>
                     <li style="margin-top: 0.5em;">Further run in SSH Terminal
                         <pre class="bigger"><code class="hljs bash">php artisan storage:link
@@ -215,13 +207,15 @@ php artisan db:seed</code></pre>
             <section>
                 <h2>Further optimization</h2>
                 <ul style="font-size: 80%;width:80%;">
-                    <li>Read the <a href="https://laravel.com/docs/10.x/deployment#optimization">docs on Optimization</a> carefully and further optimize production with
-                        <pre class="bigger"><code class="hljs bash">composer install --optimize-autoloader --no-dev
-php artisan config:cache
+                    <li>Read the <a href="https://laravel.com/docs/11.x/deployment#optimization">docs on Optimization</a> carefully and further optimize production with
+                        <pre class="bigger"><code class="hljs bash">php artisan config:cache
+php artisan event:cache
 php artisan route:cache
 php artisan view:cache</code></pre>
 
                     </li>
+                    <li style="margin-top: 1em;">All at once: <code>php artisan optimize</code></li>
+                    <li style="margin-top: 1em;">Disable caching: <code>php artisan optimize:clear</code></li>
                     <li style="margin-top: 1em;">Your webapp is even faster but enabling these caches might have side-effects! Caution!</li>
                 </ul>
 
@@ -231,7 +225,7 @@ php artisan view:cache</code></pre>
                 <h2>Maintenance mode</h2>
                 <ul style="font-size: 80%;width:80%;">
                     <li>Did you know you can put the whole application in <a
-                        href="https://laravel.com/docs/10.x/configuration#maintenance-mode">maintenance mode</a>?
+                        href="https://laravel.com/docs/11.x/configuration#maintenance-mode">maintenance mode</a>?
                         <pre class="bigger"><code class="hljs bash">php artisan down</code></pre>
 
                     </li>
@@ -246,13 +240,9 @@ php artisan view:cache</code></pre>
                     <li>Boils down to running a set of commands, for example (just an example !)
                         <pre class="bigger"><code class="hljs bash">php artisan down
 git pull
-composer install --optimize-autoloader --no-dev
+composer install --no-dev
 php artisan migrate
-php artisan cache:clear
-php artisan route:cache
-php artisan view:clear
-php artisan view:cache
-php artisan config:cache
+php artisan optimize
 php artisan up</code></pre>
 
 
@@ -277,6 +267,7 @@ php artisan up</code></pre>
                 <ul>
                     <li>a tool executing commands (over SSH) on remote servers</li>
                     <li>uses the Blade syntax to define tasks for deployment</li>
+
                 </ul>
             </section>
 
@@ -299,9 +290,33 @@ php artisan up</code></pre>
                         Run a task by
                         <pre class="bigger"><code class="hljs bash">php vendor/bin/envoy run deploy --branch=master</code></pre>
                     </li>
-                    <li>Want more? <a href="https://laravel.com/docs/10.x/envoy">Envoy Docs</a> </li>
-                    <li><a href="https://warrickbayman.medium.com/zero-downtime-laravel-deployments-with-envoy-version-2-227c8259e31c#1ed2">Example</a></li>
-                    <li>In a CI/CD context often executed only on the production server</li>
+                    <li>Want more? <a href="https://laravel.com/docs/11.x/envoy">Envoy Docs</a> </li>
+
+                    <li>Envoy is especially popular for small to mid-size projects or teams that want to keep things simple without setting up a full CI/CD pipeline: <a href="https://warrickbayman.medium.com/zero-downtime-laravel-deployments-with-envoy-version-2-227c8259e31c#1ed2">Example</a></li>
+                    <li>Envoy can be used inside a CI/CD pipeline</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Sidenote</h2>
+                <ul style="font-size: 80%;">
+                    <li>Want to use Envoy in order to deploy to Plesk from your local machine?
+                        <ul>
+                            <li style="margin-top: 0.5em;">
+                                Set up SSH connection:
+                                <ol>
+                                    <li>Generate a key pair e.g. <code>ssh-keygen -t rsa -b 2048</code> (or reuse the key pair in <code>~/.ssh</code>)</li>
+                                    <li>Register the public key in Plesk (pull button &gt; SSH Keys Manager)</li>
+                                    <li>
+                                        Find IP address and username in Plesk (tab Hosting &amp; DNS &gt; Hosting &gt; Hosting Settings)
+                                        <br>
+                                        Host name <strong>cloudplesk.ikdoeict.be</strong> will work as well
+                                    </li>
+                                    <li>Use <strong>your.name@cloudplesk.ikdoeict.be</strong> in <code>/Envoy.blade.php</code>. Envoy will use the SSH key from the underlying OS.</li>
+                                </ol>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </section>
 
@@ -335,12 +350,14 @@ php artisan up</code></pre>
                 <ul style="font-size: 80%;">
                     <li>
                         Loris Leiva, <a href="https://lorisleiva.com/using-gitlabs-pipeline-with-laravel">Using GitLab's pipeline with Laravel</a>
-
-                    </li>
-                    <li>(Loris Leiva, <a href="https://lorisleiva.com/laravel-deployment-using-gitlab-pipelines">Laravel deployment using GitLab's pipelines</a>)
+                        &rightarrow; <a href="https://github.com/lorisleiva/laravel-docker/blob/main/gitlab/.gitlab-ci.tests.yml">.gitlab-ci.yml</a>
                     </li>
                     <li>
-                        GitLab Docs, <a href="https://docs.gitlab.com/ee/ci/examples/laravel_with_gitlab_and_envoy/">Test and deploy Laravel applications with GitLab CI/CD and Envoy</a>
+                        Loris Leiva, <a href="https://lorisleiva.com/laravel-deployment-using-gitlab-pipelines">Laravel deployment using GitLab's pipelines</a>
+                        &rightarrow; <a href="https://github.com/lorisleiva/laravel-docker/blob/main/gitlab/.gitlab-ci.deployments.yml">.gitlab-ci.yml</a>
+                    </li>
+                    <li>
+                        Ahmed Esa, <a href="https://medium.com/@ahmedesa/automated-laravel-deployment-to-cpanel-via-gitlab-ci-cd-and-envoy-c2aaaff96a70">Automated Laravel Deployment to cPanel via GitLab CI/CD and Envoy</a>
                     </li>
 
                 </ul>
