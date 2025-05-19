@@ -363,6 +363,187 @@ php artisan up</code></pre>
                 </ul>
             </section>
 
+            <section>
+                <h2>Gitlab pipeline for ikdoeict/Plesk (1)</h2>
+                <ul>
+                    <li>
+                        Idea: change testing defaults to <strong>in-memory SQLite</strong> anywhere
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Stages: use a <code>lorisleiva/laravel-docker:8.3</code> container to build, lint, test and deploy
+                    </li>
+                    <li style="margin-top: 1em;font-size: 80%;">
+                        Preparation
+                        <ul>
+                            <li>Generate a key pair in a dummy directory on your system: <code>ssh-keygen -t rsa -b 2048</code></li>
+                            <li>Register the public key in your Plesk account: <br>Pull button &gt; SSH Keys &gt; SSH Keys Manager</li>
+                            <li>
+                                Enter the private key and your Plesk username in your Gitlab-account
+                                <br>
+                                Settings &gt; CI/CD &gt; Variables
+                                <br>
+                                variable type “File” with key “SSH_PRIVATE_KEY” (put newline at end of key)
+                                <br>
+                                variable type “Variable” with key “SSH_USERNAME”
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Gitlab pipeline for ikdoeict/Plesk (2)</h2>
+                <ul style="font-size: 80%;width: 100%;">
+                    <li>
+                        In <code>phpunit.xml</code>, enable testing with <strong>in-memory SQLite</strong>:
+                    </li>
+                </ul>
+                <pre class="bigger"><code class="hljs xml" style="font-size: 80%;">        &lt;env name="DB_CONNECTION" value="sqlite"/&gt;
+        &lt;env name="DB_DATABASE" value=":memory:"/&gt;</code></pre>
+                <ul style="font-size: 80%;width: 100%;">
+                    <li>
+                        Write your tests with the trait <code>RefreshDatabase</code> &hellip;
+                    </li>
+                </ul>
+                <pre class="bigger"><code class="hljs php" style="font-size: 80%;height:10em;">&lt;?php
+
+namespace Tests\Feature;
+
+use App\Models\Task;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class TaskControllerTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected User $standardUser;
+    protected User $adminUser;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this-&gt;standardUser = User::factory()-&gt;create(['role' =&gt; 'standard']);
+        $this-&gt;adminUser = User::factory()-&gt;create(['role' =&gt; 'admin']);
+    }
+
+    public function test_a_standard_user_can_only_see_his_own_tasks()
+    {
+        $task = Task::factory()-&gt;create(['user_id' =&gt; $this-&gt;standardUser-&gt;id]);
+        Task::factory()-&gt;create(); // Task for someone else
+
+        $response = $this-&gt;actingAs($this-&gt;standardUser)-&gt;getJson('/api/tasks');
+
+        $response-&gt;assertOk();
+        $response-&gt;assertJsonCount(1, 'data');
+        $response-&gt;assertJsonFragment(['id' =&gt; $task-&gt;id]);
+    }
+
+    public function test_an_admin_can_see_all_tasks()
+    {
+        Task::factory()-&gt;count(3)-&gt;create();
+
+        $response = $this-&gt;actingAs($this-&gt;adminUser)-&gt;getJson('/api/tasks');
+
+        $response-&gt;assertOk();
+        $response-&gt;assertJsonCount(3, 'data');
+    }
+}</code></pre>
+                <ul style="font-size: 80%;width: 100%;">
+                    <li>
+                         &hellip; and factories:
+                    </li>
+                </ul>
+                <pre class="bigger"><code class="hljs php" style="font-size: 80%;height:10em;">&lt;?php
+namespace Database\Factories;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class TaskFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'description' =&gt; fake()-&gt;sentence,
+            'priority' =&gt; fake()-&gt;randomElement(['low', 'medium', 'high']),
+            'user_id' =&gt; User::factory(),
+            'created_at' =&gt; now(),
+        ];
+    }
+}
+</code></pre>
+
+            </section>
+
+            <section>
+                <h2>Gitlab pipeline for ikdoeict/Plesk (3)</h2>
+                <ul style="font-size: 80%;width: 100%;">
+                    <li>
+                        Your <code>.gitlab-ci.yml</code>:
+                    </li>
+                </ul>
+                        <pre class="bigger"><code class="hljs php"  style="font-size: 80%;">image: lorisleiva/laravel-docker:8.3
+
+stages:
+  - build
+  - lint
+  - test
+  - deploy
+
+default:
+  before_script:
+    - cd app
+
+# Build Stage
+composer:
+  stage: build
+  script:
+    - composer install --no-interaction --no-ansi --no-progress
+    - cp .env.example .env
+    - php artisan key:generate
+  artifacts:
+    paths:
+      - app/vendor/
+      - app/.env
+    expire_in: 1h
+
+# Lint stage
+pint:
+  stage: lint
+  dependencies:
+    - composer
+  script:
+    - vendor/bin/pint --test
+
+# Test Stage
+unit_test:
+  stage: test
+  dependencies:
+    - composer
+  script:
+    - php artisan test
+
+# Deploy Stage
+deploy:
+  stage: deploy
+  script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - chmod 400 "$SSH_PRIVATE_KEY"
+    - ssh-add "$SSH_PRIVATE_KEY"
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+    - ssh $SSH_USERNAME@cloudplesk.ikdoeict.be "export PATH=/opt/plesk/php/8.3/bin:\$PATH &amp;&amp; cd /data/vhosts/jorismaervoet.ikdoeict.be/laravel-tasks-api-11 &amp;&amp; git pull origin master &amp;&amp; cd app &amp;&amp; composer install --no-interaction --prefer-dist --optimize-autoloader &amp;&amp; php artisan migrate --force &amp;&amp; php artisan optimize"
+  only:
+    - master</code></pre>
+                <footer><small>replace <code>/data/vhosts/jorismaervoet.ikdoeict.be/laravel-tasks-api-11</code> with your own deploy directory. Hint: run <code>pwd</code> in your Plesk terminal</small></footer>
+
+            </section>
+
         </section>
 
 
