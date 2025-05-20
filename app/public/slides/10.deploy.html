@@ -542,7 +542,8 @@ deploy:
     - ssh $SSH_USERNAME@cloudplesk.ikdoeict.be "export PATH=/opt/plesk/php/8.3/bin:\$PATH &amp;&amp; cd /data/vhosts/jorismaervoet.ikdoeict.be/laravel-tasks-api-11 &amp;&amp; git pull origin master &amp;&amp; cd app &amp;&amp; composer install --no-interaction --prefer-dist --optimize-autoloader &amp;&amp; php artisan migrate --force &amp;&amp; php artisan optimize"
   only:
     - master</code></pre>
-                <footer><small>replace <code>/data/vhosts/jorismaervoet.ikdoeict.be/laravel-tasks-api-11</code> with your own deploy directory. Hint: run <code>pwd</code> in your Plesk terminal</small></footer>
+                <footer><small>replace <code>/data/vhosts/jorismaervoet.ikdoeict.be/laravel-tasks-api-11</code> with your own deploy directory. Hint: run <code>pwd</code> in your Plesk terminal
+                    <br> and replace <code>master</code> by <code>main</code> if needed</small></footer>
 
             </section>
 
