@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Full-stack Development – Laravel course materials</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme ">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section data-background="#b5533c">
+            <h3>Full-stack Development  [OGI03<span style="text-transform: none">r</span>]</h3>
+            <h1>12. Hybrid Rendering</h1>
+        </section>
+
+        <!-- Introduction -->
+        <section>
+            <section>
+                <h2>12.1<br>Introduction</h2>
+            </section>
+
+            <section>
+                <h2>Hybrid Rendering &amp; Modern Monoliths</h2>
+                <ul>
+                    <li>
+                        Why Hybrid Rendering?
+                        <ul>
+                            <li>SPAs are powerful but complex (API, state, hydration...)</li>
+                            <li>Server rendering is simple but less dynamic</li>
+                            <li>Hybrid approaches give us the best of both worlds</li>
+                            <li>No need to separate frontend/backend completely</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        What is a Modern Monolith?
+                        <ul>
+                            <li>Single codebase for backend and frontend</li>
+                            <li>No separate API required</li>
+                            <li>Interactivity with minimal JavaScript</li>
+                            <li>Examples: Inertia, Livewire, HTMX, Fusion</li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </section>
+
+            <section>
+                <h2>Before we start</h2>
+                <ul>
+                    <li>
+                        Laravel's <a href="https://laravel.com/docs/11.x/vite">asset bundling</a> uses
+                        <a href="https://vite.dev/">Vite</a> as front-end build tool
+                    </li>
+                    <li>
+                        In Laravel's project root there are: <code>package.json</code> and <code>vite.config.js</code>
+                    </li>
+                    <li>
+                        Typically you develop in <code>resources/ts/*</code>, <code>resources/js/*</code> and <code>resources/css/*</code>
+                    </li>
+                    <li>
+                        You run <code>npm run dev</code> and <code>npm run build</code>, building to <code>public/build</code>
+                    </li>
+                    <li>
+                        From your Blade template(s), load your scripts by <code>@vite('resources/js/app.js')</code>
+                    </li>
+                    <li>
+                        <code>public/build</code> is in <code>.gitignore</code>, so you will need to build for/to production
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Because we use Docker in order to share the same set of servers &amp; tools inside our dev project,
+                        it's advisory to use <code>npm</code> from our Docker env, but <strong>mind the bug</strong> when not executing <code>npm</code> as root user:
+                        <a href="09.auth.html#/2/3">fix</a>.
+                    </li>
+                </ul>
+
+            </section>
+        </section>
+
+        <section>
+
+            <section>
+                <h2>12.2<br>HTMX</h2>
+            </section>
+            <section>
+                <h2>HTMX</h2>
+                <p><a href="https://htmx.org/">htmx.org</a></p>
+                <ul>
+                    <li><strong>Created by:</strong> Carson Gross (2020)</li>
+                    <li><strong>What:</strong> lightweight JavaScript library</li>
+                    <li><strong>How:</strong> enhances HTML with dynamic behavior using custom attributes (hx-*)</li>
+                    <li>HTML-over-the-wire interaction with minimal JavaScript</li>
+                    <li><strong>Backend:</strong> server-independent (works well with Laravel Blade)</li>
+                    <li style="margin-top: 1em;">
+                        htmx is <em>controversial</em>:
+                        <a href="https://dev.to/turculaurentiu91/why-you-should-choose-htmx-for-your-next-project-o7j">HTMX for your next project</a>,
+                        <a href="https://konfigthis.com/blog/htmx/">1,000s of opinions</a>,
+                        <a href="https://htmx.org/essays/htmx-sucks/">htmx sucks</a> #ironical,
+                        <a href="https://htmx.org/essays/future/">the future of htmx</a>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>HTMX example</h2>
+                <p>HTML</p>
+                <pre class="bigger"><code class="hljs html">&lt;script src="/path/to/htmx.min.js" defer&gt;&lt;/script&gt;
+&hellip;
+&lt;!-- Button that triggers an HTML fragment replacement --&gt;
+&lt;button hx-get="/counter" hx-target="#count" hx-swap="outerHTML"&gt;Increment&lt;/button&gt;
+&lt;div id="count"&gt;0&lt;/div&gt;</code></pre>
+                <p><strong>URL</strong> <code>/counter</code> - server response (to request containing <code>HX-Request</code> header)</p>
+                <pre class="bigger"><code class="hljs html">&lt;!-- Response is HTML that replaces the #count element --&gt;
+&lt;div id="count"&gt;1&lt;/div&gt;</code></pre>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h2>12.3<br>Inertia.js</h2>
+            </section>
+
+            <section>
+                <h2>Inertia.js</h2>
+                <p><a href="https://inertiajs.com/">inertiajs.com</a></p>
+                <ul>
+                    <li><strong>Created by:</strong> Jonathan Reinink (2019)</li>
+                    <li><strong>What:</strong> JavaScript library + Laravel adapter</li>
+                    <li><strong>How:</strong> Laravel returns JSON with props and component name</li>
+                    <li><strong>Frontend:</strong> Vue/React/Svelte renders page</li>
+                    <li style="margin-top: 1em;">Let's read about the <a href="https://inertiajs.com/server-side-setup">server-side</a> and
+                        <a href="https://inertiajs.com/client-side-setup">client-side</a> setup</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Inertia.js example (1)</h2>
+                <p>Vue-component <code>/resources/js/Pages/Post/index.vue</code></p>
+                <pre class="bigger"><code class="hljs javascript">&lt;template&gt;
+&lt;div&gt;
+  &lt;h1&gt;My Inertia CRUD&lt;/h1&gt;
+  &lt;Link href="posts/create"&gt;Create new Post&lt;/Link&gt;
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th v-for=&quot;header in headers&quot; :key=&quot;header&quot;&gt;
+          {{ header }}
+        &lt;/th&gt;
+      &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        &lt;tr v-for=&quot;post in posts&quot; :key=&quot;post.id&quot;&gt;
+          &lt;td&gt;{{ post.title }}&lt;/td&gt;
+          &lt;td&gt;{{ post.body }}&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+import { Link } from "@inertiajs/vue3";
+
+defineProps({
+  posts: {
+    type: Array,
+    default: () =&gt; [],
+  },
+});
+
+const headers = [&quot;posts&quot;, &quot;body&quot;];
+&lt;/script&gt;</code></pre>
+            </section>
+
+            <section style="font-size: 85%;">
+                <h2>Inertia.js example (2)</h2>
+                <p>Laravel controller <code>/routes/web.php</code></p>
+                <pre class="bigger"><code class="hljs php">use Inertia\Inertia;
+
+Route::get('/posts', function () {
+    $posts = Post::all();
+    return Inertia::render('Post/Index', ['posts' =&gt; $posts]);
+});</code></pre>
+
+                <p><code>/posts</code> returns full HTML unless it contains a <code>X-Inertia: true</code> header, than it returns JSON:</p>
+                <pre class="bigger"><code class="hljs json"  style="height: 18em;">{
+  "component": "Post/Index",
+  "props": {
+    "posts": [
+      {
+        "id": 1,
+        "title": "First Post",
+        "body": "This is the first post.",
+        "created_at": "2025-06-01T12:00:00.000000Z",
+        "updated_at": "2025-06-01T12:00:00.000000Z"
+      },
+      {
+        "id": 2,
+        "title": "Second Post",
+        "body": "This is the second post.",
+        "created_at": "2025-06-01T13:00:00.000000Z",
+        "updated_at": "2025-06-01T13:00:00.000000Z"
+      }
+    ]
+  },
+  "url": "/posts",
+  "version": null
+}</code></pre>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h2>12.4<br>Fusion</h2>
+            </section>
+
+            <section>
+                <h2>Fusion</h2>
+                <p><a href="https://github.com/fusion-php/fusion">github.com/fusion-php/fusion</a></p>
+                <ul>
+                    <li><strong>Created by:</strong> Aaron Francis (2023)</li>
+                    <li><strong>Status:</strong> very early development preview</li>
+                    <li><strong>What:</strong>
+                        <ul>
+                            <li>you write in 1 file both PHP/Laravel and JavaScript/Vue</li>
+                            <li>Fusion runs your PHP block as part of a Laravel controller</li>
+                            <li>Fusion transpiles the JavaScript (prop injection)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Technology:</strong> only works on Laravel + Inertia.js</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Fusion example</h2>
+                <pre class="bigger"><code class="hljs php">&lt;php&gt;
+  new class {
+    public string $name;
+
+    public function mount()
+    {
+      $this-&gt;name = Auth::user()-&gt;name;
+    }
+  }
+&lt;/php&gt;
+
+&lt;template&gt;
+  Hello {{ name }}!
+&lt;/template&gt;</code></pre>
+            </section>
+
+        </section>
+
+        <section>
+            <section>
+                <h2>12.5<br>Livewire</h2>
+            </section>
+
+            <section>
+                <h2>Livewire</h2>
+                <p><a href="https://livewire.laravel.com/">livewire.laravel.com</a> (url since v3)</p>
+                <ul>
+                    <li><strong>Created by:</strong> Caleb Porzio (2019)</li>
+                    <li><strong>What:</strong> dynamic front-end applications entirely written in Laravel/PHP</li>
+                    <li style="margin-top: 0.5em;">
+                        <strong>How:</strong>
+                        <ol start="0" style="font-size: 80%;">
+                            <li><strong>Initial page load:</strong> server renders Blade component, but injects some JavaScript (Livewire JS bridge + Alpine.js)</li>
+                            <li style="margin-top: 0.5em;"><strong>User interaction:</strong> Livewire JS bridge captures the event and sends request to the server (url <code>livewire/update</code>) with component's state and action</li>
+                            <li style="margin-top: 0.5em;">
+                                <strong>Request is processed on the server:</strong>
+                                <ol>
+                                    <li>Livewire reruns component class</li>
+                                    <li>Livewire renders the Blade view again</li>
+                                    <li>Livewire returns a JSON response with the new rendered HTML fragment and state</li>
+                                </ol>
+                            </li>
+                            <li style="margin-top: 0.5em;"><strong>On the client:</strong> Livewire JS bridge receives the response and replaces parts of the DOM</li>
+                        </ol>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Livewire example (1)</h2>
+                <ul style="font-size: 85%;width: 100%;">
+                    <li>
+                        Install: <code>composer require livewire/livewire</code>
+                    </li>
+                    <li>
+                        Create a component: <code>php artisan make:livewire counter</code>
+                    </li>
+                    <li>
+                        &longrightarrow; generates <code>app/Livewire/Counter.php</code> and <code>resources/views/livewire/counter.blade.php</code>
+                    </li>
+                    <li>
+                        Let's update <code>resources/views/livewire/counter.blade.php</code>
+                    </li>
+                </ul>
+                <pre class="bigger"><code class="hljs html">&lt;div&gt;
+    &lt;h1&gt;{{ $count }}&lt;/h1&gt;
+
+    &lt;button wire:click=&quot;increment&quot;&gt;+&lt;/button&gt;
+
+    &lt;button wire:click=&quot;decrement&quot;&gt;-&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Livewire example (2)</h2>
+                <ul style="font-size: 85%;width: 100%;">
+                    <li>
+                        Let's update our component <code>app/Livewire/Counter.php</code>
+                    </li>
+                </ul>
+                <pre class="bigger"><code class="hljs php">namespace App\Livewire;
+
+use Livewire\Component;
+
+class Counter extends Component
+{
+    public $count = 1;
+
+    public function increment()
+    {
+        $this-&gt;count++;
+    }
+
+    public function decrement()
+    {
+        $this-&gt;count--;
+    }
+
+    public function render()
+    {
+        return view(&apos;livewire.counter&apos;);
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>Livewire example (3)</h2>
+                <ul style="font-size: 85%;width: 100%;">
+                    <li>
+                        Want to render this component?
+                    </li>
+                    <li>
+                        Components can be rendered directly in <code>routes/web.php</code> if there is a default layout
+                        <pre class="bigger"><code class="hljs php">use App\Livewire\Counter;
+
+Route::get('/counter', Counter::class);</code></pre>
+                    </li>
+                    <li>
+                        &longrightarrow; Let's create a default layout: <code>php artisan livewire:layout</code>
+                    </li>
+                    <li>
+                        &longrightarrow; creates <code>resources/views/components/layouts/app.blade.php</code>
+                        <pre class="bigger"><code class="hljs">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;{{ str_replace(&apos;_&apos;, &apos;-&apos;, app()-&gt;getLocale()) }}&quot;&gt;
+    &lt;head&gt;
+        &lt;meta charset=&quot;utf-8&quot;&gt;
+        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+
+        &lt;title&gt;{{ $title ?? &apos;Page Title&apos; }}&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        {{ $slot }}
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Livewire: server response</h2>
+                <p><strong>URL:</strong> <code>/livewire/message/counter</code></p>
+                <pre class="bigger"><code class="hljs json">{
+  &quot;components&quot;: [
+    {
+      &quot;snapshot&quot;: &quot;{...}&quot;, // component state ("count" : 2) + metadata + checksum
+      &quot;effects&quot;: {
+        &quot;returns&quot;: [null], // as returned by the method increment()
+        &quot;html&quot;: &quot;&lt;div wire:id=\&quot;...\&quot;&gt;...&lt;/div&gt;&quot; // the updated HTML to be patched into the DOM.
+      }
+    }
+  ],
+  &quot;assets&quot;: [] // for dynamic injection of scripts, styles, ...
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>Setting properties</h2>
+                <ul style="font-size: 80%;">
+                    <li>
+                        With this component
+                        <pre class="bigger"><code class="hljs">class CreatePost extends Component
+{
+    public $title;
+
+    public function render()
+    {
+        return view(&apos;livewire.create-post&apos;)-&gt;with([
+            &apos;author&apos; =&gt; Auth::user()-&gt;name,
+        ]);
+    }
+}</code></pre>
+                        both <code>$title</code> and <code>$author</code> are avialable in the view:
+                        <pre class="bigger"><code class="hljs html">&lt;div&gt;
+    &lt;h1&gt;Title: {{ $title }}&lt;/h1&gt;
+
+    &lt;span&gt;Author: {{ $author }}&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Rendering Livewire Components (1)</h2>
+                <ul style="font-size: 80%;">
+                    <li>
+                        Option 1: include from an existing Blade view
+                        <pre class="bigger"><code class="hljs html">&lt;livewire:create-post /&gt;</code></pre>
+                        <ul>
+                            <li>
+                                always us kebab-case
+                            </li>
+                            <li>
+                                pass data like this:
+                                <pre class="bigger"><code class="hljs html">&lt;livewire:create-post title="Initial Title" /&gt;</code></pre>
+                            </li>
+                            <li>
+                                or, dynamically,
+                                <pre class="bigger"><code class="hljs html">&lt;livewire:create-post :title="$initialTitle" /&gt;</code></pre>
+                            </li>
+                            <li>
+                                which is received through
+                                <code>public function mount($title = null)</code> in the component
+                            </li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 0.6em;">
+                        Option 2: render as a <em>full-page component</em> (see previous example)
+                        <ul>
+                            <li>
+                                When your component needs a non-default layout:
+                                <pre class="bigger"><code class="hljs">    #[Layout('layouts.app')]
+    public function render()</code></pre>
+                                or
+                                <pre class="bigger"><code class="hljs">    return view('livewire.create-post')
+         -&gt;layout('layouts.app'); </code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Rendering Livewire Components (2)</h2>
+                <ul style="font-size: 80%;">
+                    <li>
+                        Option 2: render as a <em>full-page component</em> (see previous example)
+                        <ul>
+                            <li>
+                                Route parameters
+                                <pre class="bigger"><code class="hljs">Route::get('/posts/{id}', ShowPost::class);</code></pre>
+                                will be accepted by the <code>mount()</code> method
+                                <pre class="bigger"><code class="hljs">class ShowPost extends Component
+{
+    public Post $post;
+
+    public function mount($id)
+    {
+        $this-&gt;post = Post::findOrFail($id);
+    }</code></pre>
+                            </li>
+                            <li>
+                                But you can achieve this by <em>implicit model binding too</em>
+                                <pre class="bigger"><code class="hljs">Route::get('/posts/{post}', ShowPost::class);</code></pre>
+                                <pre class="bigger"><code class="hljs">class ShowPost extends Component
+{
+    public Post $post;
+
+    public function mount(Post $post)
+    {
+        $this-&gt;post = $post;
+    }</code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Adding <code>wire:key</code> to <code>@foreach</code> loops</h2>
+                <ul style="font-size: 80%;">
+                    <li>With the previous example, you can loop over the items of <code>$posts</code> in the view</li>
+                    <li>
+                        But you need to add <code>wire:key</code> (for internal element matching)
+                        <pre class="bigger"><code class="hljs">&lt;div&gt;
+    @foreach ($posts as $post)
+        &lt;div wire:key=&quot;{{ $post-&gt;id }}&quot;&gt;
+            &lt;!-- ... --&gt;
+        &lt;/div&gt;
+    @endforeach
+&lt;/div&gt;</code></pre>
+                    </li>
+                </ul>
+
+            </section>
+
+            <section>
+                <h2>Data binding</h2>
+                <ul style="font-size: 80%;">
+                    <li>Keep component's properties in-sync with inputs/state on the page with <code>wire:model</code>
+                        <pre class="bigger"><code class="hljs">&lt;form&gt;
+    &lt;label for=&quot;title&quot;&gt;Title:&lt;/label&gt;
+
+    &lt;input type=&quot;text&quot; id=&quot;title&quot; wire:model=&quot;title&quot;&gt;
+&lt;/form&gt;</code></pre>
+                    </li>
+                    <li>Want updates as a user types? <code>wire:model.live</code></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Event listeners and actions</h2>
+                <ul style="font-size: 78%;">
+                    <li>
+                        Couple event listeners like
+                        <code>wire:click</code>,
+                        <code>wire:mouseenter</code>,
+                        <code>wire:submit</code> to actions (= methods of your component)
+                        <pre class="bigger"><code class="hljs html">&lt;form wire:submit=&quot;save&quot;&gt;
+    &lt;input type=&quot;text&quot; wire:model=&quot;title&quot;&gt;
+    &lt;textarea wire:model=&quot;content&quot;&gt;&lt;/textarea&gt;
+    &lt;button type=&quot;submit&quot;&gt;Save&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+                        <pre class="bigger"><code class="hljs php">namespace App\Livewire;
+
+use Livewire\Component;
+use App\Models\Post;
+
+class CreatePost extends Component
+{
+    public $title = &apos;&apos;;
+    public $content = &apos;&apos;;
+
+    public function save()
+    {
+        Post::create([
+            &apos;title&apos; =&gt; $this-&gt;title,
+            &apos;content&apos; =&gt; $this-&gt;content,
+        ]);
+        return $this-&gt;redirect('/posts', navigate: true);
+    }
+
+    public function render()
+    {
+        return view(&apos;livewire.create-post&apos;);
+    }
+}</code></pre>
+                    </li>
+                    <li>Listen for specific keys e.g. <code>wire:keydown.enter="searchPosts"</code></li>
+                    <li>Passing parameters: <code>wire:click="delete({{ $post->id }})"</code>, with <em>model binding:</em> <code>public function delete(Post $post)</code></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>More on properties</h2>
+                <ul style="font-size: 80%;">
+
+                    <li>Only common types are allowed for component properties: primitive PHP types, Eloquent model (collection), DateTime, Carbon, Stringable, &hellip;</li>
+                    <li>For other types you need to implement the <code>Wireable</code> interface</li>
+                    <li>
+                        Resetting properties to their initial state:
+                        <pre><code class="hljs php">public function addTodo()
+    {
+        $this-&gt;todos[] = $this-&gt;todo;
+        $this-&gt;reset(&apos;todo&apos;);
+        // all at once: $this-&gt;todos[] = $this-&gt;pull('todo');
+    }</code></pre>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        <strong>Don't trust property values !!!</strong> (even without data binding)
+                        <ul>
+                            <li>
+                                Do not have an <code>$id</code> property on a component for updating a blogpost
+                            </li>
+                            <li>
+                                Unless you lock the property
+                                <pre><code class="hljs php">    #[Locked]
+    public $id;</code></pre>
+                            </li>
+                            <li>IDs of Eloquent model instances are locked automatically</li>
+                            <li>And use validation &hellip;</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Validation</h2>
+                <ul style="width: 100%;">
+                    <li>
+                        The basic validation workflow is very easy:
+                        <pre class="bigger"><code class="hljs">public function save()
+    {
+        $validated = $this-&gt;validate([
+            &apos;title&apos; =&gt; &apos;required|min:3&apos;,
+            &apos;content&apos; =&gt; &apos;required|min:3&apos;,
+        ]);
+        &hellip;</code></pre>
+                        <pre class="bigger"><code class="hljs html">&lt;form wire:submit=&quot;save&quot;&gt;
+    &lt;input type=&quot;text&quot; wire:model=&quot;title&quot;&gt;
+    &lt;div&gt;@error(&apos;title&apos;) {{ $message }} @enderror&lt;/div&gt;
+
+    &lt;textarea wire:model=&quot;content&quot;&gt;&lt;/textarea&gt;
+    &lt;div&gt;@error(&apos;content&apos;) {{ $message }} @enderror&lt;/div&gt;
+
+    &lt;button type=&quot;submit&quot;&gt;Save&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+                    </li>
+                    <li>
+                        Validate on live update by <code>wire:model.live</code> and <code>wire:model.blur</code> and optimize with
+                        <code>wire:model.live.debounce.150ms</code> or <code>wire:model.live.throttle.150ms</code>
+                    </li>
+                    <li>
+                        Multiple alternatives are available for defining the rules:
+                        <a href="https://livewire.laravel.com/docs/validation#validate-attributes">validate attributes</a>,
+                        <a href="https://livewire.laravel.com/docs/validation#defining-a-rules-method">rules()</a> and
+                        <a href="https://livewire.laravel.com/docs/validation#form-objects">form objects</a>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Nesting Components (1)</h2>
+                <ul style="font-size: 90%;width: 100%;">
+                    <li>
+                        For non-interactive (sub)components use <strong>Blade</strong> components
+                    </li>
+                    <li style="margin-top: 1em;">
+                        W.r.t. rendering and props, <em>nested components are "islands"</em>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Lazy loading: avoid that a component delays loading of the entire page:
+                        <pre class="bigger"><code class="hljs html">&lt;livewire:revenue lazy /&gt;</code></pre>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        Passing props (passing $todos, $label and $inline=true)
+                        <pre class="bigger"><code class="hljs html">&lt;livewire:todo-count :todos="$todos" label="Todo Count:" inline/&gt;</code></pre>
+                        when prop name = variable name:
+                        <pre class="bigger"><code class="hljs html">&lt;livewire:todo-count :$todos /&gt;</code></pre>
+                    </li>
+                    <li style="margin-top: 1em;">
+                        <code>:key</code> prop when rendering children in a loop:
+                        <pre class="bigger"><code class="hljs html">@foreach ($todos as $todo)
+    &lt;livewire:todo-item :$todo :key=&quot;$todo-&gt;id&quot; /&gt;
+@endforeach</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Nesting Components (2)</h2>
+                <ul style="font-size: 90%;width: 100%;">
+                    <li>
+                        Making a component reactive to updates to the parent's prop:
+                        <pre class="bigger"><code class="hljs html">&lt;livewire:todo-count :$todos /&gt;</code></pre>
+                        <pre class="bigger"><code class="hljs php">class TodoCount extends Component
+{
+    #[Reactive]
+    public $todos;</code></pre>
+                    </li>
+                    <li>
+                        Accessing a (single) prop from the parent's container:
+                        <pre class="bigger"><code class="hljs php">class TodoList extends Component
+{
+    public $todo = '';</code></pre>
+                        <pre class="bigger"><code class="hljs html">&lt;livewire:todo-input wire:model="todo" /&gt;</code></pre>
+                        <pre class="bigger"><code class="hljs php">class TodoInput extends Component
+{
+    #[Modelable]
+    public $value = '';</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Navigation</h2>
+                <ul>
+                    <li>
+                        SPA-like navigation with <code>wire:navigate</code> (loading bar + DOM patching)
+                        <pre class="bigger"><code class="hljs html">&lt;nav&gt;
+    &lt;a href=&quot;/&quot; wire:navigate&gt;Dashboard&lt;/a&gt;
+    &lt;a href=&quot;/posts&quot; wire:navigate&gt;Posts&lt;/a&gt;
+    &lt;a href=&quot;/users&quot; wire:navigate&gt;Users&lt;/a&gt;
+&lt;/nav&gt;</code></pre>
+                    </li>
+                    <li>
+                        Same behaviour for redirects:
+                        <pre class="bigger"><code class="hljs php">return $this-&gt;redirect('/posts', navigate: true);</code></pre>
+                    </li>
+                    <li>Prefetch on mouse down</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Alpine</h2>
+                <ul style="width: 100%; font-size: 85%;">
+                    <li>
+                        Livewire ships with AplineJS
+                        <pre class="bigger"><code class="hljs html">&lt;div&gt;
+    &lt;h1&gt;{{ $post-&gt;title }}&lt;/h1&gt;
+
+    &lt;div x-data=&quot;{ expanded: false }&quot;&gt;
+        &lt;button type=&quot;button&quot; x-on:click=&quot;expanded = ! expanded&quot;&gt;
+            &lt;span x-show=&quot;! expanded&quot;&gt;Show post content...&lt;/span&gt;
+            &lt;span x-show=&quot;expanded&quot;&gt;Hide post content...&lt;/span&gt;
+        &lt;/button&gt;
+
+        &lt;div x-show=&quot;expanded&quot;&gt;
+            {{ $post-&gt;content }}
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+                    </li>
+                    <li>
+                        Interact with Livewire through the <code>$wire</code> object
+                        <pre class="bigger"><code class="hljs html">&lt;form wire:submit=&quot;save&quot;&gt;
+    &lt;input wire:model=&quot;title&quot; type=&quot;text&quot; x-on:blur=&quot;$wire.save()&quot;&gt;
+    &lt;button type=&quot;button&quot; x-on:click=&quot;$wire.title = &apos;&apos;&quot;&gt;Clear&lt;/button&gt;
+    Character count: &lt;span x-text=&quot;$wire.content.length&quot;&gt;&lt;/span&gt; </code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Adding some JavaScript</h2>
+                <ul style="font-size: 80%;">
+                    <li>Use <code>@script</code> in your component for JavaScript to be executed each time your component is initilized</li>
+                    <li>Use <code>@assets</code> in your component for JavaScript or CSS <a href="https://livewire.laravel.com/docs/components#loading-assets">that is required to load once on the page</a></li>
+                    <li>
+                        Define <a href="https://livewire.laravel.com/docs/actions#javascript-actions">JavaScript actions</a> inside <code>@script</code>
+                        by the <code>$js()</code> function:
+                        <pre class="bigger"><code class="hljs js">$js('bookmark', () => {</code></pre>
+                    </li>
+                    <li>Call JavaScript actions from Alpine like this: <code>$wire.$js.bookmark()</code></li>
+                    <li>Call JavaScript actions from your component like this: <code>$this-&gt;js('onPostSaved'); </code></li>
+                    <li>While navigating, <code>&lt;script&gt;</code>s in the <code>&lt;head&gt;</code> are loaded once, and in the <code>&lt;body&gt;</code> every time</li>
+                    <li>
+                        In order to run code on each "page visit"
+                        <pre class="bigger"><code class="hljs js">document.addEventListener('livewire:navigated', () =&gt; { </code></pre>
+                    </li>
+                </ul>x
+            </section>
+
+
+        </section>
+        <section>
+            <section>
+                <h2>12.6<br>Conclusion</h2>
+            </section>
+
+            <section data-background="#fdfdfd">
+                <h2>Comparison</h2>
+                <table style="font-size: 60%;">
+                    <thead>
+                    <tr>
+                        <th>Technology</th>
+                        <th>Rendering</th>
+                        <th>JS Involved</th>
+                        <th>API Needed?</th>
+                        <th>Server Response Type</th>
+                        <th>Description</th>
+                        <th>Key Tech</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><strong>Traditional SPA</strong></td>
+                        <td>Client-side</td>
+                        <td>High</td>
+                        <td>✅ Yes</td>
+                        <td><strong>JSON</strong> (via REST or GraphQL)</td>
+                        <td>Decoupled frontend/backend; communicates via API.</td>
+                        <td>Vue/React + REST/GraphQL</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HTMX</strong></td>
+                        <td>Server-rendered partials</td>
+                        <td>Very Light</td>
+                        <td>❌ No</td>
+                        <td><strong>HTML fragments</strong></td>
+                        <td>HTML-over-the-wire; backend renders HTML snippets to be swapped in the DOM.</td>
+                        <td>Any backend + HTMX</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Livewire</strong></td>
+                        <td>Server-side (reactive)</td>
+                        <td>Light</td>
+                        <td>❌ No</td>
+                        <td><strong>HTML + JSON (diffs)</strong></td>
+                        <td>Server renders Blade views; diffs sent via JSON for DOM patching.</td>
+                        <td>PHP (Livewire)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Inertia.js</strong></td>
+                        <td>Client-side SPA with server routing</td>
+                        <td>Medium</td>
+                        <td>❌ No</td>
+                        <td><strong>JSON</strong> (page props & component name)</td>
+                        <td>Server sends page data as JSON; frontend renders via Vue/React.</td>
+                        <td>Laravel + Vue/React/Svelte + Inertia</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fusion</strong></td>
+                        <td>Client-side SPA with inline PHP logic</td>
+                        <td>Medium-High</td>
+                        <td>❌ No</td>
+                        <td><strong>JSON</strong> (via inline PHP execution)</td>
+                        <td>Write PHP directly inside Vue/React components; no API/controller needed.</td>
+                        <td>Vue/React + PHP (Fusion)</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </section>
+
+        </section>
+
+        <!-- The END -->
+        <section>
+            <section>
+                <h2>Questions?</h2>
+                <footer>
+                    <em><a href="http://www.ikdoeict.be/">ikdoeict.be</a> &mdash; <a href="mailto:joris.maervoet@odisee.be">joris.maervoet@odisee.be</a></em>
+                </footer>
+            </section>
+            <section>
+                <h2>Sources</h2>
+            </section>
+        </section>
+
+
+    </div>
+
+</div>
+
+<script src="dist/reveal.js"></script>
+<script src="plugin/zoom/zoom.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/search/search.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script>
+
+    // Also available as an ES module, see:
+    // https://revealjs.com/initialization/
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        center: true,
+        hash: true,
+        slideNumber: true,
+
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [ RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight ]
+    });
+
+
+</script>
+<script src="toc.js"></script>
+<script src="overlay.js"></script>
+
+</body>
+</html>
